@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#090909">
+  <meta name="description" content="Arquivo de investigação Futuros Creators — acesso restrito.">
+  <title>FC // Arquivo de Investigação</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="arg.css">
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#inicio" aria-label="Futuros Creators — início">
+      <span class="brand-mark">FC<span>/</span></span>
+      <span class="brand-copy">FUTUROS CREATORS<small>ARQUIVO DE INVESTIGAÇÃO</small></span>
+    </a>
+    <div class="top-status"><i></i><span>SISTEMA INSTÁVEL</span><b id="clock">00:00:00</b></div>
+  </header>
+
+  <main id="inicio">
+    <section class="hero">
+      <div class="eyebrow"><span class="red-dot"></span> TRANSMISSÃO INTERROMPIDA <span class="line"></span> REF. FC-02</div>
+      <h1>ALGUÉM ESTÁ<br><em>DENTRO.</em></h1>
+      <p class="hero-lead">O grupo não foi o primeiro alvo. E Naoy não começou a agir sozinho.</p>
+      <div class="hero-meta">
+        <span>CASO Nº 02-NAO</span><span>STATUS: NÃO RESOLVIDO</span><span>ACESSO: PARCIAL</span>
+      </div>
+      <div class="hero-warning"><span>!</span><p>Este arquivo foi recuperado de um diretório danificado. Algumas informações podem estar incompletas ou fora de ordem.</p></div>
+    </section>
+
+    <section class="workspace">
+      <aside class="sidebar">
+        <div class="side-label">ÍNDICE DO CASO</div>
+        <button class="nav-item active" data-target="terminal"><span>01</span> Terminal de acesso <b>›</b></button>
+        <button class="nav-item locked" data-target="arquivo-01" id="nav-file-01"><span>02</span> Registro de atividade <b>▰</b></button>
+        <button class="nav-item locked" data-target="arquivo-02" id="nav-file-02"><span>03</span> Comunicação recuperada <b>▰</b></button>
+        <button class="nav-item locked" data-target="arquivo-03" id="nav-file-03"><span>04</span> Diretório NOX <b>▰</b></button>
+        <div class="side-progress">
+          <div class="side-label">PROGRESSO LOCAL <strong id="progress-number">0%</strong></div>
+          <div class="progress-track"><span id="progress-bar"></span></div>
+          <small>O progresso individual é salvo neste dispositivo.</small>
+        </div>
+        <div class="side-note">FC / SEGURANÇA INTERNA<br>Não distribua credenciais reais.</div>
+      </aside>
+
+      <div class="content">
+        <section class="panel active-panel" id="terminal">
+          <div class="panel-head"><div><span class="file-type">CONSOLE // 001</span><h2>Terminal de acesso</h2></div><span class="pill pill-red">ACESSO LIMITADO</span></div>
+          <p class="muted">Uma sessão antiga permaneceu aberta. Há uma mensagem no buffer, mas o conteúdo foi fragmentado.</p>
+          <div class="terminal-window">
+            <div class="terminal-bar"><span></span><span></span><span></span><small>fc_recovery.exe</small></div>
+            <div class="terminal-body" id="terminal-output">
+              <p class="terminal-dim">FUTUROS CREATORS // RECOVERY CONSOLE v2.4</p>
+              <p class="terminal-dim">Verificando integridade dos arquivos...</p>
+              <p class="terminal-ok">[OK] 1 diretório recuperado</p>
+              <p class="terminal-alert">[AVISO] 3 registros permanecem bloqueados</p>
+              <p>Há uma frase repetida no arquivo de log:</p>
+              <p class="clue">“O começo está no que todos ignoraram.”</p>
+              <p class="prompt-line">_ aguardando entrada<span class="cursor"></span></p>
+            </div>
+          </div>
+          <form id="code-form" class="code-form" autocomplete="off">
+            <label for="code-input">INSIRA A CHAVE DE RECUPERAÇÃO</label>
+            <div class="input-row"><input id="code-input" name="code" type="text" placeholder="DIGITE O CÓDIGO..." maxlength="48" spellcheck="false" required><button type="submit">VALIDAR <span>↗</span></button></div>
+            <p class="form-hint" id="form-feedback" aria-live="polite">Dica: observe a frase acima. Nem toda pista é uma senha explícita.</p>
+          </form>
+          <div class="micro-hint"><span>NOTA DO SISTEMA</span><p>Se uma informação parece deslocada, talvez ela esteja na ordem errada. Não confie apenas na primeira leitura.</p></div>
+        </section>
+
+        <section class="panel document-panel" id="arquivo-01">
+          <div class="panel-head"><div><span class="file-type">DOCUMENTO // 002</span><h2>Registro de atividade</h2></div><span class="pill">RECUPERADO</span></div>
+          <div class="paper">
+            <div class="paper-top"><span>FUTUROS CREATORS</span><span>FC-LOG-014</span></div>
+            <h3>RELATÓRIO DE MOVIMENTAÇÃO</h3>
+            <p class="paper-sub">Classificação: interno · Integridade: 71%</p>
+            <div class="redacted-line"><span>DATA</span><b>██ / ██ / ____</b></div>
+            <p>Nas semanas anteriores ao incidente, houve um aumento incomum de atividade em horários nos quais o grupo costumava permanecer silencioso.</p>
+            <p>O padrão não aponta para uma única conversa. Aponta para observação contínua.</p>
+            <blockquote>“Ele fazia perguntas que pareciam normais. Só depois percebemos que já sabia as respostas.”</blockquote>
+            <p class="paper-mark">ANOTAÇÃO À MÃO: <strong>compare os horários, não os nomes.</strong></p>
+            <div class="paper-footer">CÓPIA PARCIAL // NÃO É UM REGISTRO REAL DE CONTA</div>
+          </div>
+          <form class="code-form secondary-form" data-stage="1">
+            <label for="code-2">CHAVE ENCONTRADA NO DOCUMENTO</label>
+            <div class="input-row"><input id="code-2" type="text" placeholder="PRÓXIMO CÓDIGO..." maxlength="48" required><button type="submit">VALIDAR ↗</button></div>
+            <p class="form-hint" aria-live="polite">A anotação é uma instrução. Use-a para interpretar a pista do terminal.</p>
+          </form>
+        </section>
+
+        <section class="panel document-panel" id="arquivo-02">
+          <div class="panel-head"><div><span class="file-type">PACOTE // 003</span><h2>Comunicação recuperada</h2></div><span class="pill pill-red">CONTEÚDO CORROMPIDO</span></div>
+          <div class="chat-log">
+            <div class="chat-date">[ TRECHO DE CONVERSA RECUPERADO ]</div>
+            <div class="message"><span class="sender">CREATORGIRL</span><p>Você está estranho ultimamente. Aconteceu alguma coisa?</p><time>16:08</time></div>
+            <div class="message suspicious"><span class="sender">NAOY</span><p>Vocês demoram muito para perceber as coisas.</p><time>16:09</time></div>
+            <div class="message"><span class="sender">YOAN</span><p>Perceber o quê? Do que você está falando?</p><time>16:09</time></div>
+            <div class="message corrupted"><span class="sender">NAOY // DADOS DANIFICADOS</span><p>██████ ███ ██████. O acesso nunca foi sobre vocês.</p><time>16:10</time></div>
+            <div class="message system-message"><span class="sender">SISTEMA</span><p>4 mensagens não puderam ser recuperadas.</p><time>—</time></div>
+          </div>
+          <div class="evidence-box"><span>FRAGMENTO DE METADADOS</span><code>sender_id: N_A_O_Y<br>relay: [REMOVIDO]<br>destination: N O X</code></div>
+          <form class="code-form secondary-form" data-stage="2">
+            <label for="code-3">IDENTIFIQUE O DESTINO</label>
+            <div class="input-row"><input id="code-3" type="text" placeholder="NOME OU CÓDIGO..." maxlength="48" required><button type="submit">VALIDAR ↗</button></div>
+            <p class="form-hint" aria-live="polite">O fragmento não está tentando esconder o nome. Está tentando confirmar para onde os dados eram enviados.</p>
+          </form>
+        </section>
+
+        <section class="panel document-panel" id="arquivo-03">
+          <div class="panel-head"><div><span class="file-type">DIRETÓRIO // 004</span><h2>Diretório NOX</h2></div><span class="pill pill-red">ACESSO RESTRITO</span></div>
+          <div class="sealed-file">
+            <div class="seal">FC<span>×</span>NX</div>
+            <span class="file-type">ÚLTIMO PACOTE DISPONÍVEL</span>
+            <h3>O GRUPO ERA APENAS A PORTA.</h3>
+            <p>O arquivo final ainda não foi reconstruído. Uma parte da comunidade precisa encontrar a chave que falta.</p>
+            <div class="final-fragment">“Quando duas versões da mesma história se contradizem, procure aquilo que ambas tentaram apagar.”</div>
+          </div>
+          <div class="community-box">
+            <div><span class="file-type">MARCO COLETIVO</span><h3>Protocolo de convergência</h3></div>
+            <p>Quando a comunidade encontrar a chave coletiva, ela poderá ser inserida aqui. Nesta versão demonstrativa, o marco é validado localmente; a sincronização real entre jogadores exige um pequeno backend.</p>
+            <form id="collective-form" class="code-form">
+              <label for="collective-code">CHAVE DA COMUNIDADE</label>
+              <div class="input-row"><input id="collective-code" type="text" placeholder="CHAVE COLETIVA..." maxlength="48" required><button type="submit">ENVIAR ↗</button></div>
+              <p class="form-hint" id="collective-feedback" aria-live="polite">A chave coletiva será revelada pela organização do ARG.</p>
+            </form>
+          </div>
+        </section>
+      </div>
+    </section>
+    <footer><span>FUTUROS CREATORS © <span id="year"></span></span><span>ARQUIVO FICCIONAL · ARG LORE 2</span><span class="footer-status">SESSÃO MONITORADA</span></footer>
+  </main>
+  <script src="arg.js"></script>
+</body>
+</html>
