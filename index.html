@@ -246,19 +246,13 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
 
 /* ---------- Yoan News ---------- */
 .secao.ceu { background: var(--ceu); }
-.jornal { display: grid; grid-template-columns: minmax(220px, .55fr) 1.45fr; gap: 56px; align-items: start; }
-.jornal-foto { position: sticky; top: 24px; transform: rotate(-3deg); }
-.jornal-foto img {
-    display: block; width: 100%; height: auto;
-    filter: drop-shadow(8px 8px 0 var(--tinta));
+.jornal { max-width: 980px; }
+.jornal-foto {
+    margin: 0 0 30px; overflow: hidden; transform: rotate(-1deg);
+    border: 6px solid var(--tinta); border-radius: 26px; box-shadow: 12px 12px 0 var(--uva);
 }
-.sem-foto-letra { display: none; }
-.jornal-foto.sem-foto img { display: none; }
-.jornal-foto.sem-foto .sem-foto-letra {
-    display: grid; place-items: center; aspect-ratio: 1; border-radius: 50%;
-    font: 400 min(9rem, 30vw)/1 var(--titulo); color: #fff;
-    background: var(--rosa); border: 6px solid var(--tinta); box-shadow: 8px 8px 0 var(--tinta);
-}
+.jornal-foto img { display: block; width: 100%; height: auto; }
+.jornal-foto.sem-foto { display: none; }
 .jornal-corpo .intro { margin-bottom: 28px; }
 .edicao {
     padding: 30px 32px; background: #fff;
@@ -322,8 +316,7 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
     .setas { display: none; }
     .fita { --altura: 290px; gap: 20px; }
     .adesivo { -webkit-text-stroke-width: 7px; }
-    .jornal { grid-template-columns: 1fr; gap: 28px; }
-    .jornal-foto { position: static; width: min(240px, 62%); margin: 0 auto; }
+    .jornal-foto { margin: 0 6px 26px; box-shadow: 8px 8px 0 var(--uva); }
     .edicao { padding: 22px; box-shadow: 7px 7px 0 var(--uva); }
     .equipe-grade { gap: 24px; }
 }
@@ -383,12 +376,11 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
 <section class="secao ceu" id="yoan-news">
     <div class="miolo jornal">
         <div class="jornal-foto" id="yoan-foto">
-            <img src="yoan.png" alt="Yoan, o repórter do Yoan News" width="600" height="600">
-            <span class="sem-foto-letra" aria-hidden="true">Y</span>
+            <img src="yoan.jpg" alt="Yoan News, com a Yoan de armadura dourada" width="1280" height="720">
         </div>
         <div class="jornal-corpo">
-            <h2 class="adesivo">Yoan News</h2>
-            <p class="intro">As novidades do grupo, contadas pelo Yoan. Toda edição nova aparece aqui.</p>
+            <h2 class="sr-only">Yoan News</h2>
+            <p class="intro">As novidades do grupo, contadas pela Yoan. Toda edição nova aparece aqui.</p>
             <article class="edicao" id="noticia-atual" hidden>
                 <p class="edicao-info"><span class="selo" id="noticia-selo"></span><time id="noticia-data"></time></p>
                 <h3 id="noticia-titulo"></h3>
