@@ -87,6 +87,7 @@ N_14:"NOME PARCIAL: NA.",
 N_404:"NOME NÃO ENCONTRADO.",
 "N-14-1-15-25":"REGISTRO: NAOY.",
 "Y-25-15-1-14":"REGISTRO: YOAN.",
+YOANNEWS:"YOAN NEWS — arquivo encontrado.",
 "YOAN NEWS":"YOAN NEWS — arquivo encontrado.",
 YOAN_NEWS:"Última publicação localizada.",
 NEWS_001:"PUBLICAÇÃO ARQUIVADA.",
@@ -103,6 +104,43 @@ NEWS_DELETED:"Esta notícia foi apagada por alguém.",
 NEWS_MISSING:"A notícia desapareceu. O registro permaneceu.",
 NEWS_LAST:"Você chegou tarde demais.",
 NEWS_FINAL:"Esta não é a última notícia.",
+ACADEMY_ARCHIVE:"Um nome foi removido deste registro.",
+ACADEMY_MISSING:"Este aluno nunca deveria ter existido.",
+ACADEMY_404:"A aula terminou. A investigação não.",
+ACADEMY:"Bem-vindo à Futuros Academy.",
+ACADEMY_01:"A primeira lição: observe.",
+ACADEMY_02:"A segunda lição: não confie em tudo que vê.",
+ACADEMY_03:"A terceira lição: procure os detalhes.",
+ACADEMY_07:"Você já viu este nome antes.",
+ACADEMY_14:"O arquivo foi alterado.",
+ACADEMY_TEST:"RESULTADO: APROVADO.",
+ACADEMY_FINAL:"RESULTADO: INCONCLUSIVO.",
+ACADEMY_STUDENT:"Aluno: [DADOS REMOVIDOS]",
+ACADEMY_TEACHER:"Professor: [DADOS REMOVIDOS]",
+FUTUROS:"O futuro começa onde o passado terminou.",
+FUTUROS_CREATORS:"Nem todo creator está aqui para criar.",
+FC_001:"Registro encontrado.",
+FC_002:"Registro encontrado.",
+FC_007:"Este arquivo ainda está sendo atualizado.",
+FC_014:"Algumas coisas foram esquecidas.",
+FC_ARCHIVE:"ARQUIVO FUTUROS — acesso permitido.",
+FC_404:"Este registro não deveria existir.",
+FUTURE_01:"O futuro parece diferente quando você conhece o passado.",
+CREATORS_01:"Todos possuem um nome.",
+CREATORS_07:"Alguns possuem mais de um.",
+ARCHIVE_14:"DOIS NOMES. UM REGISTRO.",
+ARCHIVE_15:"DOIS REGISTROS. UMA PRESENÇA.",
+ARCHIVE_16:"Você encontrou a primeira metade.",
+ARCHIVE_17:"A segunda metade está escondida.",
+ARCHIVE_21:"NAOY.",
+ARCHIVE_404:"NOX.",
+FILE_001:"Nome: NAOY.",
+FILE_002:"Nome: NOX.",
+FILE_003:"Os registros correspondem.",
+FILE_007:"Mesma assinatura.",
+FILE_014:"Mesma presença.",
+FILE_021:"Mesma pessoa?",
+FILE_FINAL:"SIM.",
 "/14":"Y O A N"
 };
 const BIG=new Set(["FINAL_NAME","FINAL_IDENTITY","FINAL_TRUTH","LAST_NAME","LAST_RECORD","LAST_ARCHIVE","LAST_MESSAGE","FINAL_01","FINAL_02","FINAL_03","FINAL_07","FINAL_14","FINAL_21"]);
@@ -113,7 +151,10 @@ function run(raw){
   const c=document.createElement("div");
   c.innerHTML='<span class="ps">$</span> <span class="cmd"></span>';
   c.lastChild.textContent=raw;term.insertBefore(c,row);
-  const k=raw.trim().toUpperCase(), l=raw.trim().toLowerCase();
+  const l=raw.trim().toLowerCase();
+  let k=raw.trim().toUpperCase().replace(/["“”'`]/g,"").replace(/\s+/g," ");
+  if(!R[k]){const alt=[k.replace(/ /g,"_"),k.replace(/ /g,""),k.replace(/–|—/g,"-"),k.replace(/_/g," ")];
+    for(const a of alt){if(R[a]){k=a;break;}}}
   if(!k)return;
   if(l==="date"){const n=new Date();n.setFullYear(2002,9,11);n.setHours(9,52,19);
     line("","2002-10-11 09:52:19");return;}
