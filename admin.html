@@ -70,6 +70,10 @@ textarea { width: 100%; padding: .6em .8em; font: 600 1rem/1.5 var(--texto); col
 .form-caixa.largo { grid-template-columns: 1fr; align-items: start; }
 .form-caixa .inteira { grid-column: 1 / -1; }
 td.quebra { max-width: 320px; overflow-wrap: anywhere; }
+.foto-linha { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.foto-linha img, img.mini { width: 56px; height: 56px; object-fit: cover; border: 3px solid var(--tinta); border-radius: 50%; }
+.foto-linha input[type=file] { flex: 1 1 200px; min-width: 0; font: 600 .95rem var(--texto); }
+img.mini { width: 36px; height: 36px; margin-right: 8px; vertical-align: middle; border-width: 2px; }
 
 </style>
 </head>
@@ -168,6 +172,8 @@ td.quebra { max-width: 320px; overflow-wrap: anywhere; }
                     <select id="e-plat"><option>YouTube</option><option>TikTok</option><option>Instagram</option></select></div>
                 <div><label for="e-link">Link do canal</label><input id="e-link" type="text" autocomplete="off" autocapitalize="none" placeholder="https://youtube.com/@canal"></div>
                 <div><label for="e-desc">Frase curta <small>opcional, até 200 letras</small></label><input id="e-desc" type="text" maxlength="200" autocomplete="off"></div>
+                <div class="inteira"><label for="e-foto">Foto do canal <small>opcional: escolha na galeria</small></label>
+                    <div class="foto-linha"><img id="e-prev" alt="Prévia da foto" hidden><input id="e-foto" type="file" accept="image/*"><button type="button" id="e-foto-x" hidden>Tirar foto</button></div></div>
                 <div class="btns"><button type="submit" class="rosa" id="e-salvar">Adicionar pessoa</button><button type="button" id="e-cancelar" hidden>Cancelar edição</button></div>
             </form>
             <p class="nota" id="e-msg" role="status"></p>
@@ -277,7 +283,7 @@ td.quebra { max-width: 320px; overflow-wrap: anywhere; }
 
     var S = {
         token: ler('fc_token'), usuario: '', lider: false, online: [],
-        insc: [], videos: [], admins: [], noticias: [], equipe: [], editNoticia: null, editEquipe: null,
+        insc: [], videos: [], admins: [], noticias: [], equipe: [], editNoticia: null, editEquipe: null, fotoNova: null,
         filtro: '', apagando: null, editId: null, redefinirId: null, aba: 'inscricoes', timer: null
     };
 
@@ -588,7 +594,29 @@ td.quebra { max-width: 320px; overflow-wrap: anywhere; }
         return FC.rpc('publico_equipe').then(function (l) { S.equipe = l || []; desenharEquipe(); }).catch(function () {});
     }
     var fe = $('#form-equipe'), emsg = $('#e-msg');
+    var prev = $('#e-prev'), fotoIn = $('#e-foto'), fotoX = $('#e-foto-x');
+    function mostrarFoto(src) {
+        prev.hidden = !src; fotoX.hidden = !src;
+        if (src) prev.src = src; else prev.removeAttribute('src');
+    }
+    fotoIn.addEventListener('change', function () {
+        var arq = fotoIn.files && fotoIn.files[0]; if (!arq) return;
+        if (!/^image\//.test(arq.type)) { emsg.textContent = 'Escolha um arquivo de imagem.'; fotoIn.value = ''; return; }
+        var url = URL.createObjectURL(arq), img = new Image();
+        img.onload = function () {
+            var lado = Math.min(img.naturalWidth, img.naturalHeight), cv = document.createElement('canvas');
+            cv.width = cv.height = 240;
+            var ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 240, 240);
+            ctx.drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, 240, 240);
+            URL.revokeObjectURL(url);
+            S.fotoNova = cv.toDataURL('image/jpeg', 0.82); mostrarFoto(S.fotoNova); emsg.textContent = '';
+        };
+        img.onerror = function () { URL.revokeObjectURL(url); emsg.textContent = 'Não consegui abrir essa imagem. Tente outra.'; fotoIn.value = ''; };
+        img.src = url;
+    });
+    fotoX.addEventListener('click', function () { S.fotoNova = ''; fotoIn.value = ''; mostrarFoto(null); });
     function limparEquipe() {
+        S.fotoNova = null; fotoIn.value = ''; mostrarFoto(null);
         S.editEquipe = null; fe.reset();
         $('#e-salvar').textContent = 'Adicionar pessoa'; $('#e-cancelar').hidden = true;
     }
@@ -602,7 +630,7 @@ td.quebra { max-width: 320px; overflow-wrap: anywhere; }
         var b = $('#e-salvar'); b.disabled = true;
         var editando = !!S.editEquipe;
         chamar('admin_equipe_salvar', {
-            p_id: S.editEquipe, p_nome: nome, p_canal: canal, p_plataforma: $('#e-plat').value, p_link: link, p_descricao: $('#e-desc').value.trim()
+            p_id: S.editEquipe, p_nome: nome, p_canal: canal, p_plataforma: $('#e-plat').value, p_link: link, p_descricao: $('#e-desc').value.trim(), p_foto: S.fotoNova
         }).then(function () {
             limparEquipe(); emsg.textContent = editando ? 'Pessoa atualizada.' : 'Pessoa adicionada. Já está no site.';
             return carregarEquipe();
@@ -615,7 +643,9 @@ td.quebra { max-width: 320px; overflow-wrap: anywhere; }
         S.equipe.forEach(function (p) {
             var tr = document.createElement('tr');
             function td() { var t = document.createElement('td'); tr.appendChild(t); return t; }
-            td().appendChild(criar('strong', null, p.nome));
+            var tn = td();
+            if (/^data:image\/jpeg;base64,/.test(p.foto || '')) { var mi = criar('img', 'mini'); mi.alt = ''; mi.src = p.foto; tn.appendChild(mi); }
+            tn.appendChild(criar('strong', null, p.nome));
             td().textContent = p.canal;
             td().textContent = p.plataforma;
             var ac = criar('div', 'acoes'); td().appendChild(ac);
@@ -623,6 +653,7 @@ td.quebra { max-width: 320px; overflow-wrap: anywhere; }
             ed.addEventListener('click', function () {
                 S.editEquipe = p.id; $('#e-nome').value = p.nome; $('#e-canal').value = p.canal;
                 $('#e-plat').value = p.plataforma; $('#e-link').value = p.link; $('#e-desc').value = p.descricao || '';
+                S.fotoNova = null; fotoIn.value = ''; mostrarFoto(/^data:image\/jpeg;base64,/.test(p.foto || '') ? p.foto : null);
                 $('#e-salvar').textContent = 'Salvar alterações'; $('#e-cancelar').hidden = false;
                 emsg.textContent = 'Editando ' + p.nome + '.';
                 fe.scrollIntoView({ block: 'center' });
