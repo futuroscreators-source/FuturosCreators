@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yoan News vem aí | Futuros Creators</title>
+<meta name="description" content="Yoan News, Nox News e o que está por vir no site do Futuros Creators.">
+<meta name="theme-color" content="#17101F">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+    --sol: #FFC93C;
+    --sol-claro: #FFD966;
+    --uva: #2B0A57;
+    --rosa: #FF4FA3;
+    --ceu: #35D6E0;
+    --tinta: #17101F;
+    --papel: #FFF6DD;
+    --titulo: 'Lilita One', 'Trebuchet MS', sans-serif;
+    --texto: 'Nunito', system-ui, sans-serif;
+    /* 0 = começo da contagem, 1 = Nox chegou. O JavaScript atualiza. */
+    --noite: 0;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+    margin: 0;
+    font: 500 1.0625rem/1.55 var(--texto);
+    color: #fff;
+    background: var(--tinta);
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+}
+a { color: inherit; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 4px solid var(--ceu); outline-offset: 3px; }
+
+/* ---------- Fundo: os raios do site sendo engolidos pela noite ---------- */
+.raios {
+    position: fixed; left: 50%; top: 50%;
+    width: 260vmax; height: 260vmax; margin: -130vmax 0 0 -130vmax;
+    background: repeating-conic-gradient(var(--sol-claro) 0 6deg, var(--sol) 6deg 12deg);
+    animation: girar 160s linear infinite;
+    z-index: 0;
+}
+@keyframes girar { to { transform: rotate(360deg); } }
+.noite {
+    position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background:
+        radial-gradient(circle at 50% 45%, rgba(23,16,31,0) 0 18%, rgba(23,16,31,.55) 70%),
+        var(--tinta);
+    opacity: var(--noite);
+    transition: opacity 1s linear;
+}
+
+/* ---------- Palco ---------- */
+.palco {
+    position: relative; z-index: 2;
+    min-height: 100%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 28px;
+    padding: 32px 20px 56px;
+    text-align: center;
+}
+
+.adesivo {
+    margin: 0;
+    font: 400 clamp(2.6rem, 9vw, 5.6rem)/1 var(--titulo);
+    color: #fff;
+    -webkit-text-stroke: 10px var(--tinta);
+    paint-order: stroke fill;
+    text-shadow: 5px 6px 0 var(--tinta);
+    transform: rotate(-2deg);
+}
+.subtitulo {
+    max-width: 30em; margin: 0;
+    font-size: clamp(1.05rem, 2.6vw, 1.3rem); font-weight: 800;
+    padding: .6em 1.1em;
+    background: #fff; color: var(--tinta);
+    border: 4px solid var(--tinta); border-radius: 18px;
+    box-shadow: 0 6px 0 var(--tinta);
+}
+
+/* ---------- Relógio ---------- */
+.relogio {
+    display: flex; align-items: flex-start; justify-content: center;
+    gap: clamp(8px, 2vw, 18px);
+}
+.bloco {
+    min-width: clamp(84px, 22vw, 168px);
+    padding: .15em .2em .35em;
+    background: var(--uva);
+    border: 5px solid var(--tinta); border-radius: 22px;
+    box-shadow: 0 8px 0 var(--tinta), 10px 12px 0 var(--rosa);
+}
+.bloco b {
+    display: block;
+    font: 400 clamp(3.2rem, 14vw, 7.5rem)/1.1 var(--titulo);
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+}
+.bloco span {
+    display: block; margin-top: -.2em;
+    font-weight: 800; font-size: clamp(.8rem, 2.4vw, 1.05rem);
+    color: var(--sol);
+}
+.dois-pontos {
+    align-self: center; padding-bottom: .6em;
+    font: 400 clamp(2.4rem, 9vw, 4.6rem)/1 var(--titulo);
+    color: var(--tinta); -webkit-text-stroke: 0;
+    text-shadow: 0 0 0 transparent;
+}
+body.escuro .dois-pontos { color: #fff; }
+
+/* ---------- Barra ---------- */
+.barra-bloco { width: min(640px, 100%); }
+.barra {
+    height: 26px; padding: 3px;
+    background: #fff; border: 4px solid var(--tinta); border-radius: 999px;
+    box-shadow: 0 5px 0 var(--tinta);
+    overflow: hidden;
+}
+.barra i {
+    display: block; height: 100%; width: 0%;
+    background: var(--rosa); border-radius: 999px;
+    transition: width 1s linear;
+}
+.barra-texto {
+    margin: 14px 0 0; font-weight: 800;
+    padding: .2em .8em; display: inline-block;
+    background: var(--tinta); border-radius: 999px;
+}
+
+/* ---------- Botão ---------- */
+.botao {
+    display: inline-block;
+    padding: .7em 1.4em;
+    font: 400 1.25rem/1 var(--titulo);
+    text-decoration: none;
+    border: 4px solid var(--tinta); border-radius: 999px;
+    box-shadow: 0 6px 0 var(--tinta);
+    background: #fff; color: var(--tinta);
+    transition: transform .12s, box-shadow .12s;
+}
+.botao:hover { transform: translateY(2px); box-shadow: 0 4px 0 var(--tinta); }
+.botao:active { transform: translateY(6px); box-shadow: 0 0 0 var(--tinta); }
+.botao.rosa { background: var(--rosa); color: #fff; }
+
+.voltar {
+    position: fixed; top: 16px; left: 16px; z-index: 5;
+    padding: .45em 1.05em; font-weight: 800; text-decoration: none;
+    background: #fff; color: var(--tinta);
+    border: 3px solid var(--tinta); border-radius: 999px; box-shadow: 0 4px 0 var(--tinta);
+}
+.voltar:hover { background: var(--papel); }
+
+/* ---------- Nox chegou ---------- */
+body.invadido .raios { filter: grayscale(1) brightness(.12); animation-duration: 20s; }
+body.invadido .noite { opacity: 1; transition: none; }
+body.invadido .adesivo { color: var(--rosa); animation: tremer .35s steps(2) infinite; }
+.glitch { position: relative; display: inline-block; }
+body.invadido .glitch::before,
+body.invadido .glitch::after {
+    content: attr(data-texto);
+    position: absolute; inset: 0;
+    -webkit-text-stroke: 0; text-shadow: none;
+}
+body.invadido .glitch::before { color: var(--ceu); animation: corte1 1.4s steps(1) infinite; }
+body.invadido .glitch::after  { color: var(--sol); animation: corte2 1.1s steps(1) infinite; }
+@keyframes tremer {
+    0%   { transform: rotate(-2deg) translate(0, 0); }
+    50%  { transform: rotate(-2deg) translate(3px, -2px); }
+}
+@keyframes corte1 {
+    0%, 100% { clip-path: inset(0 0 100% 0); transform: translate(0); }
+    20% { clip-path: inset(10% 0 60% 0); transform: translate(-8px, 0); }
+    60% { clip-path: inset(55% 0 15% 0); transform: translate(6px, 0); }
+}
+@keyframes corte2 {
+    0%, 100% { clip-path: inset(100% 0 0 0); transform: translate(0); }
+    30% { clip-path: inset(65% 0 5% 0); transform: translate(8px, 0); }
+    70% { clip-path: inset(20% 0 50% 0); transform: translate(-6px, 0); }
+}
+
+/* ---------- Telas pequenas e movimento reduzido ---------- */
+@media (max-width: 520px) {
+    .adesivo { -webkit-text-stroke-width: 7px; }
+    .bloco { border-width: 4px; border-radius: 16px; box-shadow: 0 6px 0 var(--tinta), 6px 8px 0 var(--rosa); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .raios, body.invadido .raios { animation: none; }
+    body.invadido .adesivo { animation: none; }
+    body.invadido .glitch::before, body.invadido .glitch::after { display: none; }
+    .barra i, .noite { transition: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="raios" aria-hidden="true"></div>
+<div class="noite" aria-hidden="true"></div>
+
+<a class="voltar" href="index.html">Voltar ao site</a>
+
+<main class="palco">
+    <h1 class="adesivo glitch" id="titulo" data-texto="Yoan News vem aí">Yoan News vem aí</h1>
+    <p class="subtitulo" id="subtitulo">O Yoan News acontece às 17:40 na página principal (futuroscreators.site).</p>
+
+    <div class="relogio" id="relogio" role="timer" aria-live="off" aria-label="Tempo até a invasão do Nox">
+        <div class="bloco"><b id="hh">00</b><span>horas</span></div>
+        <div class="dois-pontos" aria-hidden="true">:</div>
+        <div class="bloco"><b id="mm">00</b><span>minutos</span></div>
+        <div class="dois-pontos" aria-hidden="true">:</div>
+        <div class="bloco"><b id="ss">00</b><span>segundos</span></div>
+    </div>
+
+    <div class="barra-bloco" id="barra-bloco">
+        <div class="barra" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="barra"><i id="barra-i"></i></div>
+        <p class="barra-texto" id="barra-texto"></p>
+    </div>
+
+    <p id="final-texto" hidden class="subtitulo">O Nox tomou conta do site. Os criadores vão ter que revidar.</p>
+    <a id="final-botao" hidden class="botao rosa" href="index.html">Entrar no site</a>
+</main>
+
+<script>
+(function () {
+    'use strict';
+
+    /* ============ CONFIGURAÇÃO ============
+       UM relógio só, em duas fases (horário de Brasília, -03:00):
+       1) agora até YOAN_TEXTO  -> contagem para o Yoan News (página principal)
+       2) YOAN_TEXTO até NOX_TEXTO -> "Nox News chegou", mesmo relógio segue
+       3) depois de NOX_TEXTO -> o Nox invade o site
+       Para mudar o dia, troque só as datas (AAAA-MM-DD). */
+    var YOAN_TEXTO = '2026-11-16T17:40:00-03:00';
+    var NOX_TEXTO  = '2026-11-17T17:40:00-03:00';
+
+    /* Teste rápido: abra nox.html?teste=15 para ver cada fase durar
+       15 segundos (Yoan News -> Nox News -> invasão). */
+    var teste = parseInt(new URLSearchParams(location.search).get('teste'), 10);
+    var yoan, fim;
+    if (teste > 0) {
+        yoan = Date.now() + teste * 1000;
+        fim = yoan + teste * 1000;
+    } else {
+        yoan = new Date(YOAN_TEXTO).getTime();
+        fim = new Date(NOX_TEXTO).getTime();
+    }
+    var duracao = fim - yoan;
+
+    var el = {
+        corpo: document.body,
+        titulo: document.getElementById('titulo'),
+        sub: document.getElementById('subtitulo'),
+        hh: document.getElementById('hh'),
+        mm: document.getElementById('mm'),
+        ss: document.getElementById('ss'),
+        barra: document.getElementById('barra'),
+        barraI: document.getElementById('barra-i'),
+        barraTexto: document.getElementById('barra-texto'),
+        barraBloco: document.getElementById('barra-bloco'),
+        relogio: document.getElementById('relogio'),
+        finalTexto: document.getElementById('final-texto'),
+        finalBotao: document.getElementById('final-botao')
+    };
+
+    function dois(n) { return (n < 10 ? '0' : '') + n; }
+
+    function mostrar(ms) {
+        var t = Math.max(0, Math.ceil(ms / 1000));
+        el.hh.textContent = dois(Math.floor(t / 3600));
+        el.mm.textContent = dois(Math.floor((t % 3600) / 60));
+        el.ss.textContent = dois(t % 60);
+    }
+
+    function trocarTitulo(texto) {
+        el.titulo.textContent = texto;
+        el.titulo.setAttribute('data-texto', texto);
+    }
+
+    function formatarHora(ms) {
+        return new Date(ms).toLocaleString('pt-BR', {
+            day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit',
+            timeZone: 'America/Sao_Paulo'
+        }).replace(',', ' às');
+    }
+
+    function formatarSoHora(ms) {
+        return new Date(ms).toLocaleTimeString('pt-BR', {
+            hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo'
+        });
+    }
+
+    var estado = '';
+
+    function invadir() {
+        if (estado === 'fim') return;
+        estado = 'fim';
+        el.corpo.classList.add('invadido', 'escuro');
+        el.corpo.style.setProperty('--noite', 1);
+        trocarTitulo('O Nox invadiu o site');
+        el.sub.hidden = true;
+        el.relogio.hidden = true;
+        el.barraBloco.hidden = true;
+        el.finalTexto.hidden = false;
+        el.finalBotao.hidden = false;
+        document.title = 'O Nox invadiu o site | Futuros Creators';
+    }
+
+    function atualizar() {
+        var agora = Date.now();
+
+        if (agora >= fim) { invadir(); return; }
+
+        /* Fase 1: contagem para o Yoan News */
+        if (agora < yoan) {
+            if (estado !== 'yoan') {
+                estado = 'yoan';
+                trocarTitulo('Yoan News vem aí');
+                el.sub.textContent = 'O Yoan News acontece às ' + formatarSoHora(yoan) +
+                    ' na página principal (futuroscreators.site). Volte nessa hora.';
+                el.barraBloco.hidden = true;
+                el.corpo.style.setProperty('--noite', 0);
+                el.corpo.classList.remove('escuro');
+                document.title = 'Yoan News vem aí | Futuros Creators';
+                el.relogio.setAttribute('aria-label', 'Tempo até o Yoan News');
+            }
+            mostrar(yoan - agora);
+            return;
+        }
+
+        /* Fase 2: Nox News chegou, o mesmo relógio segue até a invasão */
+        if (estado !== 'nox') {
+            estado = 'nox';
+            trocarTitulo('Yoan News ou melhor... Nox News chegou...');
+            el.sub.textContent = 'O que está por vir no site?';
+            el.barraBloco.hidden = false;
+            document.title = 'Nox News chegou | Futuros Creators';
+            el.relogio.setAttribute('aria-label', 'Tempo até a invasão do Nox');
+        }
+
+        var passou = (agora - yoan) / duracao;
+        mostrar(fim - agora);
+
+        var pct = Math.min(100, Math.floor(passou * 1000) / 10);
+        el.barraI.style.width = pct + '%';
+        el.barra.setAttribute('aria-valuenow', Math.round(pct));
+        el.barraTexto.textContent = 'Vem aí até ' + formatarHora(fim) + ' (' + Math.round(pct) + '%)';
+
+        /* A noite engole os raios do sol aos poucos */
+        el.corpo.style.setProperty('--noite', (passou * 0.92).toFixed(3));
+        if (passou > .5) el.corpo.classList.add('escuro');
+    }
+
+    atualizar();
+    setInterval(atualizar, 250);
+})();
+</script>
+</body>
+</html>
