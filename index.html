@@ -37,6 +37,7 @@ body {
 }
 img { max-width: 100%; height: auto; display: block; }
 a { color: inherit; }
+[hidden] { display: none !important; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 
 :focus-visible { outline: 4px solid var(--ceu); outline-offset: 3px; }
@@ -303,6 +304,41 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
 .desc { margin: 6px 0 0; font-size: .98rem; }
 .botao.pequeno { margin-top: 14px; padding: .55em 1.1em; font-size: 1rem; box-shadow: 0 4px 0 var(--tinta); }
 
+/* ---------- Festa ---------- */
+.secao.festa { background: var(--rosa); }
+.festa-quando { margin: 0 0 14px; font: 400 clamp(1.5rem, 4vw, 2.2rem)/1.1 var(--titulo); color: var(--tinta); }
+.festa-contagem { margin: 18px 0 0; display: inline-block; padding: .3em 1em; font-weight: 800; background: #fff; border: 3px solid var(--tinta); border-radius: 999px; box-shadow: 0 4px 0 var(--tinta); }
+.festa .folha { box-shadow: 10px 10px 0 var(--tinta); }
+.dica { margin: 6px 0 0; font-size: .92rem; font-weight: 700; opacity: .75; }
+.festa-fechada { margin: 0; font: 400 1.6rem/1.2 var(--titulo); }
+#festa-ok-texto { overflow-wrap: anywhere; }
+
+/* ---------- Área de PNG ---------- */
+.png-filtros { display: flex; flex-wrap: wrap; gap: 10px; margin: 0 0 26px; }
+.chip-png { padding: .4em 1.1em; font: 800 1rem var(--texto); color: var(--tinta); background: #fff; border: 3px solid var(--tinta); border-radius: 999px; cursor: pointer; }
+.chip-png.ativo { background: var(--uva); color: #fff; transform: rotate(-2deg); box-shadow: 0 3px 0 var(--tinta); }
+.png-grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 24px; }
+.png-card {
+    display: flex; flex-direction: column; gap: 4px; padding: 10px 10px 14px; text-align: left; cursor: pointer;
+    font: 700 1rem/1.25 var(--texto); color: var(--tinta); background: #fff;
+    border: 4px solid var(--tinta); border-radius: 18px; box-shadow: 6px 6px 0 var(--uva);
+    transition: transform .12s, box-shadow .12s;
+}
+.png-card:hover { transform: translate(3px, 3px); box-shadow: 3px 3px 0 var(--uva); }
+.png-card small { font-weight: 700; opacity: .7; }
+.xadrez, .png-visor {
+    background: conic-gradient(#e9e2cf 25%, #fff 0 50%, #e9e2cf 0 75%, #fff 0) 0 0 / 20px 20px;
+}
+.xadrez { display: grid; place-items: center; aspect-ratio: 1; margin-bottom: 6px; border: 3px solid var(--tinta); border-radius: 12px; overflow: hidden; }
+.xadrez img { max-width: 100%; max-height: 100%; object-fit: contain; }
+#png-dialog { width: min(640px, 94vw); padding: 22px; text-align: center; color: #fff; background: var(--tinta); border: 5px solid #fff; border-radius: 24px; }
+#png-dialog::backdrop { background: rgba(23, 16, 31, .82); }
+#png-dialog .fechar { position: absolute; top: 10px; right: 10px; width: 44px; height: 44px; font: 400 1.9rem/1 var(--titulo); padding: 0 0 4px; background: var(--rosa); color: #fff; border: 4px solid #fff; border-radius: 50%; cursor: pointer; }
+.png-visor { display: grid; place-items: center; min-height: 200px; margin: 30px 0 14px; border-radius: 16px; overflow: hidden; }
+.png-visor img { display: block; max-width: 100%; max-height: 60vh; }
+.png-visor p { margin: 0; padding: 20px; color: var(--tinta); font-weight: 800; background: #fff; border-radius: 12px; }
+.png-dica { margin: 0 0 14px; font-size: .9rem; opacity: .8; }
+
 /* ---------- Celular ---------- */
 @media (max-width: 860px) {
     .topo { padding-bottom: 56px; }
@@ -320,6 +356,8 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
     .jornal-foto { margin: 0 6px 26px; box-shadow: 8px 8px 0 var(--uva); }
     .edicao { padding: 22px; box-shadow: 7px 7px 0 var(--uva); }
     .equipe-grade { gap: 24px; }
+    .png-grade { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .festa .folha { box-shadow: 7px 7px 0 var(--tinta); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -335,9 +373,11 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
 <section class="topo" id="inicio">
     <div class="raios" aria-hidden="true"></div>
     <nav class="menu" aria-label="Principal">
+        <a href="#festa" id="menu-festa" class="menu-festa" hidden>Festa</a>
         <a href="#academy">Academy</a>
         <a href="#yoan-news">Yoan News</a>
         <a href="#comunidade">Comunidade</a>
+        <a href="#pngs">PNGs</a>
         <a href="#equipe">Quem administra</a>
         <a href="#inscricao" class="menu-cta">Quero entrar</a>
     </nav>
@@ -354,6 +394,33 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
         <a href="#academy" class="tv" aria-label="Ir para a Futuros Academy">
             <img src="banner-academy.jpg" alt="Futuros Academy: criando shorts e melhorando a qualidade dos vídeos" width="1280" height="720">
         </a>
+    </div>
+</section>
+
+<section class="secao festa" id="festa" hidden>
+    <div class="miolo duas-colunas">
+        <div class="festa-texto">
+            <h2 class="adesivo" id="festa-titulo"></h2>
+            <p class="festa-quando" id="festa-quando"></p>
+            <p class="intro" id="festa-desc"></p>
+            <p class="festa-contagem" id="festa-contagem"></p>
+        </div>
+        <div class="folha">
+            <form id="form-festa" novalidate>
+                <div class="campo">
+                    <label for="jogador">Seu nome no PK XD com o ID</label>
+                    <input id="jogador" name="jogador" type="text" maxlength="45" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Jogador#1234">
+                    <p class="dica">Escreva do jeito que aparece no jogo: nome, # e os números do ID.</p>
+                    <p class="erro" data-erro="jogador" role="alert"></p>
+                </div>
+                <button type="submit" id="festa-enviar" class="botao rosa grande">Entrar na lista</button>
+            </form>
+            <div class="enviado" id="festa-ok" hidden>
+                <h3 id="festa-ok-titulo">Você está na lista!</h3>
+                <p id="festa-ok-texto"></p>
+            </div>
+            <p class="festa-fechada" id="festa-fechada" hidden>A lista dessa festa já fechou.</p>
+        </div>
     </div>
 </section>
 
@@ -410,6 +477,20 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
         </div>
         <div class="fita" id="fita-comunidade" tabindex="0" aria-label="Vídeos da comunidade" hidden></div>
         <p class="vazio" id="vazio-comunidade">Carregando os vídeos...</p>
+    </div>
+</section>
+
+<section class="secao sol" id="pngs">
+    <div class="miolo">
+        <div class="cabeca">
+            <div>
+                <h2 class="adesivo">Área de PNG</h2>
+                <p class="intro">Pegue o que precisar. Toque no PNG e baixe. A gente sobe PNGs novos sempre que der.</p>
+            </div>
+        </div>
+        <div class="png-filtros" id="png-filtros" hidden></div>
+        <div class="png-grade" id="png-grade" hidden></div>
+        <p class="vazio" id="vazio-pngs">Carregando os PNGs...</p>
     </div>
 </section>
 
@@ -485,6 +566,14 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
     <button type="button" class="fechar" aria-label="Fechar vídeo">&times;</button>
     <div class="player-caixa"></div>
     <p class="player-titulo"></p>
+</dialog>
+
+<dialog id="png-dialog" aria-label="PNG">
+    <button type="button" class="fechar" aria-label="Fechar">&times;</button>
+    <div class="png-visor"><img id="png-grande" alt=""><p id="png-carregando">Carregando...</p></div>
+    <p class="player-titulo" id="png-titulo"></p>
+    <p class="png-dica">No celular, se o botão não baixar, segure o dedo na imagem e escolha salvar.</p>
+    <a id="png-baixar" class="botao rosa" download="png.png" hidden>Baixar PNG</a>
 </dialog>
 
 <script src="config.js"></script>
@@ -685,6 +774,90 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
         vazio.textContent = 'Em breve você conhece a equipe por aqui.';
     }).catch(function () {
         $('#vazio-equipe').textContent = FC.configurado() ? 'Não consegui carregar a equipe agora. Atualize a página.' : 'Em breve você conhece a equipe por aqui.';
+    });
+
+    /* ---------- Festa (só aparece quando tem uma ativa) ---------- */
+    var festa = null, fform = $('#form-festa');
+    function pintarFesta() {
+        var sec = $('#festa'); if (!festa) { sec.hidden = true; $('#menu-festa').hidden = true; return; }
+        sec.hidden = false; $('#menu-festa').hidden = false;
+        $('#festa-titulo').textContent = festa.titulo;
+        $('#festa-quando').textContent = festa.quando;
+        var d = $('#festa-desc'); d.textContent = festa.descricao || ''; d.hidden = !festa.descricao;
+        var n = Number(festa.total) || 0;
+        $('#festa-contagem').textContent = n + (n === 1 ? ' pessoa na lista' : ' pessoas na lista') + (festa.vagas ? ' (vagas: ' + festa.vagas + ')' : '');
+        fform.hidden = !festa.aberta || $('#festa-ok').hidden === false;
+        $('#festa-fechada').hidden = festa.aberta;
+    }
+    function carregarFesta() {
+        return FC.rpc('publico_festa').then(function (f) { festa = f && f.id ? f : null; pintarFesta(); }).catch(function () {});
+    }
+    carregarFesta();
+    fform.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var er = $('[data-erro=jogador]', fform); er.textContent = ''; fform.jogador.closest('.campo').classList.remove('com-erro');
+        var v = fform.jogador.value.trim();
+        if (!/^[^\s#]{2,30}\s*#\s*[0-9]{1,10}$/.test(v)) {
+            er.textContent = 'Escreva no formato Nome#1234 (seu nome, # e o número do ID).'; fform.jogador.closest('.campo').classList.add('com-erro'); fform.jogador.focus(); return;
+        }
+        var b = $('#festa-enviar'); b.disabled = true; var rot = b.textContent; b.textContent = 'Enviando...';
+        FC.rpc('publico_festa_entrar', { p_festa_id: festa.id, p_jogador: v }).then(function (r) {
+            if (r && r.ok) {
+                $('#festa-ok-titulo').textContent = r.ja ? 'Você já estava na lista!' : 'Você está na lista!';
+                $('#festa-ok-texto').textContent = r.jogador + ' entrou na lista da festa. Anote o horário e chegue na hora.';
+                $('#festa-ok').hidden = false; fform.hidden = true; fform.reset(); return carregarFesta();
+            }
+            er.textContent = (r && r.erro) || 'Algo deu errado. Tente de novo.'; fform.jogador.closest('.campo').classList.add('com-erro');
+            return carregarFesta();
+        }).catch(function (e) { er.textContent = e.message; })
+          .then(function () { b.disabled = false; b.textContent = rot; });
+    });
+
+    /* ---------- Área de PNG ---------- */
+    var pngs = [], filtro = '', pdlg = $('#png-dialog');
+    function nomeArquivo(t) { return (String(t || 'png').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'png') + '.png'; }
+    function mostrarPngs() {
+        var grade = $('#png-grade'), vazio = $('#vazio-pngs'), fil = $('#png-filtros');
+        var cats = []; pngs.forEach(function (p) { if (p.categoria && cats.indexOf(p.categoria) < 0) cats.push(p.categoria); });
+        if (filtro && cats.indexOf(filtro) < 0) filtro = '';
+        fil.replaceChildren();
+        if (cats.length) {
+            [''].concat(cats).forEach(function (c) {
+                var b = criar('button', 'chip-png' + (c === filtro ? ' ativo' : ''), c || 'Todos'); b.type = 'button';
+                b.addEventListener('click', function () { filtro = c; mostrarPngs(); });
+                fil.appendChild(b);
+            });
+        }
+        fil.hidden = !cats.length;
+        var lista = pngs.filter(function (p) { return !filtro || p.categoria === filtro; });
+        grade.replaceChildren();
+        lista.forEach(function (p) {
+            var b = criar('button', 'png-card'); b.type = 'button';
+            var xadrez = criar('span', 'xadrez'); var im = criar('img'); im.alt = ''; im.loading = 'lazy';
+            if (/^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(p.mini || '')) im.src = p.mini;
+            xadrez.appendChild(im); b.appendChild(xadrez);
+            b.appendChild(criar('strong', null, p.nome));
+            if (p.categoria) b.appendChild(criar('small', null, p.categoria));
+            b.addEventListener('click', function () { abrirPng(p); });
+            grade.appendChild(b);
+        });
+        grade.hidden = !lista.length; vazio.hidden = lista.length > 0;
+        vazio.textContent = 'Os primeiros PNGs chegam em breve.';
+    }
+    function abrirPng(p) {
+        var im = $('#png-grande'), bx = $('#png-baixar'), car = $('#png-carregando');
+        im.hidden = true; im.removeAttribute('src'); bx.hidden = true; car.hidden = false; car.textContent = 'Carregando...';
+        $('#png-titulo').textContent = p.nome; pdlg.showModal();
+        FC.rpc('publico_png', { p_id: p.id }).then(function (r) {
+            if (!r || !/^data:image\/png;base64,[A-Za-z0-9+\/=]+$/.test(r.imagem || '')) throw new Error('Não achei esse PNG. Ele pode ter sido removido.');
+            im.src = r.imagem; im.alt = p.nome; im.hidden = false; car.hidden = true;
+            bx.href = r.imagem; bx.download = nomeArquivo(p.nome); bx.hidden = false;
+        }).catch(function (e) { car.textContent = e.message; });
+    }
+    $('.fechar', pdlg).addEventListener('click', function () { pdlg.close(); });
+    pdlg.addEventListener('click', function (e) { if (e.target === pdlg) pdlg.close(); });
+    FC.rpc('publico_pngs').then(function (l) { pngs = l || []; mostrarPngs(); }).catch(function () {
+        $('#vazio-pngs').textContent = FC.configurado() ? 'Não consegui carregar os PNGs agora. Atualize a página.' : 'Os PNGs chegam em breve.';
     });
 
     /* ---------- Inscrição ---------- */

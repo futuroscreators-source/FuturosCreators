@@ -74,6 +74,21 @@ td.quebra { max-width: 320px; overflow-wrap: anywhere; }
 .foto-linha img, img.mini { width: 56px; height: 56px; object-fit: cover; border: 3px solid var(--tinta); border-radius: 50%; }
 .foto-linha input[type=file] { flex: 1 1 200px; min-width: 0; font: 600 .95rem var(--texto); }
 img.mini { width: 36px; height: 36px; margin-right: 8px; vertical-align: middle; border-width: 2px; }
+.marcas { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.marcas label { display: inline-flex; align-items: center; gap: 8px; margin: 0; }
+.marcas input { width: 22px; height: 22px; accent-color: var(--rosa); }
+img.png-mini { width: 56px; height: 56px; object-fit: contain; vertical-align: middle; margin-right: 10px; border: 2px solid var(--tinta); border-radius: 8px; background: conic-gradient(#e9e2cf 25%, #fff 0 50%, #e9e2cf 0 75%, #fff 0) 0 0 / 12px 12px; }
+.festa-cartao { margin: 0 0 16px; padding: 16px 18px; background: #fff; border: 3px solid var(--tinta); border-radius: 16px; }
+.festa-cartao h3 { margin: 0 0 4px; font: 400 1.4rem var(--titulo); }
+.festa-cartao .etqs { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 12px; }
+.etq.sim { background: #9be9a8; } .etq.nao { background: #e6e0d0; }
+.lista-festa { margin-top: 14px; padding-top: 14px; border-top: 2px dashed #cdbf9b; }
+.lista-festa textarea { font-family: ui-monospace, Menlo, Consolas, monospace; }
+.jogadores { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+.jogadores span { display: inline-flex; align-items: center; gap: 6px; padding: .15em .3em .15em .8em; font-weight: 700; background: var(--papel); border: 2px solid var(--tinta); border-radius: 999px; }
+.jogadores button { padding: 0 .55em; font-size: 1rem; line-height: 1.4; }
+.add-jogador { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.add-jogador input { max-width: 260px; }
 
 </style>
 </head>
@@ -106,6 +121,8 @@ img.mini { width: 36px; height: 36px; margin-right: 8px; vertical-align: middle;
             <button type="button" role="tab" data-aba="videos">Vídeos do site</button>
             <button type="button" role="tab" data-aba="noticias">Yoan News</button>
             <button type="button" role="tab" data-aba="equipe">Equipe</button>
+            <button type="button" role="tab" data-aba="pngs">PNGs</button>
+            <button type="button" role="tab" data-aba="festas">Festas</button>
             <button type="button" role="tab" data-aba="admins" id="aba-admins" hidden>Admins</button>
             <button type="button" role="tab" data-aba="conta">Minha conta</button>
         </div>
@@ -184,6 +201,44 @@ img.mini { width: 36px; height: 36px; margin-right: 8px; vertical-align: middle;
                 </table>
                 <p class="vazio-tab" id="e-vazio" hidden>Ninguém cadastrado ainda.</p>
             </div>
+        </section>
+
+        <section id="tab-pngs" hidden>
+            <h2>Área de PNG</h2>
+            <p>Suba os PNGs que o pessoal pode baixar no site. Dá para escolher vários de uma vez. A categoria é opcional (ex.: Spoiler) e vira um botão de filtro no site.</p>
+            <form class="form-caixa" id="form-png" novalidate>
+                <div><label for="p-nome">Nome <small id="p-nome-dica">em branco = usa o nome do arquivo</small></label><input id="p-nome" type="text" maxlength="80" autocomplete="off"></div>
+                <div><label for="p-cat">Categoria <small>opcional</small></label><input id="p-cat" type="text" maxlength="30" autocomplete="off" list="p-cats"><datalist id="p-cats"></datalist></div>
+                <div class="inteira" id="p-arquivo-caixa"><label for="p-arquivo">Imagens <small>PNG ou outra imagem; o painel converte e reduz sozinho</small></label><input id="p-arquivo" type="file" accept="image/*" multiple></div>
+                <div class="btns"><button type="submit" class="rosa" id="p-salvar">Subir PNG</button><button type="button" id="p-cancelar" hidden>Cancelar edição</button></div>
+            </form>
+            <p class="nota" id="p-msg" role="status"></p>
+            <div class="caixa">
+                <table style="min-width:560px">
+                    <thead><tr><th>PNG</th><th>Categoria</th><th>Ações</th></tr></thead>
+                    <tbody id="p-linhas"></tbody>
+                </table>
+                <p class="vazio-tab" id="p-vazio" hidden>Nenhum PNG no site ainda.</p>
+            </div>
+        </section>
+
+        <section id="tab-festas" hidden>
+            <h2>Festas</h2>
+            <p>A festa só aparece no site enquanto estiver marcada como "aparece no site". Só uma festa fica no site por vez, e cada festa tem a sua própria lista. Assim ninguém usa a lista velha.</p>
+            <form class="form-caixa" id="form-festa" novalidate>
+                <div><label for="f-titulo">Nome da festa</label><input id="f-titulo" type="text" maxlength="80" autocomplete="off"></div>
+                <div><label for="f-quando">Quando <small>texto livre</small></label><input id="f-quando" type="text" maxlength="80" autocomplete="off" placeholder="Sábado, 21/11, às 20h"></div>
+                <div><label for="f-vagas">Vagas <small>opcional</small></label><input id="f-vagas" type="number" min="1" max="1000" inputmode="numeric"></div>
+                <div class="inteira"><label for="f-desc">Recado <small>opcional</small></label><input id="f-desc" type="text" maxlength="400" autocomplete="off" placeholder="Onde fica, regras, o que levar..."></div>
+                <div class="marcas inteira">
+                    <label><input type="checkbox" id="f-ativa" checked> Aparece no site</label>
+                    <label><input type="checkbox" id="f-aberta" checked> Aceitando nomes</label>
+                </div>
+                <div class="btns"><button type="submit" class="rosa" id="f-salvar">Criar festa</button><button type="button" id="f-cancelar" hidden>Cancelar edição</button></div>
+            </form>
+            <p class="nota" id="f-msg" role="status"></p>
+            <div id="f-lista"></div>
+            <p class="vazio-tab" id="f-vazio" hidden>Nenhuma festa criada ainda.</p>
         </section>
 
         <section id="tab-admins" hidden>
@@ -283,7 +338,7 @@ img.mini { width: 36px; height: 36px; margin-right: 8px; vertical-align: middle;
 
     var S = {
         token: ler('fc_token'), usuario: '', lider: false, online: [],
-        insc: [], videos: [], admins: [], noticias: [], equipe: [], editNoticia: null, editEquipe: null, fotoNova: null,
+        insc: [], videos: [], admins: [], noticias: [], equipe: [], editNoticia: null, editEquipe: null, fotoNova: null, pngs: [], festas: [], editPng: null, editFesta: null, verLista: null, jogadores: [],
         filtro: '', apagando: null, editId: null, redefinirId: null, aba: 'inscricoes', timer: null
     };
 
@@ -346,7 +401,7 @@ img.mini { width: 36px; height: 36px; margin-right: 8px; vertical-align: middle;
     }
 
     function atualizarTudo() {
-        carregarInscricoes(); carregarVideos(); carregarNoticias(); carregarEquipe(); if (S.lider) carregarAdmins();
+        carregarInscricoes(); carregarVideos(); carregarNoticias(); carregarEquipe(); carregarFestas(); if (S.lider) carregarAdmins();
     }
 
     document.querySelectorAll('.abas button').forEach(function (b) {
@@ -354,7 +409,8 @@ img.mini { width: 36px; height: 36px; margin-right: 8px; vertical-align: middle;
     });
     function abrirAba(nome) {
         S.aba = nome;
-        ['inscricoes', 'videos', 'noticias', 'equipe', 'admins', 'conta'].forEach(function (a) {
+        if (nome === 'pngs' && !S.pngsCarregados) carregarPngs();
+        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'admins', 'conta'].forEach(function (a) {
             var sec = $('#tab-' + a); if (sec) sec.hidden = a !== nome;
             var bt = $('.abas button[data-aba="' + a + '"]'); if (bt) bt.classList.toggle('ativa', a === nome);
         });
@@ -675,6 +731,229 @@ img.mini { width: 36px; height: 36px; margin-right: 8px; vertical-align: middle;
             });
             ac.appendChild(rm);
             corpo.appendChild(tr);
+        });
+    }
+
+    /* ---------- PNGs ---------- */
+    function carregarPngs() {
+        return FC.rpc('publico_pngs').then(function (l) { S.pngs = l || []; S.pngsCarregados = true; desenharPngs(); }).catch(function () {});
+    }
+    var fp = $('#form-png'), pmsg = $('#p-msg'), pfile = $('#p-arquivo');
+    function limparPng() {
+        S.editPng = null; fp.reset();
+        $('#p-salvar').textContent = 'Subir PNG'; $('#p-cancelar').hidden = true; $('#p-arquivo-caixa').hidden = false;
+    }
+    $('#p-cancelar').addEventListener('click', function () { limparPng(); pmsg.textContent = ''; });
+
+    function carregarImagem(arq) {
+        return new Promise(function (ok, ruim) {
+            var url = URL.createObjectURL(arq), im = new Image();
+            im.onload = function () { URL.revokeObjectURL(url); ok(im); };
+            im.onerror = function () { URL.revokeObjectURL(url); ruim(new Error('Não consegui abrir "' + arq.name + '". Tente outra imagem.')); };
+            im.src = url;
+        });
+    }
+    function paraPng(im, lado) {
+        var esc = Math.min(1, lado / Math.max(im.naturalWidth, im.naturalHeight));
+        var cv = document.createElement('canvas');
+        cv.width = Math.max(1, Math.round(im.naturalWidth * esc)); cv.height = Math.max(1, Math.round(im.naturalHeight * esc));
+        cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
+        return cv.toDataURL('image/png');
+    }
+    function prepararPng(arq) {
+        return carregarImagem(arq).then(function (im) {
+            var lado = 1024, grande = paraPng(im, lado);
+            while (grande.length > 1100000 && lado > 256) { lado = Math.round(lado * 0.8); grande = paraPng(im, lado); }
+            if (grande.length > 1100000) throw new Error('"' + arq.name + '" é pesada demais mesmo reduzida.');
+            var l2 = 200, mini = paraPng(im, l2);
+            while (mini.length > 60000 && l2 > 80) { l2 = Math.round(l2 * 0.8); mini = paraPng(im, l2); }
+            return { imagem: grande, mini: mini };
+        });
+    }
+    function nomeDoArquivo(arq) { return arq.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim().slice(0, 80) || 'PNG'; }
+
+    fp.addEventListener('submit', function (ev) {
+        ev.preventDefault(); pmsg.textContent = '';
+        var nome = $('#p-nome').value.trim(), cat = $('#p-cat').value.trim();
+        var b = $('#p-salvar');
+        if (S.editPng) {
+            if (nome.length < 2) { pmsg.textContent = 'Escreva o nome do PNG.'; return; }
+            b.disabled = true;
+            chamar('admin_png_salvar', { p_id: S.editPng, p_nome: nome, p_categoria: cat, p_mini: null, p_imagem: null }).then(function () {
+                limparPng(); pmsg.textContent = 'PNG atualizado.'; return carregarPngs();
+            }).catch(function (e) { pmsg.textContent = e.message; }).then(function () { b.disabled = false; });
+            return;
+        }
+        var arqs = Array.prototype.slice.call(pfile.files || []);
+        if (!arqs.length) { pmsg.textContent = 'Escolha pelo menos uma imagem.'; return; }
+        if (arqs.length === 1 && nome && nome.length < 2) { pmsg.textContent = 'O nome precisa ter pelo menos 2 letras.'; return; }
+        b.disabled = true;
+        var feitos = 0, falhas = [];
+        arqs.reduce(function (cadeia, arq, i) {
+            return cadeia.then(function () {
+                pmsg.textContent = 'Enviando ' + (i + 1) + ' de ' + arqs.length + '...';
+                return prepararPng(arq).then(function (p) {
+                    return chamar('admin_png_salvar', {
+                        p_id: null, p_nome: (arqs.length === 1 && nome) ? nome : nomeDoArquivo(arq), p_categoria: cat, p_mini: p.mini, p_imagem: p.imagem
+                    });
+                }).then(function () { feitos++; }).catch(function (e) { falhas.push(e.message); });
+            });
+        }, Promise.resolve()).then(function () {
+            pmsg.textContent = feitos + (feitos === 1 ? ' PNG subiu.' : ' PNGs subiram.') + (falhas.length ? ' Problemas: ' + falhas.join(' ') : '');
+            if (feitos) { fp.reset(); } return carregarPngs();
+        }).then(function () { b.disabled = false; });
+    });
+
+    function desenharPngs() {
+        var corpo = $('#p-linhas'); corpo.replaceChildren();
+        $('#p-vazio').hidden = S.pngs.length > 0;
+        var dl = $('#p-cats'); dl.replaceChildren();
+        var cats = []; S.pngs.forEach(function (p) { if (p.categoria && cats.indexOf(p.categoria) < 0) cats.push(p.categoria); });
+        cats.forEach(function (c) { var o = document.createElement('option'); o.value = c; dl.appendChild(o); });
+        S.pngs.forEach(function (p) {
+            var tr = document.createElement('tr');
+            function td() { var t = document.createElement('td'); tr.appendChild(t); return t; }
+            var t1 = td();
+            if (/^data:image\/png;base64,/.test(p.mini || '')) { var im = criar('img', 'png-mini'); im.alt = ''; im.src = p.mini; t1.appendChild(im); }
+            t1.appendChild(criar('strong', null, p.nome));
+            td().textContent = p.categoria || '-';
+            var ac = criar('div', 'acoes'); td().appendChild(ac);
+            var ed = criar('button', null, 'Editar nome'); ed.type = 'button';
+            ed.addEventListener('click', function () {
+                S.editPng = p.id; $('#p-nome').value = p.nome; $('#p-cat').value = p.categoria || '';
+                $('#p-salvar').textContent = 'Salvar alterações'; $('#p-cancelar').hidden = false; $('#p-arquivo-caixa').hidden = true;
+                pmsg.textContent = 'Editando "' + p.nome + '".'; fp.scrollIntoView({ block: 'center' });
+            });
+            ac.appendChild(ed);
+            var rm = criar('button', 'perigo', S.apagando === 'p' + p.id ? 'Confirmar?' : 'Remover'); rm.type = 'button';
+            rm.addEventListener('click', function () {
+                if (S.apagando !== 'p' + p.id) { S.apagando = 'p' + p.id; desenharPngs(); return; }
+                S.apagando = null;
+                chamar('admin_png_apagar', { p_id: p.id }).then(function () {
+                    if (S.editPng === p.id) limparPng();
+                    pmsg.textContent = 'PNG removido.'; return carregarPngs();
+                }).catch(function (e) { pmsg.textContent = e.message; });
+            });
+            ac.appendChild(rm);
+            corpo.appendChild(tr);
+        });
+    }
+
+    /* ---------- Festas ---------- */
+    function carregarFestas() {
+        return chamar('admin_festas').then(function (l) {
+            S.festas = l || [];
+            if (S.verLista && !S.festas.some(function (f) { return f.id === S.verLista; })) S.verLista = null;
+            desenharFestas();
+            if (S.verLista) return carregarJogadores();
+        }).catch(function () {});
+    }
+    function carregarJogadores() {
+        if (!S.verLista) return Promise.resolve();
+        return chamar('admin_festa_jogadores', { p_festa_id: S.verLista }).then(function (l) { S.jogadores = l || []; desenharFestas(); }).catch(function () {});
+    }
+    var ff = $('#form-festa'), fmsg = $('#f-msg');
+    function limparFesta() {
+        S.editFesta = null; ff.reset(); $('#f-ativa').checked = true; $('#f-aberta').checked = true;
+        $('#f-salvar').textContent = 'Criar festa'; $('#f-cancelar').hidden = true;
+    }
+    $('#f-cancelar').addEventListener('click', function () { limparFesta(); fmsg.textContent = ''; });
+    function salvarFesta(f, mudancas) {
+        var d = Object.assign({ titulo: f.titulo, quando: f.quando, descricao: f.descricao, vagas: f.vagas, aberta: f.aberta, ativa: f.ativa }, mudancas);
+        return chamar('admin_festa_salvar', { p_id: f.id, p_titulo: d.titulo, p_quando: d.quando, p_descricao: d.descricao || '', p_vagas: d.vagas, p_aberta: d.aberta, p_ativa: d.ativa });
+    }
+    ff.addEventListener('submit', function (ev) {
+        ev.preventDefault(); fmsg.textContent = '';
+        var t = $('#f-titulo').value.trim(), q = $('#f-quando').value.trim(), v = $('#f-vagas').value.trim();
+        if (t.length < 3) { fmsg.textContent = 'Escreva o nome da festa.'; return; }
+        if (q.length < 2) { fmsg.textContent = 'Diga quando é a festa.'; return; }
+        var vagas = v ? parseInt(v, 10) : null;
+        if (v && (!(vagas >= 1) || vagas > 1000)) { fmsg.textContent = 'Vagas: use um número de 1 a 1000, ou deixe em branco.'; return; }
+        var b = $('#f-salvar'); b.disabled = true; var editando = !!S.editFesta;
+        chamar('admin_festa_salvar', {
+            p_id: S.editFesta, p_titulo: t, p_quando: q, p_descricao: $('#f-desc').value.trim(), p_vagas: vagas,
+            p_aberta: $('#f-aberta').checked, p_ativa: $('#f-ativa').checked
+        }).then(function () {
+            limparFesta(); fmsg.textContent = editando ? 'Festa atualizada.' : 'Festa criada.'; return carregarFestas();
+        }).catch(function (e) { fmsg.textContent = e.message; }).then(function () { b.disabled = false; });
+    });
+
+    function copiar(texto, caixa) {
+        function reserva() { caixa.focus(); caixa.select(); try { return document.execCommand('copy'); } catch (e) { return false; } }
+        if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(texto).then(function () { return true; }, reserva);
+        return Promise.resolve(reserva());
+    }
+
+    function desenharFestas() {
+        var raiz = $('#f-lista'); raiz.replaceChildren();
+        $('#f-vazio').hidden = S.festas.length > 0;
+        S.festas.forEach(function (f) {
+            var c = criar('article', 'festa-cartao');
+            c.appendChild(criar('h3', null, f.titulo));
+            c.appendChild(criar('div', null, f.quando + (f.vagas ? ' | vagas: ' + f.vagas : '')));
+            var et = criar('div', 'etqs');
+            et.appendChild(criar('span', 'etq ' + (f.ativa ? 'sim' : 'nao'), f.ativa ? 'Aparece no site' : 'Fora do site'));
+            et.appendChild(criar('span', 'etq ' + (f.aberta ? 'sim' : 'nao'), f.aberta ? 'Lista aberta' : 'Lista fechada'));
+            et.appendChild(criar('span', 'etq', f.total + (f.total === 1 ? ' jogador' : ' jogadores')));
+            c.appendChild(et);
+            var ac = criar('div', 'acoes'); c.appendChild(ac);
+            function btn(txt, fn, cls) { var b = criar('button', cls || null, txt); b.type = 'button'; b.addEventListener('click', fn); ac.appendChild(b); return b; }
+            function aviso(e) { fmsg.textContent = e.message; }
+            btn(S.verLista === f.id ? 'Esconder lista' : 'Ver lista', function () {
+                S.verLista = S.verLista === f.id ? null : f.id; S.jogadores = []; desenharFestas(); carregarJogadores();
+            });
+            btn('Editar', function () {
+                S.editFesta = f.id; $('#f-titulo').value = f.titulo; $('#f-quando').value = f.quando; $('#f-desc').value = f.descricao || '';
+                $('#f-vagas').value = f.vagas || ''; $('#f-ativa').checked = f.ativa; $('#f-aberta').checked = f.aberta;
+                $('#f-salvar').textContent = 'Salvar alterações'; $('#f-cancelar').hidden = false;
+                fmsg.textContent = 'Editando "' + f.titulo + '".'; ff.scrollIntoView({ block: 'center' });
+            });
+            btn(f.ativa ? 'Tirar do site' : 'Mostrar no site', function () {
+                salvarFesta(f, { ativa: !f.ativa }).then(function () { fmsg.textContent = f.ativa ? 'Festa fora do site.' : 'Festa no ar. As outras saíram do site.'; return carregarFestas(); }).catch(aviso);
+            });
+            btn(f.aberta ? 'Fechar lista' : 'Abrir lista', function () {
+                salvarFesta(f, { aberta: !f.aberta }).then(carregarFestas).catch(aviso);
+            });
+            btn(S.apagando === 'f' + f.id ? 'Confirmar?' : 'Apagar', function () {
+                if (S.apagando !== 'f' + f.id) { S.apagando = 'f' + f.id; desenharFestas(); return; }
+                S.apagando = null;
+                chamar('admin_festa_apagar', { p_id: f.id }).then(function () { fmsg.textContent = 'Festa apagada.'; return carregarFestas(); }).catch(aviso);
+            }, 'perigo');
+
+            if (S.verLista === f.id) {
+                var box = criar('div', 'lista-festa');
+                box.appendChild(criar('strong', null, 'Lista pronta para copiar (' + S.jogadores.length + ')'));
+                var ta = criar('textarea'); ta.readOnly = true; ta.rows = Math.min(14, Math.max(3, S.jogadores.length));
+                ta.value = S.jogadores.map(function (j) { return j.jogador; }).join('\n'); ta.setAttribute('aria-label', 'Lista de jogadores');
+                box.appendChild(ta);
+                var lin = criar('div', 'btns');
+                var cp = criar('button', 'rosa', 'Copiar lista'); cp.type = 'button';
+                cp.addEventListener('click', function () {
+                    copiar(ta.value, ta).then(function (ok) { fmsg.textContent = ok ? 'Lista copiada. É só colar.' : 'Não consegui copiar sozinho. Segure o texto e copie.'; });
+                });
+                lin.appendChild(cp); box.appendChild(lin);
+                var jg = criar('div', 'jogadores');
+                S.jogadores.forEach(function (j) {
+                    var s = criar('span', null, j.jogador);
+                    var x = criar('button', 'perigo', '×'); x.type = 'button'; x.setAttribute('aria-label', 'Tirar ' + j.jogador);
+                    x.addEventListener('click', function () {
+                        chamar('admin_festa_jogador_apagar', { p_id: j.id }).then(function () { return carregarFestas(); }).catch(aviso);
+                    });
+                    s.appendChild(x); jg.appendChild(s);
+                });
+                box.appendChild(jg);
+                var add = criar('div', 'add-jogador');
+                var inp = criar('input'); inp.type = 'text'; inp.placeholder = 'Jogador#1234'; inp.autocomplete = 'off'; inp.setAttribute('aria-label', 'Adicionar jogador');
+                var ad = criar('button', null, 'Adicionar na lista'); ad.type = 'button';
+                ad.addEventListener('click', function () {
+                    chamar('admin_festa_jogador_add', { p_festa_id: f.id, p_jogador: inp.value }).then(function (r) {
+                        fmsg.textContent = r && r.ja ? 'Esse jogador já estava na lista.' : 'Jogador adicionado.'; return carregarFestas();
+                    }).catch(aviso);
+                });
+                add.appendChild(inp); add.appendChild(ad); box.appendChild(add);
+                c.appendChild(box);
+            }
+            raiz.appendChild(c);
         });
     }
 
