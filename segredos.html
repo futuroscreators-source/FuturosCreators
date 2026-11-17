@@ -41,14 +41,39 @@ body.shake .crt{animation:shake .09s infinite;filter:contrast(1.3) saturate(1.5)
 .icon{position:absolute;left:8%;top:9%;width:5%;aspect-ratio:1;background:#111;border:2px solid #fff}
 .cap{position:absolute;left:6%;top:15%;background:#000;color:#fff;font:12px Arial,sans-serif;padding:3px 5px}
 .glt{color:#d93a3a;animation:jit .12s infinite}
+
+#desk{position:absolute;inset:0;display:none}
+.os .cap,.os .icon{display:none}
+#icons{position:absolute;left:2%;top:4%;display:grid;grid-auto-flow:column;grid-template-rows:repeat(4,auto);gap:6px 10px}
+.ic{width:64px;text-align:center;color:#fff;font:11px Arial,sans-serif;text-shadow:1px 1px #000;cursor:pointer;user-select:none}
+.ic u{display:block;font-size:26px;text-decoration:none}
+.dw{position:absolute;background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;display:flex;flex-direction:column;box-shadow:2px 2px 0 #000;font:13px Arial,sans-serif;color:#000}
+.dt{background:#00128a;color:#fff;font-weight:bold;padding:3px 6px;display:flex;justify-content:space-between;cursor:move}
+.dt b{cursor:pointer;padding:0 5px;background:#c0c0c0;color:#000}
+.db{flex:1;overflow:auto;padding:8px;background:#fff;color:#000}
+#tb{position:absolute;left:0;right:0;bottom:0;height:26px;background:#c0c0c0;border-top:2px solid #fff;display:flex;align-items:center;gap:6px;padding:0 6px;font:12px Arial,sans-serif;z-index:9999;color:#000}
+#tbw{flex:1;display:flex;gap:4px;overflow:hidden}
+#tbw button{font-size:11px;max-width:90px;overflow:hidden}
+#twi{cursor:pointer}
+.nw{padding:5px;border:1px solid #888;margin:3px 0;cursor:pointer}.nf{padding:4px}.err{color:#b00;font-size:12px}
+.fi{cursor:pointer;padding:2px}.cd{width:100%;font:18px monospace;text-align:right}
+.cg{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-top:6px}.cg button{padding:8px 0;font-size:15px}
+.ab{display:flex;gap:4px}.ab input{flex:1;min-width:0}.pg{margin-top:8px}
+.db textarea{width:100%;height:100%;resize:none;border:0;outline:0}
+#boot{position:fixed;inset:0;background:#000;color:#3fc23f;font:15px "Courier New",monospace;padding:8%;opacity:0;pointer-events:none;transition:opacity 1.5s;z-index:20000;line-height:1.8}
+#boot.on{opacity:1;pointer-events:auto}
+.bar{width:60%;height:12px;border:1px solid #3fc23f;margin-top:14px}.bar i{display:block;height:100%;width:0;background:#3fc23f;transition:width 2.6s linear}
+@keyframes gl{0%{filter:hue-rotate(0)}20%{filter:hue-rotate(90deg) saturate(4);transform:skewX(6deg)}40%{filter:invert(1)}60%{filter:hue-rotate(250deg) contrast(2);transform:translateX(-10px) scaleY(1.04)}80%{filter:grayscale(1) brightness(2)}100%{filter:none}}
+body.gl .screen{animation:gl .22s steps(1) infinite}
 </style>
 </head>
 <body>
 <div class="crt"><div class="screen">
 <span class="shape s1"></span><span class="shape s2"></span><span class="shape s3"></span>
+<div id="desk"><div id="icons"></div><div id="tb"><span>▣ FUTUROS_OS</span><div id="tbw"></div><span id="twi">⛔</span><span id="clk"></span></div></div>
 <div class="icon"></div><div class="cap">Command Line</div>
 <div class="win">
-<div class="title"><span>▣</span><span>Terminal</span><span>_ ▫ ✕</span></div>
+<div class="title"><span>▣</span><span>Terminal</span><span>_ ▫ <b id="tx" style="cursor:pointer">✕</b></span></div>
 <div class="menu"><u>F</u>ile <span>Edit</span> <span>Search</span> <span>Help</span></div>
 <div class="term" id="term">
 <div class="path">CENTRAL DOMAIN <i>/</i></div>
@@ -57,6 +82,7 @@ body.shake .crt{animation:shake .09s infinite;filter:contrast(1.3) saturate(1.5)
 </div></div>
 </div></div>
 
+<div id="boot"></div>
 <div id="blackout"></div>
 <script>
 const SB_URL="https://bknawsiwukebceditpuq.supabase.co";
@@ -101,7 +127,8 @@ async function run(raw){
     else if(!r.ok)line("err","Código não reconhecido.");
     else{
       found.push(v.toUpperCase());
-      if(r.efeito==="blackout"){await shake(1800);blackout(r.texto.split("|"));}
+      if(r.efeito==="sistema"){await sistema(r.texto.split("|"));}
+      else if(r.efeito==="blackout"){await shake(1800);blackout(r.texto.split("|"));}
       else if(r.efeito==="shake"){await shake(1300);line("",r.texto);}
       else if(r.efeito==="glitch")line("glt",zalgo(r.texto,1));
       else line(r.efeito==="big"?"big":"",r.texto);
@@ -114,6 +141,103 @@ input.addEventListener("keydown",e=>{
   else if(e.key==="ArrowUp"&&hi>0){input.value=hist[--hi];e.preventDefault();}
   else if(e.key==="ArrowDown"){input.value=hist[++hi]||"";}
 });
+
+/* ===== FUTUROS_OS ===== */
+function ls0(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function ls1(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+const desk=document.getElementById("desk"),scr=document.querySelector(".screen"),tw=document.querySelector(".win");
+let est={},wifi=ls0("fc_wn"),wpass=ls0("fc_wp")||"",zi=20;
+const Z=()=>++zi,T0=Date.UTC(2002,9,11,9,52,19),S0=Date.now(),hora=()=>new Date(T0+Date.now()-S0).toISOString();
+function el(t,c,h){const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e;}
+async function rpc(fn,b){const h={"Content-Type":"application/json",apikey:SB_KEY.trim()};
+  if(SB_KEY.trim().startsWith("eyJ"))h.Authorization="Bearer "+SB_KEY.trim();
+  const r=await fetch(SB_URL.trim().replace(/\/+$/,"")+"/rest/v1/rpc/"+fn,{method:"POST",headers:h,body:JSON.stringify(b||{})});
+  if(!r.ok)throw new Error("HTTP "+r.status);return r.json();}
+function drag(w,h){h.style.touchAction="none";
+  h.onpointerdown=e=>{if(e.target.tagName==="B")return;w.style.zIndex=Z();const r=w.getBoundingClientRect(),p=scr.getBoundingClientRect(),sx=e.clientX-r.left,sy=e.clientY-r.top;
+    h.setPointerCapture(e.pointerId);h.onpointermove=m=>{w.style.left=(m.clientX-sx-p.left)+"px";w.style.top=(m.clientY-sy-p.top)+"px";};h.onpointerup=()=>{h.onpointermove=null};};}
+function tb(){const x=document.getElementById("tbw");x.innerHTML="";
+  desk.querySelectorAll(".dw").forEach(w=>{const b=el("button","");b.textContent=w.querySelector(".dt span").textContent;b.onclick=()=>w.style.zIndex=Z();x.append(b)});
+  if(tw.style.display!=="none"){const b=el("button","","Terminal");b.onclick=()=>tw.style.zIndex=Z();x.append(b)}
+  document.getElementById("twi").textContent=wifi?"📶":"⛔";}
+function win(id,title,build,w,h){
+  const o=document.getElementById("w_"+id);if(o)o.remove();
+  const e=el("div","dw"),n=desk.querySelectorAll(".dw").length;e.id="w_"+id;
+  e.style.cssText="width:"+w+"%;height:"+h+"%;left:"+(10+n*4)+"%;top:"+(5+n*4)+"%;z-index:"+Z();
+  const t=el("div","dt","<span>"+title+"</span><b>✕</b>"),b=el("div","db");
+  t.lastChild.onclick=()=>{e.remove();tb()};e.onpointerdown=()=>{e.style.zIndex=Z()};
+  e.append(t,b);desk.append(e);drag(e,t);build(b);tb();}
+function calc(b){const d=el("input","cd");d.readOnly=true;b.append(d);const g=el("div","cg");
+  "C ( ) / 7 8 9 * 4 5 6 - 1 2 3 + 0 . ⌫ =".split(" ").forEach(k=>{const x=el("button","",k);
+    x.onclick=()=>{if(k==="C")d.value="";else if(k==="⌫")d.value=d.value.slice(0,-1);
+      else if(k==="="){try{if(/^[0-9+\-*\/.() ]+$/.test(d.value))d.value=String(Function('"use strict";return ('+d.value+')')())}catch(e){d.value="ERRO"}}
+      else d.value+=k};g.append(x)});b.append(g);}
+function nota(b){const t=el("textarea");t.value=ls0("fc_nota")||"";t.oninput=()=>ls1("fc_nota",t.value);b.append(t);}
+function rel(b){b.style.cssText+=";background:#111;color:#3fc23f;font:20px monospace;display:flex;align-items:center;justify-content:center;text-align:center";
+  const u=()=>{if(!b.isConnected)return clearInterval(iv);const d=hora();b.textContent=d.slice(0,10)+" "+d.slice(11,19)};const iv=setInterval(u,1000);u();}
+function arq(b){
+  if(est.arquivos_corrompido==="false"){const o=el("pre");(est.arquivos_lista||"").split("|").filter(Boolean).forEach(n=>{const d=el("div","fi");d.textContent="📄 "+n;d.onclick=()=>{o.textContent=est["arquivo:"+n]||"(vazio)"};b.append(d)});b.append(o);return;}
+  b.style.cssText+=";background:#000;color:#d93a3a;font-family:monospace";
+  const l=el("div"),m=el("div");b.append(el("div","","⚠ ERRO 0xC0RRUPT: sistema de arquivos corrompido"),l,m);
+  const j=n=>n.replace(/[aeiou]/gi,()=>"█▓▒░#@?"[Math.random()*7|0]),N=["registro_01","registro_02","academy_03","assinatura_07","backup_14","arquivo_21","final"];
+  const draw=()=>{if(!b.isConnected)return clearInterval(iv);l.innerHTML="";N.forEach(n=>{const d=el("div","fi");d.textContent="📄 "+j(n);d.onclick=()=>{m.textContent="Não foi possível ler: setor ilegível."};l.append(d)})};
+  const iv=setInterval(draw,450);draw();}
+function wf(b){
+  if(est.wifi_ativo==="false"){b.textContent="Adaptador de rede desativado.";return}
+  b.append(el("p","","Redes disponíveis"));
+  [["FUTUROS_ACADEMY",1,"▂▄▆█"],["NOX_5G",1,"▂▄"],["Visitante",0,"▂"]].forEach(([n,s,q])=>{
+    const r=el("div","nw"),f=el("div","nf"),i=el("input"),bt=el("button","","Conectar"),m=el("div","err");
+    r.textContent=q+" "+n+(s?" 🔒":"")+(wifi===n?" — conectado":"");f.style.display="none";i.type="password";i.placeholder="Senha";if(!s)i.style.display="none";
+    r.onclick=()=>{f.style.display=f.style.display==="none"?"block":"none"};
+    bt.onclick=async()=>{
+      if(n==="NOX_5G"){m.textContent="Autenticação recusada. Esta rede não aceita você.";return}
+      if(!s){wifi=n;wpass="";ls1("fc_wn",n);ls1("fc_wp","");m.textContent="Conectado (sem acesso à internet).";tb();return}
+      m.textContent="conectando...";
+      try{const x=await rpc("wifi_conectar",{p_senha:i.value});
+        if(x.limite)m.textContent="Muitas tentativas. Aguarde um minuto.";
+        else if(x.ok){wifi=n;wpass=i.value;ls1("fc_wn",n);ls1("fc_wp",i.value);m.textContent="Conectado.";tb()}
+        else m.textContent="Senha incorreta.";
+      }catch(e){m.textContent="Falha na conexão ["+e.message+"]"}};
+    f.append(i,bt,m);b.append(r,f);});}
+function nav(b){
+  b.innerHTML='<div class="ab"><input value="futuros.net"><button>Ir</button></div><div class="pg"></div>';
+  const u=b.querySelector("input"),pg=b.querySelector(".pg"),msg=(t,s)=>{pg.innerHTML="";pg.append(el("b","",t),el("p","",s||""))};
+  const go=async()=>{
+    if(!wifi)return msg("Sem conexão","ERR_INTERNET_DISCONNECTED. Conecte-se a uma rede Wi-Fi.");
+    if(wifi==="Visitante")return msg("Sem internet","A rede Visitante não tem acesso à internet.");
+    pg.textContent="carregando...";
+    try{const r=await rpc("navegador_pagina",{p_senha:wpass,p_url:u.value});
+      if(r.limite)return msg("Muitas tentativas","Aguarde um minuto.");
+      if(!r.ok){wifi=null;wpass="";ls1("fc_wn","");ls1("fc_wp","");tb();return msg("Conexão recusada","A senha da rede mudou. Reconecte-se.")}
+      pg.innerHTML="";pg.append(el("h3","",""));pg.firstChild.textContent=r.titulo;r.texto.split("|").forEach(t=>{const p=el("p");p.textContent=t;pg.append(p)});
+    }catch(e){msg("Falha de conexão","["+e.message+"]")}};
+  b.querySelector("button").onclick=go;u.onkeydown=e=>{if(e.key==="Enter")go()};go();}
+function trav(b,id){const ok=(est.apps_liberados||"").split(",").map(s=>s.trim()).includes(id);
+  b.style.cssText+=";background:#111;font-family:monospace;white-space:pre-wrap;color:"+(ok?"#3fc23f":"#d93a3a");
+  b.textContent=ok?(est["app_"+id+"_texto"]||"Aplicativo vazio."):"🔒 ACESSO NEGADO\n\nEste aplicativo está bloqueado.\nAutorização necessária.";}
+const APPS=[["term","💻","Terminal"],["nav","🌐","Navegador"],["arq","📁","Arquivos"],["wifi","📶","Wi-Fi"],["calc","🧮","Calculadora"],["nota","📝","Notas"],["rel","🕘","Relógio"],["msg","💬","Mensagens",1],["cam","📷","Câmera",1],["news","🗞","Yoan News",1],["gal","🖼","Galeria",1]];
+async function abrir([id,,nome]){
+  if(id==="term"){tw.style.display="flex";tw.style.zIndex=Z();input.focus();tb();return}
+  if(!["calc","nota","rel"].includes(id)){try{est=await rpc("sistema_estado")}catch(e){}}
+  const M={nav:[nav,62,62],arq:[arq,58,56],wifi:[wf,52,56],calc:[calc,34,66],nota:[nota,44,52],rel:[rel,34,36]};
+  const m=M[id];m?win(id,nome,m[0],m[1],m[2]):win(id,nome,b=>trav(b,id),44,40);}
+async function iniciar(){
+  scr.classList.add("os");desk.style.display="block";tw.style.display="none";
+  try{est=await rpc("sistema_estado")}catch(e){}
+  const ic=document.getElementById("icons");ic.innerHTML="";
+  APPS.forEach(a=>{const bl=a[3]&&!(est.apps_liberados||"").split(",").map(s=>s.trim()).includes(a[0]);
+    const d=el("div","ic","<u>"+a[1]+"</u>"+a[2]+(bl?" 🔒":""));d.onclick=()=>abrir(a);ic.append(d)});
+  document.getElementById("tx").onclick=()=>{tw.style.display="none";tb()};
+  document.getElementById("twi").onclick=()=>abrir(APPS[3]);
+  drag(tw,tw.querySelector(".title"));
+  setInterval(()=>document.getElementById("clk").textContent=hora().slice(11,16),1000);tb();}
+async function sistema(lines){
+  document.body.classList.add("shake","gl");await wait(2600);document.body.classList.remove("shake","gl");
+  const o=document.getElementById("boot");o.innerHTML="";o.classList.add("on");
+  for(const l of lines){const p=el("div");p.textContent=l;o.append(p);await wait(650);}
+  const bar=el("div","bar","<i></i>");o.append(bar);await wait(150);bar.firstChild.style.width="100%";await wait(2900);
+  ls1("fc_sys","1");await iniciar();o.classList.remove("on");}
+if(ls0("fc_sys")==="1")iniciar();
 term.addEventListener("click",()=>input.focus());
 input.focus();
 </script>
