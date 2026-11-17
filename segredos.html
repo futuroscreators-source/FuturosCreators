@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CENTRAL DOMAIN</title>
+<style>
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:#050505;display:flex;align-items:center;justify-content:center;font-family:"Courier New",monospace;overflow:hidden}
+.crt{width:min(96vw,1100px);aspect-ratio:4/3;max-height:96vh;background:#3b3b2a;border-radius:28px;padding:5% 6%;box-shadow:inset 0 0 40px #000,0 0 60px #000}
+.screen{position:relative;width:100%;height:100%;border-radius:9% / 11%;overflow:hidden;background:
+linear-gradient(#0000 94%,#0003 0) 0 0/22px 22px,linear-gradient(90deg,#0000 94%,#0003 0) 0 0/22px 22px,#5d6a6f}
+.screen:before,.screen:after{content:"";position:absolute;pointer-events:none}
+.screen:before{width:14%;aspect-ratio:1;border-radius:50%;background:#d93a3a;left:2%;bottom:3%}
+.screen:after{width:8%;aspect-ratio:1;border-radius:50%;background:#e3d02e;right:18%;top:2%;box-shadow:0 0 0 0 #0000}
+.shape{position:absolute;pointer-events:none}
+.s1{right:0;top:6%;width:14%;height:38%;background:#d93a3a;clip-path:polygon(40% 0,100% 40%,100% 100%,0 80%)}
+.s2{left:3%;top:36%;width:3.5%;height:30%;background:#2f9be0;transform:rotate(4deg)}
+.s3{right:0;bottom:12%;width:10%;height:30%;background:#2f9be0;clip-path:polygon(100% 0,100% 100%,0 100%)}
+.win{position:absolute;left:14%;top:20%;width:78%;height:70%;background:#c0c0c0;border:2px solid;border-color:#fff #404040 #404040 #fff;display:flex;flex-direction:column;box-shadow:2px 2px 0 #000}
+.title{background:#00128a;color:#fff;font:bold 14px Arial,sans-serif;text-align:center;padding:4px 6px;display:flex;justify-content:space-between}
+.menu{font:13px Arial,sans-serif;padding:4px 10px;display:flex;gap:16px;color:#000}
+.term{flex:1;background:#0f0f0f;margin:2px;padding:14px 18px;overflow-y:auto;color:#eee;font-size:clamp(12px,1.7vw,17px);line-height:1.55;cursor:text}
+.path{color:#3fc23f}.path i{color:#9b3fc2;font-style:normal}
+.cmd{color:#f0a030}.ps{color:#3fc23f}
+.out{white-space:pre-wrap;word-break:break-word}
+.err{color:#888}.big{color:#fff;font-weight:bold}
+.row{display:flex;gap:8px;align-items:center}
+#in{flex:1;background:none;border:0;outline:0;color:#f0a030;font:inherit;caret-color:#f0a030;padding:0;min-width:0}
+@keyframes shake{0%{transform:translate(0,0) rotate(0)}20%{transform:translate(-14px,8px) rotate(-1deg)}40%{transform:translate(12px,-10px) rotate(1.2deg)}60%{transform:translate(-10px,-6px) rotate(-.8deg)}80%{transform:translate(9px,12px) rotate(.8deg)}100%{transform:translate(0,0) rotate(0)}}
+body.shake .crt{animation:shake .09s infinite;filter:contrast(1.3) saturate(1.5)}
+#blackout{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;text-align:center;padding:24px;transition:opacity 2.5s ease;z-index:9}
+#blackout.on{opacity:1;pointer-events:auto}
+#blackout p{margin:0;color:#e8e8e8;font-size:clamp(16px,3vw,28px);opacity:0;transition:opacity 2s ease 2s}
+#blackout .z{color:#d93a3a;font-size:clamp(22px,4.5vw,44px);transition-delay:4.2s;animation:jit .12s infinite}
+#blackout.on p{opacity:1}
+@keyframes jit{0%{transform:translate(0,0)}25%{transform:translate(-2px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,-2px)}100%{transform:translate(1px,2px)}}
+#blackout small{color:#444;font-size:12px;opacity:0;transition:opacity 1s ease 8s}
+#blackout.on small{opacity:1}
+.icon{position:absolute;left:8%;top:9%;width:5%;aspect-ratio:1;background:#111;border:2px solid #fff}
+.cap{position:absolute;left:6%;top:15%;background:#000;color:#fff;font:12px Arial,sans-serif;padding:3px 5px}
+.glt{color:#d93a3a;animation:jit .12s infinite}
+</style>
+</head>
+<body>
+<div class="crt"><div class="screen">
+<span class="shape s1"></span><span class="shape s2"></span><span class="shape s3"></span>
+<div class="icon"></div><div class="cap">Command Line</div>
+<div class="win">
+<div class="title"><span>▣</span><span>Terminal</span><span>_ ▫ ✕</span></div>
+<div class="menu"><u>F</u>ile <span>Edit</span> <span>Search</span> <span>Help</span></div>
+<div class="term" id="term">
+<div class="path">CENTRAL DOMAIN <i>/</i></div>
+<div class="out err">Digite um código e pressione Enter. Comandos: ajuda, date, log, limpar</div>
+<div class="row"><span class="ps">$</span><input id="in" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Terminal"></div>
+</div></div>
+</div></div>
+
+<div id="blackout"></div>
+<script>
+const SB_URL="COLE_AQUI_A_URL_DO_SEU_PROJETO_SUPABASE";
+const SB_KEY="COLE_AQUI_A_ANON_KEY";
+const term=document.getElementById("term"),input=document.getElementById("in");
+const row=input.parentElement,bo=document.getElementById("blackout"),found=[],hist=[];let hi=0;
+function line(cls,txt){const d=document.createElement("div");d.className="out "+cls;d.textContent=txt;term.insertBefore(d,row);term.scrollTop=term.scrollHeight;return d;}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+async function shake(ms){document.body.classList.add("shake");await wait(ms);document.body.classList.remove("shake");}
+function blackout(lines){
+  bo.innerHTML="";
+  lines.forEach((l,i)=>{const p=document.createElement("p"),red=l[0]==="!";
+    p.textContent=red?l.slice(1):l;if(red)p.className="z";
+    p.style.transitionDelay=(1.5+i*2.4)+"s";bo.appendChild(p);});
+  const t=2+lines.length*2.4+1,s=document.createElement("small");
+  s.textContent="clique para voltar";s.style.transitionDelay=t+"s";bo.appendChild(s);
+  bo.dataset.ready="";bo.classList.add("on");setTimeout(()=>bo.dataset.ready="1",t*1000);
+}
+bo.addEventListener("click",()=>{if(bo.dataset.ready==="1")bo.classList.remove("on");});
+async function resgatar(c){
+  const r=await fetch(SB_URL+"/rest/v1/rpc/resgatar_codigo",{method:"POST",
+    headers:{"Content-Type":"application/json",apikey:SB_KEY,Authorization:"Bearer "+SB_KEY},
+    body:JSON.stringify({p_codigo:c})});
+  if(!r.ok)throw new Error(r.status);return r.json();
+}
+async function run(raw){
+  const c=document.createElement("div");
+  c.innerHTML='<span class="ps">$</span> <span class="cmd"></span>';
+  c.lastChild.textContent=raw;term.insertBefore(c,row);
+  const v=raw.trim(),l=v.toLowerCase();if(!v)return;
+  if(l==="date"){line("","2002-10-11 09:52:19");return;}
+  if(l==="limpar"||l==="clear"){[...term.querySelectorAll("div")].forEach(d=>{if(d!==row&&!d.classList.contains("path"))d.remove()});return;}
+  if(l==="ajuda"||l==="help"){line("err","Digite um código e pressione Enter. Comandos: ajuda, date, log, limpar");return;}
+  if(l==="log"){line("err",found.length?found.join("\n"):"Nenhum registro acessado.");return;}
+  input.disabled=true;const w=line("err","consultando a CENTRAL...");
+  try{
+    const r=await resgatar(v);w.remove();
+    if(r.limite)line("err","Acesso bloqueado temporariamente. Aguarde um minuto.");
+    else if(!r.ok)line("err","Código não reconhecido.");
+    else{
+      found.push(v.toUpperCase());
+      if(r.efeito==="blackout"){await shake(1800);blackout(r.texto.split("|"));}
+      else if(r.efeito==="shake"){await shake(1300);line("",r.texto);}
+      else line(r.efeito==="big"?"big":r.efeito==="glitch"?"glt":"",r.texto);
+    }
+  }catch(e){w.remove();line("err","Sinal perdido com a CENTRAL. Tente de novo.");}
+  input.disabled=false;input.focus();
+}
+input.addEventListener("keydown",e=>{
+  if(e.key==="Enter"&&!input.disabled){const v=input.value;hist.push(v);hi=hist.length;input.value="";run(v);}
+  else if(e.key==="ArrowUp"&&hi>0){input.value=hist[--hi];e.preventDefault();}
+  else if(e.key==="ArrowDown"){input.value=hist[++hi]||"";}
+});
+term.addEventListener("click",()=>input.focus());
+input.focus();
+</script>
+</body>
+</html>
