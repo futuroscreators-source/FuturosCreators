@@ -98,6 +98,20 @@ input[type=date] { display: block; width: 100%; min-width: 0; max-width: 100%; m
 .fb-msg { margin: 0 0 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .etq.t-sugestao { background: var(--sol); } .etq.t-elogio { background: #9be9a8; } .etq.t-problema { background: #ffb3c9; } .etq.t-ideia { background: #a8e8ee; }
 input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.4em; }
+.st-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 6px 0 22px; }
+.st-card { padding: 12px 16px; background: #fff; border: 3px solid var(--tinta); border-radius: 16px; }
+.st-card small { display: block; font-weight: 800; opacity: .75; }
+.st-card strong { font: 400 2rem/1.15 var(--titulo); }
+#tab-stats h3 { margin: 24px 0 8px; font: 400 1.35rem var(--titulo); }
+.st-barras { display: flex; align-items: flex-end; gap: 4px; height: 190px; padding: 10px 12px 6px; overflow-x: auto; background: #fff; border: 3px solid var(--tinta); border-radius: 16px; }
+.st-col { display: flex; flex: 1 0 auto; flex-direction: column; justify-content: flex-end; align-items: center; min-width: 22px; height: 100%; font-size: .72rem; font-weight: 800; }
+.st-bar { width: 100%; min-height: 2px; background: var(--rosa); border-radius: 5px 5px 0 0; }
+.st-bar.hoje { background: var(--uva); } .st-horas .st-bar { background: var(--ceu); }
+.st-col span { line-height: 1.5; }
+.st-linha { display: grid; grid-template-columns: minmax(110px, 190px) 1fr 120px; gap: 12px; align-items: center; margin: 0 0 8px; font-weight: 800; }
+.st-trilho { height: 22px; background: #fff; border: 3px solid var(--tinta); border-radius: 999px; overflow: hidden; }
+.st-fill { height: 100%; background: var(--rosa); }
+@media (max-width: 600px) { .st-linha { grid-template-columns: 1fr 1fr; } .st-trilho { grid-column: 1 / -1; order: 3; } }
 </style>
 </head>
 <body>
@@ -133,6 +147,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
             <button type="button" role="tab" data-aba="festas">Festas</button>
             <button type="button" role="tab" data-aba="destaque">Destaque da Semana</button>
             <button type="button" role="tab" data-aba="feedbacks" id="aba-feedbacks">Feedbacks</button>
+            <button type="button" role="tab" data-aba="stats" id="aba-stats" hidden>Estatísticas</button>
             <button type="button" role="tab" data-aba="admins" id="aba-admins" hidden>Admins</button>
             <button type="button" role="tab" data-aba="conta">Minha conta</button>
         </div>
@@ -287,6 +302,22 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
             <p class="nota" id="fb-msg" role="status"></p>
         </section>
 
+        <section id="tab-stats" hidden>
+            <h2>Estatísticas do site</h2>
+            <p>Só líderes veem esta aba. Quantas pessoas entram no site. Não guarda IP: cada navegador recebe um código aleatório. Horários de Brasília. Para não contar as suas próprias visitas, abra o site uma vez com <strong>?semcontar</strong> no final do endereço (e <strong>?contar</strong> para voltar a contar).</p>
+            <div class="resumo" id="st-periodo"></div>
+            <div class="st-cards" id="st-cards"></div>
+            <h3>Visitas por dia</h3>
+            <div class="st-barras" id="st-dias"></div>
+            <h3>Média de visitas em cada hora do dia</h3>
+            <div class="st-barras st-horas" id="st-horas"></div>
+            <h3>Quantos chegaram a ver cada parte do site</h3>
+            <div id="st-secoes"></div>
+            <h3>Celular/tablet ou computador</h3>
+            <div id="st-aparelhos"></div>
+            <p class="nota" id="st-msg" role="status"></p>
+        </section>
+
         <section id="tab-admins" hidden>
             <h2>Admins</h2>
             <p>Só o líder cria contas. Anote a senha e passe para a pessoa; ela pode trocar em "Minha conta".</p>
@@ -383,6 +414,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
     function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 
     var S = {
+        stDias: 30, stats: null,
         token: ler('fc_token'), usuario: '', lider: false, online: [],
         insc: [], videos: [], admins: [], noticias: [], equipe: [], editNoticia: null, editEquipe: null, fotoNova: null, pngs: [], festas: [], destaques: [], editDestaque: null, fotoDest: null, feedbacks: [], fbFiltro: '', editPng: null, editFesta: null, verLista: null, jogadores: [],
         filtro: '', apagando: null, editId: null, redefinirId: null, aba: 'inscricoes', timer: null
@@ -428,7 +460,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
     function abrirPainel() {
         ping().then(function () {
             $('#tela-login').hidden = true; $('#tela-painel').hidden = false;
-            $('#aba-admins').hidden = !S.lider;
+            $('#aba-admins').hidden = !S.lider; $('#aba-stats').hidden = !S.lider;
             atualizarTudo();
             clearInterval(S.timer);
             S.timer = setInterval(function () { ping().then(atualizarTudo).catch(function () {}); }, 25000);
@@ -440,6 +472,8 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
     function ping() {
         return chamar('admin_ping').then(function (r) {
             S.usuario = r.usuario; S.lider = !!r.lider; S.online = r.online || [];
+            $('#aba-stats').hidden = !S.lider;
+            if (!S.lider && S.aba === 'stats') abrirAba('inscricoes');
             $('#eu-nome').textContent = S.usuario;
             $('#eu-lider').hidden = !S.lider;
             $('#online-texto').textContent = 'Admins online: ' + S.online.length + (S.online.length ? ' (' + S.online.join(', ') + ')' : '');
@@ -454,9 +488,11 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
         b.addEventListener('click', function () { abrirAba(b.dataset.aba); });
     });
     function abrirAba(nome) {
+        if (nome === 'stats' && !S.lider) nome = 'inscricoes';
         S.aba = nome;
         if (nome === 'pngs' && !S.pngsCarregados) carregarPngs();
-        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'feedbacks', 'admins', 'conta'].forEach(function (a) {
+        if (nome === 'stats') carregarStats();
+        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'feedbacks', 'stats', 'admins', 'conta'].forEach(function (a) {
             var sec = $('#tab-' + a); if (sec) sec.hidden = a !== nome;
             var bt = $('.abas button[data-aba="' + a + '"]'); if (bt) bt.classList.toggle('ativa', a === nome);
         });
@@ -804,6 +840,72 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
             ac.appendChild(rm);
             corpo.appendChild(tr);
         });
+    }
+
+    /* ---------- Estatísticas ---------- */
+    var NOMES_SECAO = { inicio: 'Topo do site', festa: 'Festa', academy: 'Academy', 'yoan-news': 'Yoan News', destaque: 'Destaque da Semana', comunidade: 'Vídeos da comunidade', pngs: 'PNGs', equipe: 'Quem administra', inscricao: 'Quero entrar' };
+    var NOMES_AP = { celular: 'Celular/tablet', computador: 'Computador' };
+    function nf(n) { return Number(n || 0).toLocaleString('pt-BR'); }
+    function pf(n) { return Number(n || 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%'; }
+    function barras(caixa, itens, mostrarValor) {
+        caixa.replaceChildren();
+        var max = Math.max.apply(null, itens.map(function (i) { return i.v; }).concat([1]));
+        itens.forEach(function (i) {
+            var c = criar('div', 'st-col'); c.title = i.titulo;
+            if (mostrarValor) c.appendChild(criar('span', null, i.rotuloValor));
+            var b = criar('div', 'st-bar' + (i.destaque ? ' hoje' : '')); b.style.height = Math.max(2, Math.round(i.v / max * 120)) + 'px';
+            c.appendChild(b); c.appendChild(criar('span', null, i.rotulo)); caixa.appendChild(c);
+        });
+    }
+    function linhaPct(caixa, nome, pct, detalhe) {
+        var l = criar('div', 'st-linha'); l.appendChild(criar('span', null, nome));
+        var t = criar('div', 'st-trilho'), f = criar('div', 'st-fill'); f.style.width = Math.min(100, pct) + '%'; t.appendChild(f); l.appendChild(t);
+        l.appendChild(criar('span', null, pf(pct) + ' (' + detalhe + ')')); caixa.appendChild(l);
+    }
+    function desenharStats() {
+        var r = S.stats; if (!r) return;
+        var per = $('#st-periodo'); per.replaceChildren();
+        [7, 30, 90].forEach(function (d) {
+            var b = criar('button', S.stDias === d ? 'ativa' : '', 'Últimos ' + d + ' dias'); b.type = 'button';
+            b.addEventListener('click', function () { S.stDias = d; carregarStats(); });
+            per.appendChild(b);
+        });
+        var dias = r.por_dia || [], horas = r.por_hora || [], total = r.total_visitas || 0;
+        var hoje = dias.length ? dias[dias.length - 1] : { visitas: 0, unicos: 0 };
+        var melhor = dias.reduce(function (m, d) { return d.visitas > m.visitas ? d : m; }, { visitas: 0, dia: '' });
+        var pico = horas.reduce(function (m, h) { return h.visitas > m.visitas ? h : m; }, { visitas: 0, hora: 0 });
+        var cards = $('#st-cards'); cards.replaceChildren();
+        [['Visitas no período', nf(total)], ['Visitantes únicos', nf(r.visitantes_unicos)],
+         ['Média por dia', (total / (r.dias || 1)).toLocaleString('pt-BR', { maximumFractionDigits: 1 })],
+         ['Hoje', nf(hoje.visitas) + ' (' + nf(hoje.unicos) + ' únicos)'],
+         ['Melhor dia', melhor.visitas ? melhor.dia.slice(8, 10) + '/' + melhor.dia.slice(5, 7) + ': ' + nf(melhor.visitas) : '-'],
+         ['Horário de pico', pico.visitas ? pico.hora + 'h' : '-']].forEach(function (c) {
+            var el = criar('div', 'st-card'); el.appendChild(criar('small', null, c[0])); el.appendChild(criar('strong', null, c[1])); cards.appendChild(el);
+        });
+        var mostrarVal = dias.length <= 31;
+        barras($('#st-dias'), dias.map(function (d, i) {
+            return { v: d.visitas, rotulo: d.dia.slice(8, 10), rotuloValor: String(d.visitas), destaque: i === dias.length - 1,
+                     titulo: d.dia.slice(8, 10) + '/' + d.dia.slice(5, 7) + ': ' + d.visitas + ' visitas, ' + d.unicos + ' únicos' };
+        }), mostrarVal);
+        barras($('#st-horas'), horas.map(function (h) {
+            return { v: h.media, rotulo: String(h.hora), rotuloValor: h.media.toLocaleString('pt-BR', { maximumFractionDigits: 1 }),
+                     titulo: h.hora + 'h: média de ' + h.media + ' visitas por dia (' + h.visitas + ' no período)' };
+        }), true);
+        var sc = $('#st-secoes'); sc.replaceChildren();
+        var secs = r.secoes || [], ord = Object.keys(NOMES_SECAO);
+        secs.sort(function (a, b) { var x = ord.indexOf(a.alvo), y = ord.indexOf(b.alvo); return (x < 0 ? 99 : x) - (y < 0 ? 99 : y); });
+        if (!secs.length) sc.appendChild(criar('p', 'vazio-tab', 'Ainda sem dados. Eles aparecem conforme o pessoal rola o site.'));
+        secs.forEach(function (x) { linhaPct(sc, NOMES_SECAO[x.alvo] || x.alvo, x.pct, nf(x.vistos) + ' pessoas'); });
+        var ap = $('#st-aparelhos'); ap.replaceChildren();
+        (r.aparelhos || []).forEach(function (x) { linhaPct(ap, NOMES_AP[x.aparelho] || x.aparelho, x.pct, nf(x.visitas) + ' visitas'); });
+        if (!(r.aparelhos || []).length) ap.appendChild(criar('p', 'vazio-tab', 'Ainda sem dados.'));
+    }
+    function carregarStats() {
+        $('#st-msg').textContent = 'Carregando...';
+        return chamar('admin_estatisticas', { p_dias: S.stDias }).then(function (r) {
+            S.stats = r; desenharStats();
+            $('#st-msg').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '.';
+        }).catch(function (e) { $('#st-msg').textContent = e.message || 'Não consegui carregar as estatísticas.'; });
     }
 
     /* ---------- Feedbacks ---------- */
