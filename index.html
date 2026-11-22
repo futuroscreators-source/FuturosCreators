@@ -339,6 +339,41 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
 .png-visor p { margin: 0; padding: 20px; color: var(--tinta); font-weight: 800; background: #fff; border-radius: 12px; }
 .png-dica { margin: 0 0 14px; font-size: .9rem; opacity: .8; }
 
+/* ---------- Criador Destaque da Semana ---------- */
+.destaque-cartao {
+    display: grid; grid-template-columns: auto 1fr; gap: 14px 36px; align-items: center;
+    padding: 34px; background: #fff; transform: rotate(-.6deg);
+    border: 5px solid var(--tinta); border-radius: 26px; box-shadow: 10px 10px 0 var(--rosa);
+}
+.destaque-foto { position: relative; width: 190px; height: 190px; }
+.destaque-img { display: block; width: 100%; height: 100%; object-fit: cover; border: 6px solid var(--tinta); border-radius: 50%; background: var(--papel); }
+.inicial-grande { display: grid; place-items: center; font: 400 5.5rem/1 var(--titulo); color: #fff; background: var(--rosa); }
+.coroa {
+    position: absolute; right: -8px; top: -8px; display: grid; place-items: center; width: 56px; height: 56px;
+    font: 400 1.9rem/1 var(--titulo); background: var(--sol); border: 4px solid var(--tinta); border-radius: 50%; transform: rotate(14deg);
+}
+.destaque-info h3 { margin: 0; font: 400 clamp(2rem, 5vw, 3.1rem)/1.05 var(--titulo); overflow-wrap: anywhere; }
+.destaque-info .canal-nome { margin: 4px 0 0; }
+.conquistas { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
+.conquistas .selo { background: var(--ceu); }
+.destaque-numeros { margin: 14px 0 0; font-weight: 800; }
+.destaque-frase { margin: 10px 0 0; max-width: 36em; overflow-wrap: anywhere; }
+.destaque-antigos { margin-top: 44px; }
+.destaque-antigos h3 { margin: 0 0 14px; font: 400 1.6rem var(--titulo); }
+.hall { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.hall-item { display: flex; gap: 12px; align-items: center; padding: 12px 14px; background: #fff; border: 4px solid var(--tinta); border-radius: 16px; }
+.hall-img { flex: none; width: 54px; height: 54px; object-fit: cover; border: 3px solid var(--tinta); border-radius: 50%; background: var(--papel); }
+.hall-inicial { display: grid; place-items: center; font: 400 1.6rem/1 var(--titulo); color: #fff; background: var(--rosa); }
+.hall-item strong { display: block; line-height: 1.2; overflow-wrap: anywhere; }
+.hall-item small { display: block; font-weight: 700; opacity: .8; line-height: 1.3; }
+.rodape-feedback { margin: 0 0 22px; }
+.rodape-feedback span { display: block; margin-bottom: 4px; font-weight: 700; }
+@media (max-width: 700px) {
+    .destaque-cartao { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 24px; box-shadow: 7px 7px 0 var(--rosa); }
+    .destaque-foto { width: 150px; height: 150px; }
+    .conquistas { justify-content: center; }
+}
+
 /* ---------- Celular ---------- */
 @media (max-width: 860px) {
     .topo { padding-bottom: 56px; }
@@ -375,7 +410,8 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
     <nav class="menu" aria-label="Principal">
         <a href="#festa" id="menu-festa" class="menu-festa" hidden>Festa</a>
         <a href="#academy">Academy</a>
-        <a href="#yoan-news">Yoan News</a>
+        <a href="#yoan-news" id="menu-yoan-news" hidden>Yoan News</a>
+        <a href="#destaque" id="menu-destaque" hidden>Destaque</a>
         <a href="#comunidade">Comunidade</a>
         <a href="#pngs">PNGs</a>
         <a href="#equipe">Quem administra</a>
@@ -441,7 +477,7 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
     </div>
 </section>
 
-<section class="secao ceu" id="yoan-news">
+<section class="secao ceu" id="yoan-news" hidden>
     <div class="miolo jornal">
         <div class="jornal-foto" id="yoan-foto">
             <img src="yoan.jpg" alt="Yoan News, com a Yoan de armadura dourada" width="1280" height="720">
@@ -459,6 +495,32 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
                 <h3>Edições anteriores</h3>
                 <div id="lista-antigas"></div>
             </div>
+        </div>
+    </div>
+</section>
+
+<section class="secao sol" id="destaque" hidden>
+    <div class="miolo">
+        <div class="cabeca">
+            <div>
+                <h2 class="adesivo">Criador Destaque da Semana</h2>
+                <p class="intro" id="destaque-semana"></p>
+            </div>
+        </div>
+        <article class="destaque-cartao">
+            <div class="destaque-foto" id="destaque-foto"></div>
+            <div class="destaque-info">
+                <h3 id="destaque-nome"></h3>
+                <p class="canal-nome" id="destaque-canal"></p>
+                <ul class="conquistas" id="destaque-conquistas" aria-label="Conquistas da semana"></ul>
+                <p class="destaque-numeros" id="destaque-numeros" hidden></p>
+                <p class="destaque-frase" id="destaque-frase" hidden></p>
+                <a class="botao rosa pequeno" id="destaque-link" target="_blank" rel="noopener noreferrer" hidden>Ver canal</a>
+            </div>
+        </article>
+        <div class="destaque-antigos" id="destaque-antigos" hidden>
+            <h3>Destaques anteriores</h3>
+            <div class="hall" id="lista-destaques"></div>
         </div>
     </div>
 </section>
@@ -559,6 +621,7 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
 
 <footer class="rodape">
     <img src="logo-creators.png" alt="Futuros Creators" width="1000" height="607">
+    <p class="rodape-feedback"><span>Tem uma ideia ou achou algum problema?</span><a class="botao claro pequeno" href="feedback.html">Mandar feedback</a></p>
     <p>&copy; 2026 Futuros Creators</p>
 </footer>
 
@@ -719,11 +782,11 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
     }
     function mostrarNoticias(lista) {
         var vazio = $('#vazio-noticias'), atual = $('#noticia-atual'), ant = $('#noticias-antigas');
-        if (!lista.length) {
-            atual.hidden = true; ant.hidden = true; vazio.hidden = false;
-            vazio.textContent = 'A primeira edição do Yoan News sai em breve.';
-            return;
-        }
+        lista = lista || [];
+        /* Sem nenhuma edição publicada, a seção e o link do menu ficam escondidos (igual à Festa) */
+        $('#yoan-news').hidden = !lista.length;
+        $('#menu-yoan-news').hidden = !lista.length;
+        if (!lista.length) { atual.hidden = true; ant.hidden = true; return; }
         var n = lista[0];
         vazio.hidden = true; atual.hidden = false;
         $('#noticia-selo').textContent = 'Edição nº ' + n.edicao;
@@ -746,8 +809,56 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
         ant.hidden = !resto.length;
     }
     FC.rpc('publico_noticias').then(mostrarNoticias).catch(function () {
-        $('#vazio-noticias').textContent = FC.configurado() ? 'Não consegui carregar o Yoan News agora. Atualize a página.' : 'O Yoan News chega em breve.';
+        /* Se não deu para carregar, a seção continua escondida */
     });
+
+    /* ---------- Criador Destaque da Semana (só aparece quando tem um cadastrado) ---------- */
+    function fmtSemana(ini) {
+        var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(ini || ''); if (!m) return '';
+        try {
+            var a = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])), b = new Date(a.getTime() + 6 * 864e5);
+            var mes = function (d) { return d.toLocaleDateString('pt-BR', { month: 'long', timeZone: 'UTC' }); };
+            return 'Semana de ' + a.getUTCDate() + (mes(a) === mes(b) ? '' : ' de ' + mes(a)) + ' a ' + b.getUTCDate() + ' de ' + mes(b);
+        } catch (e) { return ''; }
+    }
+    function avatar(p, cls, clsInicial) {
+        if (/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(p.foto || '')) {
+            var f = criar('img', cls); f.alt = 'Foto do canal ' + p.canal; f.src = p.foto; return f;
+        }
+        return criar('span', clsInicial, (p.nome || '?').trim().charAt(0).toUpperCase());
+    }
+    function listaConquistas(d) { return Array.isArray(d.conquistas) ? d.conquistas.filter(Boolean) : []; }
+    function mostrarDestaques(lista) {
+        lista = lista || [];
+        $('#destaque').hidden = !lista.length; $('#menu-destaque').hidden = !lista.length;
+        if (!lista.length) return;
+        var d = lista[0];
+        $('#destaque-semana').textContent = fmtSemana(d.semana_inicio);
+        var f = $('#destaque-foto'); f.replaceChildren();
+        f.appendChild(avatar(d, 'destaque-img', 'destaque-img inicial-grande'));
+        var c = criar('span', 'coroa', '\u2605'); c.setAttribute('aria-hidden', 'true'); f.appendChild(c);
+        $('#destaque-nome').textContent = d.nome;
+        $('#destaque-canal').textContent = d.canal;
+        var ul = $('#destaque-conquistas'); ul.replaceChildren();
+        listaConquistas(d).forEach(function (t) { var li = criar('li'); li.appendChild(criar('span', 'selo', t)); ul.appendChild(li); });
+        var n = $('#destaque-numeros'); n.textContent = d.numeros || ''; n.hidden = !d.numeros;
+        var fr = $('#destaque-frase'); fr.textContent = d.frase || ''; fr.hidden = !d.frase;
+        var a = $('#destaque-link');
+        if (/^https:\/\//i.test(d.link || '')) { a.href = d.link; a.hidden = false; } else a.hidden = true;
+
+        var resto = lista.slice(1), caixa = $('#lista-destaques');
+        caixa.replaceChildren();
+        resto.forEach(function (e) {
+            var it = criar('div', 'hall-item');
+            it.appendChild(avatar(e, 'hall-img', 'hall-img hall-inicial'));
+            var t = criar('div'); t.appendChild(criar('strong', null, e.nome));
+            t.appendChild(criar('small', null, fmtSemana(e.semana_inicio)));
+            var q = listaConquistas(e).join(' \u2022 '); if (q) t.appendChild(criar('small', null, q));
+            it.appendChild(t); caixa.appendChild(it);
+        });
+        $('#destaque-antigos').hidden = !resto.length;
+    }
+    FC.rpc('publico_destaques').then(mostrarDestaques).catch(function () { /* sem banco: a seção continua escondida */ });
 
     /* ---------- Quem administra ---------- */
     function cardEquipe(p) {

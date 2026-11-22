@@ -90,6 +90,13 @@ img.png-mini { width: 56px; height: 56px; object-fit: contain; vertical-align: m
 .add-jogador { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .add-jogador input { max-width: 260px; }
 
+input[type=date] { width: 100%; padding: .6em .8em; font: 600 1rem var(--texto); color: var(--tinta); background: var(--papel); border: 3px solid var(--tinta); border-radius: 12px; }
+.fb-cartao { margin: 0 0 14px; padding: 14px 18px; background: #fff; border: 3px solid var(--tinta); border-radius: 16px; }
+.fb-cartao.novo { border-left-width: 12px; border-left-color: var(--rosa); }
+.fb-topo { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin: 0 0 8px; font-weight: 800; }
+.fb-topo time { font-weight: 700; opacity: .75; }
+.fb-msg { margin: 0 0 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.etq.t-sugestao { background: var(--sol); } .etq.t-elogio { background: #9be9a8; } .etq.t-problema { background: #ffb3c9; } .etq.t-ideia { background: #a8e8ee; }
 </style>
 </head>
 <body>
@@ -123,6 +130,8 @@ img.png-mini { width: 56px; height: 56px; object-fit: contain; vertical-align: m
             <button type="button" role="tab" data-aba="equipe">Equipe</button>
             <button type="button" role="tab" data-aba="pngs">PNGs</button>
             <button type="button" role="tab" data-aba="festas">Festas</button>
+            <button type="button" role="tab" data-aba="destaque">Destaque da Semana</button>
+            <button type="button" role="tab" data-aba="feedbacks" id="aba-feedbacks">Feedbacks</button>
             <button type="button" role="tab" data-aba="admins" id="aba-admins" hidden>Admins</button>
             <button type="button" role="tab" data-aba="conta">Minha conta</button>
         </div>
@@ -241,6 +250,42 @@ img.png-mini { width: 56px; height: 56px; object-fit: contain; vertical-align: m
             <p class="vazio-tab" id="f-vazio" hidden>Nenhuma festa criada ainda.</p>
         </section>
 
+        <section id="tab-destaque" hidden>
+            <h2>Criador Destaque da Semana</h2>
+            <p>Escolha quem foi o melhor da semana e marque no que ele se destacou. O mais recente aparece em destaque no site e os outros viram "Destaques anteriores". Se não houver nenhum cadastrado, a seção some do site.</p>
+            <form class="form-caixa" id="form-destaque" novalidate>
+                <div><label for="d-semana">Semana que começa em <small>segunda-feira</small></label><input id="d-semana" type="date"></div>
+                <div><label for="d-nome">Nome do criador</label><input id="d-nome" type="text" maxlength="60" autocomplete="off"></div>
+                <div><label for="d-canal">Nome do canal</label><input id="d-canal" type="text" maxlength="80" autocomplete="off"></div>
+                <div><label for="d-link">Link do canal</label><input id="d-link" type="text" autocomplete="off" autocapitalize="none" placeholder="https://youtube.com/@canal"></div>
+                <div class="inteira"><label>Em que ele foi o melhor</label>
+                    <div class="marcas" id="d-conquistas"></div></div>
+                <div><label for="d-outra">Outra conquista <small>opcional</small></label><input id="d-outra" type="text" maxlength="40" autocomplete="off" placeholder="Ex.: Melhor thumbnail"></div>
+                <div><label for="d-numeros">Números da semana <small>opcional</small></label><input id="d-numeros" type="text" maxlength="120" autocomplete="off" placeholder="7 vídeos, 52 mil visualizações"></div>
+                <div class="inteira"><label for="d-frase">Por que ganhou <small>opcional, até 300 letras</small></label><input id="d-frase" type="text" maxlength="300" autocomplete="off"></div>
+                <div class="inteira"><label for="d-foto">Foto do criador <small>opcional: escolha na galeria</small></label>
+                    <div class="foto-linha"><img id="d-prev" alt="Prévia da foto" hidden><input id="d-foto" type="file" accept="image/*"><button type="button" id="d-foto-x" hidden>Tirar foto</button></div></div>
+                <div class="btns"><button type="submit" class="rosa" id="d-salvar">Publicar destaque</button><button type="button" id="d-cancelar" hidden>Cancelar edição</button></div>
+            </form>
+            <p class="nota" id="d-msg" role="status"></p>
+            <div class="caixa">
+                <table style="min-width:620px">
+                    <thead><tr><th>Semana</th><th>Criador</th><th>Conquistas</th><th>Ações</th></tr></thead>
+                    <tbody id="d-linhas"></tbody>
+                </table>
+                <p class="vazio-tab" id="d-vazio" hidden>Nenhum destaque cadastrado ainda.</p>
+            </div>
+        </section>
+
+        <section id="tab-feedbacks" hidden>
+            <h2>Feedbacks</h2>
+            <p>O que o pessoal mandou pela página de feedback do site.</p>
+            <div class="resumo" id="fb-resumo"></div>
+            <div id="fb-lista"></div>
+            <p class="vazio-tab" id="fb-vazio" hidden>Nenhum feedback por aqui ainda.</p>
+            <p class="nota" id="fb-msg" role="status"></p>
+        </section>
+
         <section id="tab-admins" hidden>
             <h2>Admins</h2>
             <p>Só o líder cria contas. Anote a senha e passe para a pessoa; ela pode trocar em "Minha conta".</p>
@@ -338,7 +383,7 @@ img.png-mini { width: 56px; height: 56px; object-fit: contain; vertical-align: m
 
     var S = {
         token: ler('fc_token'), usuario: '', lider: false, online: [],
-        insc: [], videos: [], admins: [], noticias: [], equipe: [], editNoticia: null, editEquipe: null, fotoNova: null, pngs: [], festas: [], editPng: null, editFesta: null, verLista: null, jogadores: [],
+        insc: [], videos: [], admins: [], noticias: [], equipe: [], editNoticia: null, editEquipe: null, fotoNova: null, pngs: [], festas: [], destaques: [], editDestaque: null, fotoDest: null, feedbacks: [], fbFiltro: '', editPng: null, editFesta: null, verLista: null, jogadores: [],
         filtro: '', apagando: null, editId: null, redefinirId: null, aba: 'inscricoes', timer: null
     };
 
@@ -401,7 +446,7 @@ img.png-mini { width: 56px; height: 56px; object-fit: contain; vertical-align: m
     }
 
     function atualizarTudo() {
-        carregarInscricoes(); carregarVideos(); carregarNoticias(); carregarEquipe(); carregarFestas(); if (S.lider) carregarAdmins();
+        carregarInscricoes(); carregarVideos(); carregarNoticias(); carregarEquipe(); carregarFestas(); carregarDestaques(); carregarFeedbacks(); if (S.lider) carregarAdmins();
     }
 
     document.querySelectorAll('.abas button').forEach(function (b) {
@@ -410,7 +455,7 @@ img.png-mini { width: 56px; height: 56px; object-fit: contain; vertical-align: m
     function abrirAba(nome) {
         S.aba = nome;
         if (nome === 'pngs' && !S.pngsCarregados) carregarPngs();
-        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'admins', 'conta'].forEach(function (a) {
+        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'feedbacks', 'admins', 'conta'].forEach(function (a) {
             var sec = $('#tab-' + a); if (sec) sec.hidden = a !== nome;
             var bt = $('.abas button[data-aba="' + a + '"]'); if (bt) bt.classList.toggle('ativa', a === nome);
         });
@@ -642,6 +687,163 @@ img.png-mini { width: 56px; height: 56px; object-fit: contain; vertical-align: m
             });
             ac.appendChild(rm);
             corpo.appendChild(tr);
+        });
+    }
+
+    /* ---------- Criador Destaque da Semana ---------- */
+    var CONQ = ['Mais criativo', 'Mais visualizações', 'Mais vídeos na semana', 'Melhor edição', 'Maior evolução', 'Mais engajamento'];
+    var fd = $('#form-destaque'), dmsg = $('#d-msg'), dprev = $('#d-prev'), dfoto = $('#d-foto'), dfotoX = $('#d-foto-x');
+    CONQ.forEach(function (c) {
+        var l = criar('label'), i = criar('input'); i.type = 'checkbox'; i.value = c;
+        l.appendChild(i); l.appendChild(document.createTextNode(' ' + c)); $('#d-conquistas').appendChild(l);
+    });
+    function segundaDaSemana() {
+        var x = new Date(); x = new Date(x.getFullYear(), x.getMonth(), x.getDate());
+        x.setDate(x.getDate() - ((x.getDay() + 6) % 7));
+        return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0');
+    }
+    function fmtSemana(ini) {
+        var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(ini || ''); if (!m) return '-';
+        return m[3] + '/' + m[2] + '/' + m[1] + ' a ' + (function () {
+            var b = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]) + 6 * 864e5);
+            return String(b.getUTCDate()).padStart(2, '0') + '/' + String(b.getUTCMonth() + 1).padStart(2, '0') + '/' + b.getUTCFullYear();
+        })();
+    }
+    $('#d-semana').value = segundaDaSemana();
+    function mostrarFotoDest(src) {
+        dprev.hidden = !src; dfotoX.hidden = !src;
+        if (src) dprev.src = src; else dprev.removeAttribute('src');
+    }
+    dfoto.addEventListener('change', function () {
+        var arq = dfoto.files && dfoto.files[0]; if (!arq) return;
+        if (!/^image\//.test(arq.type)) { dmsg.textContent = 'Escolha um arquivo de imagem.'; dfoto.value = ''; return; }
+        var url = URL.createObjectURL(arq), img = new Image();
+        img.onload = function () {
+            var lado = Math.min(img.naturalWidth, img.naturalHeight), cv = document.createElement('canvas');
+            cv.width = cv.height = 240;
+            var ctx = cv.getContext('2d'); ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, 240, 240);
+            ctx.drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, 240, 240);
+            URL.revokeObjectURL(url);
+            S.fotoDest = cv.toDataURL('image/jpeg', 0.82); mostrarFotoDest(S.fotoDest); dmsg.textContent = '';
+        };
+        img.onerror = function () { URL.revokeObjectURL(url); dmsg.textContent = 'Não consegui abrir essa imagem. Tente outra.'; dfoto.value = ''; };
+        img.src = url;
+    });
+    dfotoX.addEventListener('click', function () { S.fotoDest = ''; dfoto.value = ''; mostrarFotoDest(null); });
+    function marcarConq(lista) {
+        var extras = [];
+        lista = lista || [];
+        document.querySelectorAll('#d-conquistas input').forEach(function (i) { i.checked = lista.indexOf(i.value) !== -1; });
+        lista.forEach(function (t) { if (CONQ.indexOf(t) === -1) extras.push(t); });
+        $('#d-outra').value = extras.join(', ');
+    }
+    function limparDestaque() {
+        S.fotoDest = null; dfoto.value = ''; mostrarFotoDest(null); S.editDestaque = null; fd.reset(); marcarConq([]);
+        $('#d-semana').value = segundaDaSemana();
+        $('#d-salvar').textContent = 'Publicar destaque'; $('#d-cancelar').hidden = true;
+    }
+    $('#d-cancelar').addEventListener('click', function () { limparDestaque(); dmsg.textContent = ''; });
+    function carregarDestaques() {
+        return FC.rpc('publico_destaques').then(function (l) { S.destaques = l || []; desenharDestaques(); }).catch(function () {});
+    }
+    fd.addEventListener('submit', function (ev) {
+        ev.preventDefault(); dmsg.textContent = '';
+        var nome = $('#d-nome').value.trim(), canal = $('#d-canal').value.trim(), link = $('#d-link').value.trim(), semana = $('#d-semana').value;
+        var conq = [];
+        document.querySelectorAll('#d-conquistas input:checked').forEach(function (i) { conq.push(i.value); });
+        var outra = $('#d-outra').value.trim(); if (outra) conq.push(outra);
+        if (!semana) { dmsg.textContent = 'Escolha a semana.'; return; }
+        if (nome.length < 2) { dmsg.textContent = 'Escreva o nome do criador.'; return; }
+        if (canal.length < 2) { dmsg.textContent = 'Escreva o nome do canal.'; return; }
+        if (!/^https:\/\/\S{4,}$/i.test(link)) { dmsg.textContent = 'O link do canal precisa começar com https://'; return; }
+        if (!conq.length) { dmsg.textContent = 'Marque pelo menos uma conquista.'; return; }
+        var b = $('#d-salvar'); b.disabled = true;
+        var editando = !!S.editDestaque;
+        chamar('admin_destaque_salvar', {
+            p_id: S.editDestaque, p_semana: semana, p_nome: nome, p_canal: canal, p_link: link, p_foto: S.fotoDest,
+            p_conquistas: conq, p_numeros: $('#d-numeros').value.trim(), p_frase: $('#d-frase').value.trim()
+        }).then(function () {
+            limparDestaque(); dmsg.textContent = editando ? 'Destaque atualizado.' : 'Destaque publicado. Já está no site.';
+            return carregarDestaques();
+        }).catch(function (e) { dmsg.textContent = e.message; })
+          .then(function () { b.disabled = false; });
+    });
+    function desenharDestaques() {
+        var corpo = $('#d-linhas'); corpo.replaceChildren();
+        $('#d-vazio').hidden = S.destaques.length > 0;
+        S.destaques.forEach(function (d) {
+            var tr = document.createElement('tr');
+            function td() { var t = document.createElement('td'); tr.appendChild(t); return t; }
+            td().textContent = fmtSemana(d.semana_inicio);
+            var tn = td();
+            if (/^data:image\/jpeg;base64,/.test(d.foto || '')) { var mi = criar('img', 'mini'); mi.alt = ''; mi.src = d.foto; tn.appendChild(mi); }
+            tn.appendChild(criar('strong', null, d.nome)); tn.appendChild(document.createElement('br')); tn.appendChild(document.createTextNode(d.canal));
+            td().textContent = (d.conquistas || []).join(', ');
+            var ac = criar('div', 'acoes'); td().appendChild(ac);
+            var ed = criar('button', null, 'Editar'); ed.type = 'button';
+            ed.addEventListener('click', function () {
+                S.editDestaque = d.id; $('#d-semana').value = String(d.semana_inicio).slice(0, 10);
+                $('#d-nome').value = d.nome; $('#d-canal').value = d.canal; $('#d-link').value = d.link;
+                $('#d-numeros').value = d.numeros || ''; $('#d-frase').value = d.frase || ''; marcarConq(d.conquistas);
+                S.fotoDest = null; dfoto.value = ''; mostrarFotoDest(/^data:image\/jpeg;base64,/.test(d.foto || '') ? d.foto : null);
+                $('#d-salvar').textContent = 'Salvar alterações'; $('#d-cancelar').hidden = false;
+                dmsg.textContent = 'Editando o destaque de ' + d.nome + '.';
+                fd.scrollIntoView({ block: 'start' });
+            });
+            ac.appendChild(ed);
+            var rm = criar('button', 'perigo', S.apagando === 'd' + d.id ? 'Confirmar?' : 'Apagar'); rm.type = 'button';
+            rm.addEventListener('click', function () {
+                if (S.apagando !== 'd' + d.id) { S.apagando = 'd' + d.id; desenharDestaques(); return; }
+                S.apagando = null;
+                chamar('admin_destaque_apagar', { p_id: d.id }).then(function () {
+                    if (S.editDestaque === d.id) limparDestaque();
+                    dmsg.textContent = 'Destaque apagado.'; return carregarDestaques();
+                }).catch(function (e) { dmsg.textContent = e.message; });
+            });
+            ac.appendChild(rm);
+            corpo.appendChild(tr);
+        });
+    }
+
+    /* ---------- Feedbacks ---------- */
+    var TIPOS = { sugestao: 'Sugestão', elogio: 'Elogio', problema: 'Problema', ideia: 'Ideia de vídeo' };
+    function carregarFeedbacks() {
+        return chamar('admin_feedbacks').then(function (l) { S.feedbacks = l || []; desenharFeedbacks(); }).catch(function () {});
+    }
+    function desenharFeedbacks() {
+        var novos = S.feedbacks.filter(function (f) { return !f.lido; }).length;
+        $('#aba-feedbacks').textContent = novos ? 'Feedbacks (' + novos + ')' : 'Feedbacks';
+        var resumo = $('#fb-resumo'); resumo.replaceChildren();
+        [['', 'Todos (' + S.feedbacks.length + ')'], ['novo', 'Não lidos (' + novos + ')'], ['lido', 'Lidos (' + (S.feedbacks.length - novos) + ')']].forEach(function (f) {
+            var b = criar('button', S.fbFiltro === f[0] ? 'ativa' : '', f[1]); b.type = 'button';
+            b.addEventListener('click', function () { S.fbFiltro = f[0]; desenharFeedbacks(); });
+            resumo.appendChild(b);
+        });
+        var lista = S.feedbacks.filter(function (f) { return !S.fbFiltro || (S.fbFiltro === 'novo' ? !f.lido : f.lido); });
+        var caixa = $('#fb-lista'); caixa.replaceChildren();
+        $('#fb-vazio').hidden = lista.length > 0;
+        lista.forEach(function (f) {
+            var c = criar('article', 'fb-cartao' + (f.lido ? '' : ' novo'));
+            var t = criar('div', 'fb-topo');
+            t.appendChild(criar('span', 'etq t-' + (TIPOS[f.tipo] ? f.tipo : 'sugestao'), TIPOS[f.tipo] || 'Feedback'));
+            t.appendChild(criar('span', null, f.nome || 'Anônimo'));
+            if (f.nota) t.appendChild(criar('span', null, 'Nota ' + f.nota + '/5'));
+            t.appendChild(criar('time', null, fmtData(f.criado_em)));
+            c.appendChild(t); c.appendChild(criar('p', 'fb-msg', f.mensagem));
+            var ac = criar('div', 'acoes');
+            var lb = criar('button', null, f.lido ? 'Marcar como não lido' : 'Marcar como lido'); lb.type = 'button';
+            lb.addEventListener('click', function () {
+                chamar('admin_feedback_marcar', { p_id: f.id, p_lido: !f.lido }).then(carregarFeedbacks).catch(function (e) { $('#fb-msg').textContent = e.message; });
+            });
+            ac.appendChild(lb);
+            var rm = criar('button', 'perigo', S.apagando === 'f' + f.id ? 'Confirmar?' : 'Apagar'); rm.type = 'button';
+            rm.addEventListener('click', function () {
+                if (S.apagando !== 'f' + f.id) { S.apagando = 'f' + f.id; desenharFeedbacks(); return; }
+                S.apagando = null;
+                chamar('admin_feedback_apagar', { p_id: f.id }).then(function () { $('#fb-msg').textContent = 'Feedback apagado.'; return carregarFeedbacks(); })
+                  .catch(function (e) { $('#fb-msg').textContent = e.message; });
+            });
+            ac.appendChild(rm); c.appendChild(ac); caixa.appendChild(c);
         });
     }
 

@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feedback | Futuros Creators</title>
+<meta name="description" content="Mande sua sugestão, elogio ou problema para a equipe dos Futuros Creators.">
+<meta name="theme-color" content="#FFC93C">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+
+:root {
+    --sol: #FFC93C;
+    --sol-claro: #FFD966;
+    --uva: #2B0A57;
+    --rosa: #FF4FA3;
+    --ceu: #35D6E0;
+    --tinta: #17101F;
+    --papel: #FFF6DD;
+    --raio: 18px;
+    --titulo: 'Lilita One', 'Trebuchet MS', sans-serif;
+    --texto: 'Nunito', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+body {
+    margin: 0;
+    font: 500 1.0625rem/1.55 var(--texto);
+    color: var(--tinta);
+    background: var(--sol);
+    -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+:focus-visible { outline: 4px solid var(--ceu); outline-offset: 3px; }
+
+/* ---------- Título no estilo da logo: branco, contorno preto grosso ---------- */
+.adesivo {
+    margin: 0 0 .35em;
+    font: 400 clamp(2.3rem, 6vw, 3.8rem)/1.02 var(--titulo);
+    color: #fff;
+    -webkit-text-stroke: 9px var(--tinta);
+    paint-order: stroke fill;
+    text-shadow: 4px 5px 0 var(--tinta);
+    letter-spacing: .01em;
+    transform: rotate(-1.5deg);
+    transform-origin: left center;
+}
+
+/* ---------- Botões ---------- */
+.botao {
+    display: inline-block;
+    padding: .7em 1.4em;
+    font: 400 1.25rem/1 var(--titulo);
+    text-decoration: none;
+    border: 4px solid var(--tinta);
+    border-radius: 999px;
+    box-shadow: 0 6px 0 var(--tinta);
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+}
+.botao:hover { transform: translateY(2px); box-shadow: 0 4px 0 var(--tinta); }
+.botao:active { transform: translateY(6px); box-shadow: 0 0 0 var(--tinta); }
+.botao.rosa { background: var(--rosa); color: #fff; }
+.botao.claro { background: #fff; color: var(--tinta); }
+.botao.grande { width: 100%; font-size: 1.5rem; padding: .8em 1em; }
+
+.menu { position: relative; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; max-width: 1180px; margin: 0 auto; }
+.menu a {
+    padding: .45em 1.05em; font-weight: 800; text-decoration: none;
+    background: #fff; border: 3px solid var(--tinta); border-radius: 999px;
+    box-shadow: 0 4px 0 var(--tinta);
+}
+.menu a:hover { background: var(--papel); }
+/* ---------- Seções ---------- */
+.secao { padding: 80px 20px; }
+.secao.escura { background: var(--uva); color: #fff; }
+.secao.papel { background: var(--papel); }
+.secao.sol { background: var(--sol); }
+.miolo { max-width: 1180px; margin: 0 auto; }
+.cabeca { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 36px; }
+.intro { max-width: 32em; margin: 0; font-size: 1.15rem; font-weight: 700; }
+.logo-secao { width: min(380px, 80vw); margin: -6% 0 -7% -12px; }
+.vazio { padding: 40px 24px; border: 4px dashed currentColor; border-radius: var(--raio); font-weight: 800; text-align: center; opacity: .85; }
+
+.botao.pequeno { margin-top: 14px; padding: .55em 1.1em; font-size: 1rem; box-shadow: 0 4px 0 var(--tinta); }
+.duas-colunas { display: grid; grid-template-columns: .85fr 1.15fr; gap: 56px; align-items: start; }
+.folha {
+    padding: 34px; background: #fff;
+    border: 5px solid var(--tinta); border-radius: 26px;
+    box-shadow: 10px 10px 0 var(--uva);
+}
+.campo { margin: 0 0 22px; padding: 0; border: 0; min-width: 0; }
+.campo label, .campo legend { display: block; margin-bottom: 8px; padding: 0; font-weight: 800; font-size: 1.05rem; }
+.campo input[type=text], .campo textarea {
+    width: 100%; padding: .75em .9em;
+    font: 600 1.05rem/1.4 var(--texto); color: var(--tinta);
+    background: var(--papel); border: 3px solid var(--tinta); border-radius: 14px;
+}
+.campo textarea { resize: vertical; min-height: 130px; }
+.campo input::placeholder, .campo textarea::placeholder { color: #8b8296; font-weight: 500; }
+.campo input[type=text]:focus, .campo textarea:focus { outline: none; background: #fff; box-shadow: 0 0 0 4px var(--ceu); }
+
+.arroba { display: flex; align-items: stretch; }
+.arroba span {
+    display: grid; place-items: center; padding: 0 .9em;
+    font: 400 1.4rem var(--titulo); background: var(--sol);
+    border: 3px solid var(--tinta); border-right: 0; border-radius: 14px 0 0 14px;
+}
+.arroba input { border-radius: 0 14px 14px 0 !important; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip input { position: absolute; opacity: 0; pointer-events: none; }
+.chip span {
+    display: inline-block; padding: .5em 1.1em; margin: 0;
+    font-weight: 800; background: var(--papel);
+    border: 3px solid var(--tinta); border-radius: 999px; cursor: pointer;
+    transition: background .12s, transform .12s;
+}
+.chip input:checked + span { background: var(--rosa); color: #fff; transform: rotate(-2deg); box-shadow: 0 3px 0 var(--tinta); }
+.chip input:focus-visible + span { outline: 4px solid var(--ceu); outline-offset: 3px; }
+
+.campo.ciente .marca { display: flex; gap: 12px; align-items: flex-start; font-weight: 600; font-size: .98rem; cursor: pointer; }
+.marca input { width: 24px; height: 24px; flex: none; margin: 2px 0 0; accent-color: var(--rosa); }
+
+.erro { min-height: 0; margin: 6px 0 0; font-weight: 800; font-size: .95rem; color: #C4125F; }
+.erro:empty { display: none; }
+.campo.com-erro input[type=text], .campo.com-erro textarea { border-color: #C4125F; }
+.erro.geral { margin-top: 14px; text-align: center; }
+.isca { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.enviado { text-align: center; padding: 28px 8px; }
+.enviado h3 { margin: 0 0 10px; font: 400 2.4rem/1.1 var(--titulo); }
+.enviado p { margin: 0 auto; max-width: 24em; font-weight: 700; }
+
+/* ---------- Rodapé ---------- */
+.rodape { padding: 40px 20px; text-align: center; background: var(--tinta); color: #cfc6dc; }
+.rodape img { width: 170px; margin: 0 auto 6px; }
+.rodape p { margin: 0; font-size: .95rem; }
+
+
+/* ---------- Página de feedback ---------- */
+.fb-topo { padding: 20px 20px 0; background: var(--sol); }
+.fb-topo .menu { margin-bottom: 0; }
+.secao.fb { padding-top: 40px; min-height: 80vh; }
+.fb-texto .intro { margin-bottom: 14px; }
+.fb-texto ul { margin: 18px 0 0; padding-left: 1.2em; font-weight: 700; }
+.fb-texto li { margin-bottom: 6px; }
+.campo textarea { min-height: 170px; }
+.contagem { margin: 6px 0 0; font-size: .92rem; font-weight: 700; opacity: .75; text-align: right; }
+.notas { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.notas .ponta { font-size: .9rem; font-weight: 700; opacity: .75; }
+.botoes-ok { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 22px; }
+@media (max-width: 860px) {
+    .menu { justify-content: center; }
+    .secao { padding: 56px 18px; }
+    .secao.fb { padding-top: 32px; }
+    .duas-colunas { grid-template-columns: 1fr; gap: 36px; }
+    .folha { padding: 22px; box-shadow: 7px 7px 0 var(--uva); }
+    .adesivo { -webkit-text-stroke-width: 7px; }
+}
+</style>
+</head>
+<body>
+
+<header class="fb-topo">
+    <nav class="menu" aria-label="Principal">
+        <a href="index.html">&larr; Voltar para o site</a>
+    </nav>
+</header>
+
+<main class="secao sol fb">
+    <div class="miolo duas-colunas">
+        <div class="fb-texto">
+            <h1 class="adesivo">Seu feedback</h1>
+            <p class="intro">Conta pra gente o que você achou. Cada mensagem é lida pela equipe.</p>
+            <ul>
+                <li>Sugestões para o grupo e para o site</li>
+                <li>Elogios (a gente adora)</li>
+                <li>Algo quebrado ou estranho</li>
+                <li>Ideias de vídeo para a Academy</li>
+            </ul>
+        </div>
+        <div class="folha">
+            <form id="form-feedback" novalidate>
+                <fieldset class="campo">
+                    <legend>Sobre o que é?</legend>
+                    <div class="chips">
+                        <label class="chip"><input type="radio" name="tipo" value="sugestao" checked><span>Sugestão</span></label>
+                        <label class="chip"><input type="radio" name="tipo" value="elogio"><span>Elogio</span></label>
+                        <label class="chip"><input type="radio" name="tipo" value="problema"><span>Problema</span></label>
+                        <label class="chip"><input type="radio" name="tipo" value="ideia"><span>Ideia de vídeo</span></label>
+                    </div>
+                </fieldset>
+                <fieldset class="campo">
+                    <legend>Quanto você curte o grupo? <small>opcional</small></legend>
+                    <div class="notas chips">
+                        <span class="ponta">1 = pouco</span>
+                        <label class="chip"><input type="radio" name="nota" value="1"><span>1</span></label>
+                        <label class="chip"><input type="radio" name="nota" value="2"><span>2</span></label>
+                        <label class="chip"><input type="radio" name="nota" value="3"><span>3</span></label>
+                        <label class="chip"><input type="radio" name="nota" value="4"><span>4</span></label>
+                        <label class="chip"><input type="radio" name="nota" value="5"><span>5</span></label>
+                        <span class="ponta">5 = muito</span>
+                    </div>
+                </fieldset>
+                <div class="campo">
+                    <label for="mensagem">Sua mensagem</label>
+                    <textarea id="mensagem" name="mensagem" maxlength="1000" placeholder="Escreva aqui..."></textarea>
+                    <p class="contagem" id="contagem">0 de 1000 letras</p>
+                    <p class="erro" data-erro="mensagem" role="alert"></p>
+                </div>
+                <div class="campo">
+                    <label for="nome">Seu nome <small>opcional</small></label>
+                    <input id="nome" name="nome" type="text" maxlength="40" autocomplete="off" placeholder="Pode deixar em branco">
+                    <p class="dica">Sem nome, o feedback chega como anônimo.</p>
+                </div>
+                <div class="isca" aria-hidden="true"><label>Não preencha <input type="text" id="isca" name="site" tabindex="-1" autocomplete="off"></label></div>
+                <button type="submit" id="fb-enviar" class="botao rosa grande">Enviar feedback</button>
+                <p class="erro geral" id="fb-erro" role="alert"></p>
+            </form>
+            <div class="enviado" id="fb-ok" hidden>
+                <h3>Obrigado!</h3>
+                <p>Seu feedback chegou para a equipe.</p>
+                <div class="botoes-ok">
+                    <button type="button" class="botao claro" id="fb-outro">Enviar outro</button>
+                    <a class="botao rosa" href="index.html">Voltar ao site</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="rodape">
+    <img src="logo-creators.png" alt="Futuros Creators" width="1000" height="607">
+    <p>&copy; 2026 Futuros Creators</p>
+</footer>
+
+<script src="config.js"></script>
+<script>
+/* Conversa com o banco de dados (Supabase) chamando as funções do banco.sql */
+(function (w) {
+    'use strict';
+    var cfg = w.FUTUROS_CONFIG || {};
+
+    function configurado() {
+        return /^https?:\/\//.test(cfg.url || '') && !/COLOQUE/.test((cfg.url || '') + (cfg.chave || '')) && !!cfg.chave;
+    }
+
+    function rpc(nome, args) {
+        if (!configurado()) return Promise.reject(new Error('O site ainda não foi ligado ao banco de dados. Preencha o config.js.'));
+        var h = { 'Content-Type': 'application/json', 'apikey': cfg.chave };
+        if (/^eyJ/.test(cfg.chave)) h['Authorization'] = 'Bearer ' + cfg.chave; // chave antiga (JWT)
+        var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+        var t = setTimeout(function () { if (ctrl) ctrl.abort(); }, 20000);
+        var opcoes = { method: 'POST', headers: h, body: JSON.stringify(args || {}) };
+        if (ctrl) opcoes.signal = ctrl.signal;
+
+        return fetch(cfg.url.replace(/\/$/, '') + '/rest/v1/rpc/' + nome, opcoes).then(function (r) {
+            clearTimeout(t);
+            return r.json().catch(function () { return null; }).then(function (j) {
+                if (!r.ok) {
+                    var msg = (j && j.message) || '';
+                    var cod = (j && j.code) || '';
+                    if (r.status === 404 || cod === 'PGRST202' || /Could not find the function/i.test(msg)) {
+                        msg = 'O banco ainda não foi preparado. Rode o banco.sql no Supabase (SQL Editor).';
+                    } else if (r.status === 401 || /api key/i.test(msg)) {
+                        msg = 'A chave do Supabase no config.js está errada.';
+                    } else if (!msg) {
+                        msg = 'Erro ' + r.status + '. Tente de novo.';
+                    }
+                    var e = new Error(msg);
+                    e.codigo = cod; e.status = r.status; throw e;
+                }
+                return j;
+            });
+        }, function (err) {
+            clearTimeout(t);
+            if (err && err.name === 'AbortError') {
+                throw new Error('O banco demorou demais para responder. Se o projeto do Supabase é novo, espere 2 minutos e tente de novo.');
+            }
+            throw new Error('Não consegui falar com o banco. Confira a internet e o endereço (Project URL) no config.js.');
+        });
+    }
+
+    w.FC = { rpc: rpc, configurado: configurado };
+})(window);
+
+</script>
+<script>
+(function () {
+    'use strict';
+    var $ = function (s) { return document.querySelector(s); };
+    var form = $('#form-feedback'), msg = $('#mensagem'), btn = $('#fb-enviar');
+
+    function guardar(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+    function ler(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+
+    function contar() { $('#contagem').textContent = msg.value.length + ' de 1000 letras'; }
+    msg.addEventListener('input', function () { contar(); erroCampo(''); });
+
+    function erroCampo(t) {
+        var e = document.querySelector('[data-erro="mensagem"]'); e.textContent = t;
+        msg.closest('.campo').classList.toggle('com-erro', !!t);
+    }
+
+    form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        $('#fb-erro').textContent = ''; erroCampo('');
+        if ($('#isca').value) return; // robô preencheu o campo escondido
+        var texto = msg.value.trim();
+        if (texto.length < 10) { erroCampo('Escreva pelo menos 10 letras.'); msg.focus(); return; }
+        var ultimo = Number(ler('fc_fb_ultimo')) || 0;
+        if (Date.now() - ultimo < 60000) { $('#fb-erro').textContent = 'Espere um minutinho antes de mandar outro.'; return; }
+
+        var tipo = form.querySelector('input[name="tipo"]:checked').value;
+        var nota = form.querySelector('input[name="nota"]:checked');
+        btn.disabled = true; var rot = btn.textContent; btn.textContent = 'Enviando...';
+        FC.rpc('publico_feedback_enviar', {
+            p_nome: $('#nome').value.trim() || null, p_tipo: tipo, p_mensagem: texto, p_nota: nota ? Number(nota.value) : null
+        }).then(function () {
+            guardar('fc_fb_ultimo', String(Date.now()));
+            form.hidden = true; $('#fb-ok').hidden = false; form.reset(); contar();
+        }).catch(function (e) {
+            $('#fb-erro').textContent = e.message || 'Não consegui enviar agora. Tente de novo.';
+        }).then(function () { btn.disabled = false; btn.textContent = rot; });
+    });
+
+    $('#fb-outro').addEventListener('click', function () { $('#fb-ok').hidden = true; form.hidden = false; msg.focus(); });
+    contar();
+})();
+</script>
+</body>
+</html>
