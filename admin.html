@@ -90,13 +90,14 @@ img.png-mini { width: 56px; height: 56px; object-fit: contain; vertical-align: m
 .add-jogador { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .add-jogador input { max-width: 260px; }
 
-input[type=date] { width: 100%; padding: .6em .8em; font: 600 1rem var(--texto); color: var(--tinta); background: var(--papel); border: 3px solid var(--tinta); border-radius: 12px; }
+input[type=date] { display: block; width: 100%; min-width: 0; max-width: 100%; min-height: 2.9em; -webkit-appearance: none; appearance: none; text-align: left; padding: .6em .8em; font: 600 1rem var(--texto); color: var(--tinta); background: var(--papel); border: 3px solid var(--tinta); border-radius: 12px; }
 .fb-cartao { margin: 0 0 14px; padding: 14px 18px; background: #fff; border: 3px solid var(--tinta); border-radius: 16px; }
 .fb-cartao.novo { border-left-width: 12px; border-left-color: var(--rosa); }
 .fb-topo { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin: 0 0 8px; font-weight: 800; }
 .fb-topo time { font-weight: 700; opacity: .75; }
 .fb-msg { margin: 0 0 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .etq.t-sugestao { background: var(--sol); } .etq.t-elogio { background: #9be9a8; } .etq.t-problema { background: #ffb3c9; } .etq.t-ideia { background: #a8e8ee; }
+input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.4em; }
 </style>
 </head>
 <body>
@@ -254,7 +255,7 @@ input[type=date] { width: 100%; padding: .6em .8em; font: 600 1rem var(--texto);
             <h2>Criador Destaque da Semana</h2>
             <p>Escolha quem foi o melhor da semana e marque no que ele se destacou. O mais recente aparece em destaque no site e os outros viram "Destaques anteriores". Se não houver nenhum cadastrado, a seção some do site.</p>
             <form class="form-caixa" id="form-destaque" novalidate>
-                <div><label for="d-semana">Semana que começa em <small>segunda-feira</small></label><input id="d-semana" type="date"></div>
+                <div><label for="d-semana">Semana (segunda-feira)</label><input id="d-semana" type="date"></div>
                 <div><label for="d-nome">Nome do criador</label><input id="d-nome" type="text" maxlength="60" autocomplete="off"></div>
                 <div><label for="d-canal">Nome do canal</label><input id="d-canal" type="text" maxlength="80" autocomplete="off"></div>
                 <div><label for="d-link">Link do canal</label><input id="d-link" type="text" autocomplete="off" autocapitalize="none" placeholder="https://youtube.com/@canal"></div>
