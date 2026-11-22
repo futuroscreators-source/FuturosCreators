@@ -860,6 +860,38 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
     }
     FC.rpc('publico_destaques').then(mostrarDestaques).catch(function () { /* sem banco: a seção continua escondida */ });
 
+    /* ---------- Contagem de acessos (sem IP: só um código aleatório por navegador) ---------- */
+    (function () {
+        try {
+            if (/[?&]semcontar\b/.test(location.search)) localStorage.setItem('fc_nao_contar', '1');
+            if (/[?&]contar\b/.test(location.search)) localStorage.removeItem('fc_nao_contar');
+            if (localStorage.getItem('fc_nao_contar') || navigator.webdriver || navigator.doNotTrack === '1') return;
+            var id = localStorage.getItem('fc_vid');
+            if (!/^[a-z0-9]{8,40}$/.test(id || '')) {
+                var b = new Uint8Array(12); crypto.getRandomValues(b);
+                id = Array.prototype.map.call(b, function (x) { return (x % 36).toString(36); }).join('');
+                localStorage.setItem('fc_vid', id);
+            }
+            var enviar = function (tipo, alvo) {
+                FC.rpc('publico_registrar', {
+                    p_visitante: id, p_tipo: tipo, p_alvo: alvo || null,
+                    p_aparelho: tipo === 'visita' ? (matchMedia('(pointer: coarse)').matches ? 'celular' : 'computador') : null
+                }).catch(function () {});
+            };
+            if (!sessionStorage.getItem('fc_sess')) { sessionStorage.setItem('fc_sess', '1'); enviar('visita'); }
+            if (!('IntersectionObserver' in window)) return;
+            var vistos = {};
+            /* conta a seção quando ela passa pela faixa do meio da tela */
+            var obs = new IntersectionObserver(function (itens) {
+                itens.forEach(function (it) {
+                    if (!it.isIntersecting || vistos[it.target.id]) return;
+                    vistos[it.target.id] = 1; obs.unobserve(it.target); enviar('secao', it.target.id);
+                });
+            }, { rootMargin: '-35% 0px -35% 0px', threshold: 0 });
+            document.querySelectorAll('section[id]').forEach(function (el) { obs.observe(el); });
+        } catch (e) { /* contagem nunca pode quebrar o site */ }
+    })();
+
     /* ---------- Quem administra ---------- */
     function cardEquipe(p) {
         var c = criar('article', 'pessoa ' + String(p.plataforma).toLowerCase());
