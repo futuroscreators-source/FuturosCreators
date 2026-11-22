@@ -112,6 +112,30 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 .st-trilho { height: 22px; background: #fff; border: 3px solid var(--tinta); border-radius: 999px; overflow: hidden; }
 .st-fill { height: 100%; background: var(--rosa); }
 @media (max-width: 600px) { .st-linha { grid-template-columns: 1fr 1fr; } .st-trilho { grid-column: 1 / -1; order: 3; } }
+.chat-lembretes { margin: 0 0 14px; padding: 12px 16px; background: var(--sol); border: 3px solid var(--tinta); border-radius: 16px; }
+.chat-lembretes h3 { margin: 0 0 6px; font: 400 1.2rem var(--titulo); }
+.chat-lemb { display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 8px 0; border-top: 2px dashed var(--tinta); overflow-wrap: anywhere; }
+#chat-lembretes-lista .chat-lemb:first-child { border-top: 0; }
+.chat-lemb small { display: block; font-weight: 700; }
+.chat-lemb.urgente small { color: #b0103a; }
+.chat-caixa { display: flex; flex-direction: column; gap: 10px; height: min(55vh, 520px); padding: 14px; overflow-y: auto; background: #fff; border: 3px solid var(--tinta); border-radius: 16px; }
+.chat-msg { align-self: flex-start; max-width: min(88%, 560px); padding: 8px 12px 10px; background: var(--papel); border: 3px solid var(--tinta); border-radius: 16px 16px 16px 4px; }
+.chat-msg.meu { align-self: flex-end; background: var(--sol); border-radius: 16px 16px 4px 16px; }
+.chat-msg.lembrete { border-style: dashed; }
+.chat-topo { display: flex; gap: 8px; align-items: baseline; font-size: .85rem; }
+.chat-topo time { font-weight: 700; opacity: .7; }
+.chat-texto { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.chat-texto.feito { text-decoration: line-through; opacity: .6; }
+.chat-arq { display: flex; align-items: center; gap: 10px; margin-top: 6px; padding: 6px 10px; font: 700 .95rem var(--texto); text-align: left; background: #fff; border: 3px solid var(--tinta); border-radius: 12px; cursor: pointer; }
+.chat-arq img { flex: none; width: 56px; height: 56px; object-fit: cover; border-radius: 8px; }
+.chat-arq span { overflow-wrap: anywhere; }
+.chat-msg .perigo { margin-top: 6px; padding: .1em .7em; font-size: .8rem; }
+.chat-form { margin-top: 12px; }
+.chat-form textarea { min-height: 3.4em; background: #fff; }
+.chat-opcoes { display: flex; flex-wrap: wrap; gap: 10px 14px; align-items: center; margin-top: 8px; }
+.chat-opcoes label { font-weight: 800; }
+.chat-opcoes input[type=date] { width: auto; min-height: 0; padding: .3em .6em; }
+.chat-opcoes input[type=file] { display: none; }
 </style>
 </head>
 <body>
@@ -146,6 +170,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
             <button type="button" role="tab" data-aba="pngs">PNGs</button>
             <button type="button" role="tab" data-aba="festas">Festas</button>
             <button type="button" role="tab" data-aba="destaque">Destaque da Semana</button>
+            <button type="button" role="tab" data-aba="chat" id="aba-chat">Chat</button>
             <button type="button" role="tab" data-aba="feedbacks" id="aba-feedbacks">Feedbacks</button>
             <button type="button" role="tab" data-aba="stats" id="aba-stats" hidden>Estatísticas</button>
             <button type="button" role="tab" data-aba="admins" id="aba-admins" hidden>Admins</button>
@@ -291,6 +316,29 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
                 </table>
                 <p class="vazio-tab" id="d-vazio" hidden>Nenhum destaque cadastrado ainda.</p>
             </div>
+        </section>
+
+        <section id="tab-chat" hidden>
+            <h2>Chat da equipe</h2>
+            <p>Só admins veem. Serve para conversar, mandar arquivos (até 3 MB) e deixar lembretes. Mensagens somem depois de 45 dias; lembretes abertos ficam até alguém marcar como feito.</p>
+            <div class="chat-lembretes" id="chat-lembretes" hidden>
+                <h3>Lembretes abertos</h3>
+                <div id="chat-lembretes-lista"></div>
+            </div>
+            <div class="chat-caixa" id="chat-msgs" aria-live="polite"></div>
+            <p class="vazio-tab" id="chat-vazio" hidden>Ninguém falou nada ainda. Quebre o gelo!</p>
+            <form class="chat-form" id="chat-form" novalidate>
+                <textarea id="chat-texto" maxlength="2000" placeholder="Escreva uma mensagem..."></textarea>
+                <div class="chat-opcoes">
+                    <button type="button" id="chat-anexar">Anexar arquivo</button>
+                    <input type="file" id="chat-arq">
+                    <span id="chat-arq-nome"></span><button type="button" id="chat-arq-x" hidden>Tirar</button>
+                    <label><input type="checkbox" id="chat-lembrete"> Lembrete</label>
+                    <input type="date" id="chat-dia" hidden title="Para qual dia? (opcional)">
+                    <button type="submit" class="rosa" id="chat-enviar">Enviar</button>
+                </div>
+            </form>
+            <p class="nota" id="chat-msg" role="status"></p>
         </section>
 
         <section id="tab-feedbacks" hidden>
@@ -481,7 +529,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
     }
 
     function atualizarTudo() {
-        carregarInscricoes(); carregarVideos(); carregarNoticias(); carregarEquipe(); carregarFestas(); carregarDestaques(); carregarFeedbacks(); if (S.lider) carregarAdmins();
+        carregarInscricoes(); carregarVideos(); carregarNoticias(); carregarEquipe(); carregarFestas(); carregarDestaques(); carregarFeedbacks(); if (S.aba !== 'chat') buscarChat(); if (S.lider) carregarAdmins();
     }
 
     document.querySelectorAll('.abas button').forEach(function (b) {
@@ -492,10 +540,11 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
         S.aba = nome;
         if (nome === 'pngs' && !S.pngsCarregados) carregarPngs();
         if (nome === 'stats') carregarStats();
-        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'feedbacks', 'stats', 'admins', 'conta'].forEach(function (a) {
+        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'chat', 'feedbacks', 'stats', 'admins', 'conta'].forEach(function (a) {
             var sec = $('#tab-' + a); if (sec) sec.hidden = a !== nome;
             var bt = $('.abas button[data-aba="' + a + '"]'); if (bt) bt.classList.toggle('ativa', a === nome);
         });
+        if (nome === 'chat') entrarChat(); else pararChat();
     }
 
     function fmtData(ts) {
@@ -907,6 +956,177 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
             $('#st-msg').textContent = 'Atualizado às ' + new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + '.';
         }).catch(function (e) { $('#st-msg').textContent = e.message || 'Não consegui carregar as estatísticas.'; });
     }
+
+    /* ---------- Chat dos admins ---------- */
+    var MAX_ARQ = 3 * 1024 * 1024;
+    S.chat = { msgs: {}, versao: 0, arq: null, timer: null, ocupado: false, rolar: true };
+    function hojeISO() { var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+    function fmtDia(iso) { return String(iso).slice(8, 10) + '/' + String(iso).slice(5, 7); }
+    function chatHora(ts) {
+        var d = new Date(ts); if (isNaN(d)) return '';
+        var h = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        return d.toDateString() === new Date().toDateString() ? h : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + h;
+    }
+    function tamanhoTxt(n) { n = Number(n) || 0; return n >= 1048576 ? (n / 1048576).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB'; }
+    function prazoTxt(iso) {
+        var h = hojeISO(); if (iso === h) return 'para hoje'; if (iso < h) return 'atrasado (' + fmtDia(iso) + ')'; return 'para ' + fmtDia(iso);
+    }
+    function chaveVisto() { return 'fc_chat_visto_' + S.usuario; }
+
+    function buscarChat() {
+        if (!S.token || S.chat.ocupado) return Promise.resolve();
+        S.chat.ocupado = true;
+        return chamar('admin_chat_listar', { p_desde: S.chat.versao }).then(function (r) {
+            var primeira = !S.chat.carregado, mudou = false;
+            (r.msgs || []).forEach(function (m) { mudou = true; if (m.apagada) delete S.chat.msgs[m.id]; else S.chat.msgs[m.id] = m; });
+            S.chat.versao = r.versao || S.chat.versao; S.chat.carregado = true;
+            if (mudou || primeira) desenharChat(); else atualizarNaoLidas();
+        }).catch(function () {}).then(function () { S.chat.ocupado = false; });
+    }
+    function atualizarNaoLidas() {
+        var maior = 0, nao = 0, guardado = ler(chaveVisto()), visto = Number(guardado) || 0;
+        Object.keys(S.chat.msgs).forEach(function (k) { var m = S.chat.msgs[k]; if (m.id > maior) maior = m.id; });
+        if (guardado === null) { guardar(chaveVisto(), String(maior)); visto = maior; } /* primeiro acesso: nada de "não lido" antigo */
+        Object.keys(S.chat.msgs).forEach(function (k) { var m = S.chat.msgs[k]; if (m.id > visto && m.autor !== S.usuario) nao++; });
+        if (S.aba === 'chat') { guardar(chaveVisto(), String(maior)); nao = 0; }
+        $('#aba-chat').textContent = nao ? 'Chat (' + nao + ')' : 'Chat';
+    }
+    function balao(m) {
+        var meu = m.autor === S.usuario;
+        var b = criar('article', 'chat-msg' + (meu ? ' meu' : '') + (m.lembrete ? ' lembrete' : ''));
+        var topo = criar('div', 'chat-topo');
+        topo.appendChild(criar('strong', null, meu ? 'Você' : m.autor)); topo.appendChild(criar('time', null, chatHora(m.criado_em)));
+        b.appendChild(topo);
+        if (m.lembrete) b.appendChild(criar('span', 'etq', 'Lembrete' + (m.para_dia ? ' ' + prazoTxt(String(m.para_dia).slice(0, 10)) : '') + (m.feito ? ' (feito por ' + (m.feito_por || '?') + ')' : '')));
+        if (m.texto) b.appendChild(criar('p', 'chat-texto' + (m.lembrete && m.feito ? ' feito' : ''), m.texto));
+        if (m.arq_nome) {
+            var a = criar('button', 'chat-arq'); a.type = 'button';
+            if (/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(m.arq_mini || '')) { var im = criar('img'); im.alt = ''; im.src = m.arq_mini; a.appendChild(im); }
+            a.appendChild(criar('span', null, m.arq_nome + ' (' + tamanhoTxt(m.arq_tamanho) + ')'));
+            a.addEventListener('click', function () { baixarArquivoChat(m, a); });
+            b.appendChild(a);
+        }
+        if (meu || S.lider) {
+            var rm = criar('button', 'perigo', S.apagando === 'c' + m.id ? 'Confirmar?' : 'Apagar'); rm.type = 'button';
+            rm.addEventListener('click', function () {
+                if (S.apagando !== 'c' + m.id) { S.apagando = 'c' + m.id; desenharChat(); return; }
+                S.apagando = null;
+                chamar('admin_chat_apagar', { p_id: m.id }).then(function () { delete S.chat.msgs[m.id]; desenharChat(); return buscarChat(); })
+                  .catch(function (e) { $('#chat-msg').textContent = e.message; });
+            });
+            b.appendChild(rm);
+        }
+        return b;
+    }
+    function desenharChat() {
+        var lista = Object.keys(S.chat.msgs).map(function (k) { return S.chat.msgs[k]; }).sort(function (a, b) { return a.id - b.id; });
+        var abertos = lista.filter(function (m) { return m.lembrete && !m.feito; });
+        var lb = $('#chat-lembretes-lista'); lb.replaceChildren(); $('#chat-lembretes').hidden = !abertos.length;
+        abertos.forEach(function (m) {
+            var dia = m.para_dia ? String(m.para_dia).slice(0, 10) : '';
+            var li = criar('div', 'chat-lemb' + (dia && dia <= hojeISO() ? ' urgente' : ''));
+            var t = criar('div'); t.appendChild(criar('strong', null, m.texto));
+            t.appendChild(criar('small', null, 'de ' + m.autor + (dia ? ' | ' + prazoTxt(dia) : '')));
+            li.appendChild(t);
+            var ok = criar('button', 'rosa', 'Feito'); ok.type = 'button';
+            ok.addEventListener('click', function () {
+                ok.disabled = true;
+                chamar('admin_chat_lembrete_feito', { p_id: m.id, p_feito: true }).then(buscarChat).catch(function (e) { $('#chat-msg').textContent = e.message; ok.disabled = false; });
+            });
+            li.appendChild(ok); lb.appendChild(li);
+        });
+        var cx = $('#chat-msgs');
+        var perto = S.chat.rolar || cx.scrollHeight - cx.scrollTop - cx.clientHeight < 90;
+        cx.replaceChildren();
+        $('#chat-vazio').hidden = lista.length > 0; cx.hidden = !lista.length;
+        lista.forEach(function (m) { cx.appendChild(balao(m)); });
+        if (perto && S.aba === 'chat') { cx.scrollTop = cx.scrollHeight; S.chat.rolar = false; }
+        atualizarNaoLidas();
+    }
+    function baixarArquivoChat(m, bt) {
+        bt.disabled = true;
+        chamar('admin_chat_arquivo', { p_id: m.id }).then(function (r) {
+            var bin = atob(r.dados), u = new Uint8Array(bin.length);
+            for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+            var seguro = /^(image\/(png|jpeg|gif|webp)|application\/pdf|audio\/|video\/|text\/plain)/.test(r.tipo || '');
+            var url = URL.createObjectURL(new Blob([u], { type: seguro ? r.tipo : 'application/octet-stream' }));
+            var a = document.createElement('a'); a.href = url; a.download = r.nome || 'arquivo';
+            document.body.appendChild(a); a.click(); a.remove();
+            setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
+        }).catch(function (e) { $('#chat-msg').textContent = e.message; }).then(function () { bt.disabled = false; });
+    }
+    function entrarChat() {
+        S.chat.rolar = true; desenharChat(); buscarChat();
+        clearInterval(S.chat.timer);
+        S.chat.timer = setInterval(function () {
+            if (!S.token) { pararChat(); return; }
+            if (!document.hidden) buscarChat();
+        }, 5000);
+    }
+    function pararChat() { clearInterval(S.chat.timer); S.chat.timer = null; }
+
+    /* anexos */
+    function base64De(dataUrl) { return String(dataUrl).split(',')[1] || ''; }
+    function lerArquivo(f) {
+        return new Promise(function (res, rej) {
+            var r = new FileReader(); r.onload = function () { res(r.result); }; r.onerror = function () { rej(new Error('Não consegui ler o arquivo.')); }; r.readAsDataURL(f);
+        });
+    }
+    function mostrarAnexo() {
+        var a = S.chat.arq;
+        $('#chat-arq-nome').textContent = a ? a.nome + ' (' + tamanhoTxt(a.tamanho) + ')' : ''; $('#chat-arq-x').hidden = !a;
+    }
+    function prepararAnexo(f) {
+        var msg = $('#chat-msg'); msg.textContent = '';
+        var imagem = /^image\/(jpeg|png|webp)$/.test(f.type);
+        if (!imagem && f.size > MAX_ARQ) { msg.textContent = 'Arquivo grande demais. O limite é 3 MB.'; return; }
+        if (imagem) {
+            var url = URL.createObjectURL(f), img = new Image();
+            img.onload = function () {
+                var esc = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight)), cv = document.createElement('canvas');
+                cv.width = Math.round(img.naturalWidth * esc); cv.height = Math.round(img.naturalHeight * esc);
+                var cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); cx.drawImage(img, 0, 0, cv.width, cv.height);
+                var mini = document.createElement('canvas'), e2 = Math.min(1, 200 / Math.max(img.naturalWidth, img.naturalHeight));
+                mini.width = Math.round(img.naturalWidth * e2); mini.height = Math.round(img.naturalHeight * e2);
+                var mc = mini.getContext('2d'); mc.fillStyle = '#fff'; mc.fillRect(0, 0, mini.width, mini.height); mc.drawImage(img, 0, 0, mini.width, mini.height);
+                URL.revokeObjectURL(url);
+                var grande = base64De(cv.toDataURL('image/jpeg', 0.85));
+                S.chat.arq = { nome: f.name.replace(/\.[^.]+$/, '') + '.jpg', tipo: 'image/jpeg', dados: grande, mini: mini.toDataURL('image/jpeg', 0.7), tamanho: Math.round(grande.length * 3 / 4) };
+                mostrarAnexo();
+            };
+            img.onerror = function () { URL.revokeObjectURL(url); msg.textContent = 'Não consegui abrir essa imagem.'; };
+            img.src = url; return;
+        }
+        lerArquivo(f).then(function (d) {
+            S.chat.arq = { nome: f.name, tipo: f.type || 'application/octet-stream', dados: base64De(d), mini: null, tamanho: f.size }; mostrarAnexo();
+        }).catch(function (e) { msg.textContent = e.message; });
+    }
+    $('#chat-anexar').addEventListener('click', function () { $('#chat-arq').click(); });
+    $('#chat-arq').addEventListener('change', function () { var f = this.files && this.files[0]; if (f) prepararAnexo(f); this.value = ''; });
+    $('#chat-arq-x').addEventListener('click', function () { S.chat.arq = null; mostrarAnexo(); });
+    $('#chat-lembrete').addEventListener('change', function () { $('#chat-dia').hidden = !this.checked; if (!this.checked) $('#chat-dia').value = ''; });
+
+    /* enviar */
+    function enviarChat() {
+        var texto = $('#chat-texto').value.trim(), arq = S.chat.arq, lemb = $('#chat-lembrete').checked, msg = $('#chat-msg'), b = $('#chat-enviar');
+        msg.textContent = '';
+        if (!texto && !arq) return;
+        if (lemb && !texto) { msg.textContent = 'O lembrete precisa de um texto.'; return; }
+        if (b.disabled) return;
+        b.disabled = true;
+        chamar('admin_chat_enviar', {
+            p_texto: texto || null, p_lembrete: lemb, p_para_dia: lemb && $('#chat-dia').value ? $('#chat-dia').value : null,
+            p_arq_nome: arq ? arq.nome : null, p_arq_tipo: arq ? arq.tipo : null, p_arq_mini: arq ? arq.mini : null, p_arq_dados: arq ? arq.dados : null
+        }).then(function () {
+            $('#chat-texto').value = ''; $('#chat-lembrete').checked = false; $('#chat-dia').hidden = true; $('#chat-dia').value = '';
+            S.chat.arq = null; mostrarAnexo(); S.chat.rolar = true;
+            return buscarChat();
+        }).catch(function (e) { msg.textContent = e.message; }).then(function () { b.disabled = false; });
+    }
+    $('#chat-form').addEventListener('submit', function (ev) { ev.preventDefault(); enviarChat(); });
+    $('#chat-texto').addEventListener('keydown', function (ev) {
+        if (ev.key === 'Enter' && !ev.shiftKey && matchMedia('(pointer: fine)').matches) { ev.preventDefault(); enviarChat(); }
+    });
 
     /* ---------- Feedbacks ---------- */
     var TIPOS = { sugestao: 'Sugestão', elogio: 'Elogio', problema: 'Problema', ideia: 'Ideia de vídeo' };
