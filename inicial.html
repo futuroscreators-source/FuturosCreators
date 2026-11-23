@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ferramentas para criadores de YouTube — Futuros Creators</title>
+<meta name="description" content="Ferramenta independente do Futuros Creators que mostra ao criador estatísticas e análises do próprio canal do YouTube, com conexão opcional pela conta Google.">
+<meta name="theme-color" content="#FFC93C">
+<link rel="canonical" href="https://futuroscreators.site/inicial">
+<link rel="icon" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--sol:#FFC93C;--sol-claro:#FFD966;--uva:#2B0A57;--rosa:#FF4FA3;--ceu:#35D6E0;--tinta:#17101F;--papel:#FFF6DD;--titulo:'Lilita One','Trebuchet MS',sans-serif;--texto:'Nunito',system-ui,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:16px}
+body{margin:0;font:500 1.0625rem/1.65 var(--texto);color:var(--tinta);background:var(--sol);-webkit-font-smoothing:antialiased}
+img{max-width:100%;height:auto;display:block}
+a{color:var(--uva);font-weight:800;overflow-wrap:anywhere}
+:focus-visible{outline:4px solid var(--ceu);outline-offset:3px}
+.topo{position:relative;overflow:hidden;padding:20px 20px 40px}
+.raios{position:absolute;left:50%;top:50%;width:260vmax;height:260vmax;margin:-130vmax 0 0 -130vmax;background:repeating-conic-gradient(var(--sol-claro) 0 6deg,var(--sol) 6deg 12deg);animation:girar 160s linear infinite;pointer-events:none}
+@keyframes girar{to{transform:rotate(360deg)}}
+.menu{position:relative;display:flex;justify-content:flex-end;flex-wrap:wrap;gap:10px;max-width:920px;margin:0 auto}
+.menu a{padding:.45em 1.05em;font-weight:800;text-decoration:none;color:var(--tinta);background:#fff;border:3px solid var(--tinta);border-radius:999px;box-shadow:0 4px 0 var(--tinta)}
+.menu a:hover,.menu a[aria-current]{background:var(--papel)}
+.menu .cta{background:var(--uva);color:#fff}
+.cab{position:relative;max-width:920px;margin:18px auto 0}
+.cab img{width:min(260px,60vw);transform:rotate(-3deg);margin:0 0 -4px -6px;filter:drop-shadow(0 6px 0 rgba(23,16,31,.25))}
+h1{margin:0;font:400 clamp(2.1rem,6vw,3.4rem)/1.05 var(--titulo);color:#fff;-webkit-text-stroke:9px var(--tinta);paint-order:stroke fill;text-shadow:4px 5px 0 var(--tinta);transform:rotate(-1.5deg);transform-origin:left center}
+.data{display:inline-block;margin:22px 0 0;padding:.3em .9em;font-weight:800;background:#fff;border:3px solid var(--tinta);border-radius:999px}
+main{padding:0 20px 70px}
+.folha{max-width:920px;margin:0 auto;padding:clamp(22px,4vw,48px);background:var(--papel);border:5px solid var(--tinta);border-radius:26px;box-shadow:10px 10px 0 var(--uva)}
+.indice{margin:0 0 34px;padding:18px 22px;background:#fff;border:3px solid var(--tinta);border-radius:18px}
+.indice summary{cursor:pointer;font:400 1.35rem var(--titulo)}
+.indice ol{margin:12px 0 0;padding:0;list-style:none;columns:2 280px;column-gap:28px;font-size:.95rem}
+.indice li{margin:0 0 5px;break-inside:avoid}
+.indice a{font-weight:700;text-decoration:none}.indice a:hover{text-decoration:underline}
+h2{margin:2em 0 .5em;font:400 clamp(1.4rem,3.4vw,1.8rem)/1.2 var(--titulo);color:var(--uva)}
+h2::before{content:"";display:block;width:64px;height:6px;margin-bottom:12px;background:var(--rosa);border-radius:6px}
+h3{margin:1.6em 0 .4em;font-weight:800;font-size:1.1rem}
+p{margin:0 0 1em}ul{margin:0 0 1.1em;padding-left:1.3em}li{margin:.3em 0}li::marker{color:var(--rosa)}
+.volta{display:inline-block;margin-top:34px;padding:.7em 1.4em;font:400 1.2rem/1 var(--titulo);color:#fff;text-decoration:none;background:var(--rosa);border:4px solid var(--tinta);border-radius:999px;box-shadow:0 6px 0 var(--tinta)}
+.volta:hover{transform:translateY(2px);box-shadow:0 4px 0 var(--tinta)}
+.rodape{padding:40px 20px;text-align:center;background:var(--tinta);color:#cfc6dc}
+.rodape img{width:170px;margin:0 auto 6px}.rodape p{margin:0 0 6px;font-size:.95rem}
+.rodape a{color:#fff}
+@media(prefers-reduced-motion:reduce){.raios{animation:none}}
+@media print{.raios,.menu,.indice,.volta{display:none}body{background:#fff}.folha{box-shadow:none}}
+</style>
+</head>
+<body>
+<header class="topo">
+<div class="raios" aria-hidden="true"></div>
+<nav class="menu" aria-label="Principal">
+<a href="/termos-de-uso">Termos de Uso</a>
+<a href="/politica-de-privacidade">Privacidade</a>
+<a href="/" class="cta">Voltar ao site</a>
+</nav>
+<div class="cab">
+<a href="/" aria-label="Futuros Creators, página inicial"><img src="/logo-creators.png" alt="Futuros Creators" width="1000" height="607"></a>
+<h1>Ferramentas para criadores de YouTube</h1>
+<span class="data">Ferramenta independente para criadores de conteúdo</span>
+</div>
+</header>
+<main>
+<article class="folha">
+
+
+<h2 id="sO que é">O que é</h2>
+<p>O Futuros Creators é um projeto independente que ajuda criadores de vídeos, principalmente do universo de PK XD, a aprender e a evoluir juntos. Além dos vídeos e materiais da comunidade, oferecemos ferramentas de análise para canais do YouTube.</p>
+<h2 id="sPara que serve a nossa ferramenta de YouTube">Para que serve a nossa ferramenta de YouTube</h2>
+<p>A ferramenta mostra ao próprio criador informações sobre o seu canal: vídeos, playlists, estatísticas e métricas, além de cálculos e análises feitos a partir desses dados. Tudo é exibido a você, na hora, para ajudar a entender o desempenho do canal.</p>
+<h2 id="sComo funciona a conexão com o Google">Como funciona a conexão com o Google</h2>
+<ul>
+<li>A conexão é <strong>opcional</strong>: você só conecta se quiser usar a ferramenta.</li>
+<li>O login é feito na tela oficial do Google. Nós <strong>nunca</strong> vemos nem pedimos a sua senha.</li>
+<li>Você vê quais permissões estão sendo pedidas e decide se autoriza.</li>
+<li>Você pode retirar a autorização quando quiser em <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</li>
+</ul>
+<h2 id="sO que fazemos com os seus dados">O que fazemos com os seus dados</h2>
+<p>Usamos os dados do seu canal somente para mostrar os resultados da ferramenta a você. Não vendemos esses dados e não os usamos para publicidade. A ferramenta não mantém uma base própria para guardar de forma permanente os dados da sua conta Google ou YouTube. Os detalhes estão na <a href="/politica-de-privacidade">Política de Privacidade</a> e nos <a href="/termos-de-uso">Termos de Uso</a>.</p>
+<p>O uso e a transferência, para qualquer outro app, das informações recebidas das APIs do Google seguirão a Política de Dados do Usuário dos Serviços de API do Google, incluindo os requisitos de Uso Limitado.</p>
+<h2 id="sQuem somos">Quem somos</h2>
+<p>O Futuros Creators é uma iniciativa totalmente independente. Não somos uma organização oficial, nem afiliada ou representante da Afterverse, PK XD, Wildlife Studios, Google ou YouTube.</p>
+<h2 id="sContato">Contato</h2>
+<p>Dúvidas ou pedidos sobre dados pessoais: <strong><a href="mailto:futuroscreators@gmail.com">futuroscreators@gmail.com</a></strong></p>
+<p>Conheça o projeto completo em <a href="https://futuroscreators.site/">futuroscreators.site</a>.</p>
+<a class="volta" href="/">Voltar ao site</a>
+</article>
+</main>
+<footer class="rodape">
+<img src="/logo-creators.png" alt="Futuros Creators" width="1000" height="607">
+<p><a href="/termos-de-uso">Termos de Uso</a> · <a href="/politica-de-privacidade">Política de Privacidade</a></p>
+<p>&copy; 2026 Futuros Creators — Iniciativa independente</p>
+</footer>
+</body>
+</html>
