@@ -392,8 +392,37 @@ a { color: inherit; }
         $('#hero-intro').textContent = aberto ? 'Conecte seu YouTube e veja quantos Shorts e vídeos longos você postou no mês e a média de views de cada tipo.' : 'Acesso só para quem a equipe liberou.';
     }
     function mostrarCodigo(msg) { titulo(false); $('#codigo-erro').textContent = msg || ''; vista('codigo'); }
-    function falha(e) { if (e && e.codigo === 'beta') { limparBeta(); mostrarCodigo(e.message); } else erro(e && e.message); }
-    function entrou(nome) { titulo(true); $('#ola').textContent = 'Olá, ' + nome + '! Você está no beta.'; vista('inicio'); }
+    function falha(e) {
+        if (e && e.codigo === 'beta') {
+            limparBeta();
+            sessaoBeta().then(function (r) {
+                if (r.ok) erro('Sua sessão foi renovada. Toque em "Tentar de novo" para continuar.');
+                else mostrarCodigo(e.message);
+            });
+        } else erro(e && e.message);
+    }
+    function entrou(nome) {
+        titulo(true);
+        $('#ola').textContent = nome ? 'Olá, ' + nome + '! Você está no beta.' : 'Beta aberto. Boas-vindas!';
+        $('#sair-beta').hidden = !nome;   /* visitante não precisa de "sair": não há código */
+        vista('inicio');
+    }
+    /* Descobre se a pessoa já tem acesso. Beta aberto: entra como visitante, sem código. Fechado: pede o código. */
+    function sessaoBeta() {
+        var tk = betaToken();
+        var checar = tk ? FC.rpc('publico_beta_sessao', { p_token: tk }).catch(function () { return null; }) : Promise.resolve(null);
+        return checar.then(function (r) {
+            if (r && r.ok) return r;
+            limparBeta();
+            return FC.rpc('publico_beta_estado').catch(function () { return null; }).then(function (e) {
+                if (!e || !e.aberto) return { ok: false };
+                return FC.rpc('publico_beta_visitante').then(function (v) {
+                    if (v && v.ok) { guardarBeta(v.token); return { ok: true, nome: null }; }
+                    return { ok: false, erro: v && v.erro };
+                }).catch(function () { return { ok: false }; });
+            });
+        });
+    }
     function nf(n, d) { return Number(n || 0).toLocaleString('pt-BR', { maximumFractionDigits: d == null ? 0 : d }); }
     function criar(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
 
@@ -468,21 +497,20 @@ a { color: inherit; }
         var code = q.get('code'), st = q.get('state'), err = q.get('error'), guardado = null;
         history.replaceState(null, '', location.pathname);   /* tira o código do endereço */
         try { guardado = JSON.parse(sessionStorage.getItem(CHAVE) || 'null'); sessionStorage.removeItem(CHAVE); } catch (e) { guardado = null; }
-        if (!betaToken()) {
-            mostrarCodigo('Entre com o código do beta para continuar.');
-        } else if (err) {
-            erro(err === 'access_denied' ? 'Você cancelou a conexão. Sem problema: é só tentar de novo quando quiser.' : 'O Google não completou a conexão. Tente de novo.');
-        } else if (!code || !guardado || !st || st !== guardado.state) {
-            erro('Não consegui confirmar essa conexão. Comece de novo pelo botão.');
-        } else {
-            vista('carregando');
-            fn({ acao: 'calcular', redirect_uri: REDIRECT, code: code, code_verifier: guardado.verifier, mes: guardado.mes })
-                .then(mostrar).catch(falha);
-        }
+        sessaoBeta().then(function (r) {
+            if (!r.ok) { mostrarCodigo(r.erro || 'Entre com o código do beta para continuar.'); return; }
+            if (err) {
+                erro(err === 'access_denied' ? 'Você cancelou a conexão. Sem problema: é só tentar de novo quando quiser.' : 'O Google não completou a conexão. Tente de novo.');
+            } else if (!code || !guardado || !st || st !== guardado.state) {
+                erro('Não consegui confirmar essa conexão. Comece de novo pelo botão.');
+            } else {
+                vista('carregando');
+                return fn({ acao: 'calcular', redirect_uri: REDIRECT, code: code, code_verifier: guardado.verifier, mes: guardado.mes }).then(mostrar);
+            }
+        }).catch(falha);
     } else {
-        var tk = betaToken();
-        (tk ? FC.rpc('publico_beta_sessao', { p_token: tk }).catch(function () { return null; }) : Promise.resolve(null)).then(function (r) {
-            if (r && r.ok) entrou(r.nome); else { limparBeta(); mostrarCodigo(''); }
+        sessaoBeta().then(function (r) {
+            if (r.ok) entrou(r.nome); else mostrarCodigo(r.erro || '');
         });
     }
 

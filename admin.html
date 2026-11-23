@@ -139,6 +139,11 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 .b-novo { margin: 14px 0; padding: 14px 18px; background: var(--sol); border: 3px solid var(--tinta); border-radius: 16px; }
 .b-codigo { margin: 8px 0; font: 400 2rem/1.2 var(--titulo); letter-spacing: .08em; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
 .b-novo p { margin: 6px 0; font-weight: 700; overflow-wrap: anywhere; }
+.b-estado { margin: 12px 0 16px; padding: 12px 18px; border: 3px solid var(--tinta); border-radius: 16px; background: var(--papel); }
+.b-estado.aberto { background: #9be9a8; }
+.b-estado.fechado { background: #ffb3c9; }
+.b-estado strong { font: 400 1.4rem var(--titulo); }
+.b-estado p { margin: 4px 0 8px; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -372,7 +377,12 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 
         <section id="tab-beta" hidden>
             <h2>Acesso ao Beta</h2>
-            <p>Só líderes veem esta aba. O <strong>beta.html</strong> só abre para quem tem um código. Cada pessoa recebe um código só dela, que você pode desativar ou trocar quando quiser. O código aparece <strong>uma única vez</strong>, na hora em que é criado.</p>
+            <p>Só líderes veem esta aba. Com o beta <strong>fechado</strong>, o <strong>beta.html</strong> só abre para quem tem um código. Com ele <strong>aberto</strong>, qualquer pessoa com o link entra sem código. Os códigos abaixo continuam guardados e voltam a valer quando você fechar de novo. Cada código aparece <strong>uma única vez</strong>, na hora em que é criado.</p>
+            <div class="b-estado" id="b-estado">
+                <strong id="b-estado-txt">Carregando...</strong>
+                <p id="b-estado-desc"></p>
+                <div class="btns"><button type="button" class="rosa" id="b-alternar" hidden></button></div>
+            </div>
             <form class="form-caixa" id="form-beta" novalidate>
                 <div><label for="b-nome">Nome do testador</label><input id="b-nome" type="text" maxlength="40" autocomplete="off"></div>
                 <div><label for="b-dias">Validade do acesso</label>
@@ -926,9 +936,37 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
     S.beta = []; S.codigoNovo = null;
     function linkBeta() { return location.origin + location.pathname.replace(/[^\/]*$/, '') + 'beta.html'; }
     function carregarBeta() {
+        carregarEstadoBeta();
         return chamar('admin_beta_listar').then(function (l) { S.beta = l || []; desenharBeta(); })
             .catch(function (e) { $('#b-msg').textContent = e.message; });
     }
+    /* interruptor: beta aberto (sem código) ou fechado (exige código) */
+    function carregarEstadoBeta() {
+        return FC.rpc('publico_beta_estado').then(function (e) { S.betaAberto = !!(e && e.aberto); desenharEstadoBeta(); })
+            .catch(function () {
+                $('#b-estado').className = 'b-estado'; $('#b-estado-txt').textContent = 'Não consegui ver o estado do beta';
+                $('#b-estado-desc').textContent = 'Rode o arquivo beta_aberto.sql no Supabase e recarregue.'; $('#b-alternar').hidden = true;
+            });
+    }
+    function desenharEstadoBeta() {
+        var aberto = S.betaAberto, bt = $('#b-alternar'), confirmando = S.apagando === 'balt';
+        $('#b-estado').className = 'b-estado ' + (aberto ? 'aberto' : 'fechado');
+        $('#b-estado-txt').textContent = aberto ? 'Beta ABERTO' : 'Beta FECHADO';
+        $('#b-estado-desc').textContent = aberto
+            ? 'Qualquer pessoa com o link entra sem código. (O Google ainda só deixa conectar quem está nos usuários de teste.)'
+            : 'Só entra quem tem um código válido, gerado abaixo.';
+        bt.hidden = false;
+        bt.textContent = confirmando ? 'Confirmar?' : (aberto ? 'Fechar o beta (voltar a exigir código)' : 'Abrir o beta para todos');
+    }
+    $('#b-alternar').addEventListener('click', function () {
+        if (S.apagando !== 'balt') { S.apagando = 'balt'; desenharEstadoBeta(); return; }
+        S.apagando = null;
+        var bt = this; bt.disabled = true;
+        chamar('admin_beta_definir_aberto', { p_aberto: !S.betaAberto }).then(function (r) {
+            S.betaAberto = !!r.aberto; desenharEstadoBeta();
+            $('#b-msg').textContent = S.betaAberto ? 'Beta aberto. Quem tem o link já pode entrar.' : 'Beta fechado. Quem estava de visitante saiu, e só entra com código.';
+        }).catch(function (e) { $('#b-msg').textContent = e.message; desenharEstadoBeta(); }).then(function () { bt.disabled = false; });
+    });
     function mostrarCodigoNovo(nome, codigo) {
         S.codigoNovo = { nome: nome, codigo: codigo };
         $('#b-novo-titulo').textContent = 'Código de ' + nome;
