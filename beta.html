@@ -193,6 +193,10 @@ a { color: inherit; }
 .lista-shorts .views { grid-row: 1 / span 2; grid-column: 2; align-self: center; font: 400 1.3rem var(--titulo); }
 .estimado { display: inline-block; margin-left: 6px; padding: 0 .5em; font-size: .75rem; font-weight: 800; background: var(--sol); border: 2px solid var(--tinta); border-radius: 999px; }
 .carregando { padding: 30px 0; text-align: center; font-size: 1.2rem; font-weight: 800; }
+.ranking-ok { padding: 12px 16px; margin: 14px 0 0; font-weight: 800; background: var(--ceu); border: 3px solid var(--tinta); border-radius: 14px; }
+.ranking-ok a { color: inherit; }
+.consent { margin-top: 6px; padding: 14px 16px; background: var(--papel); border: 3px solid var(--tinta); border-radius: 14px; }
+.consent small { display: block; margin: 6px 0 0 36px; font-weight: 700; opacity: .8; }
 .botoes-res { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
 @media (max-width: 860px) {
     .beta-hero { flex-direction: column; text-align: center; gap: 14px; }
@@ -247,7 +251,7 @@ a { color: inherit; }
                 <p class="res-nota" id="ola"></p>
                 <ul class="passos">
                     <li>É só leitura: o site não posta, não apaga e não muda nada no seu canal.</li>
-                    <li>O acesso é usado uma vez, na hora, e encerrado em seguida. Nada seu fica guardado.</li>
+                    <li>O acesso ao seu YouTube é usado uma vez, na hora, e encerrado em seguida. Só guardamos algo se você marcar a caixa do ranking abaixo.</li>
                     <li>Você escolhe a conta do canal na tela do Google.</li>
                     <li>Metas do mês: <strong>16 Shorts</strong> e <strong>8 vídeos longos</strong>.</li>
                 </ul>
@@ -258,6 +262,11 @@ a { color: inherit; }
                         <label class="chip"><input type="radio" name="mes" value="-1"><span>Mês passado</span></label>
                     </div>
                 </fieldset>
+                <div class="campo ciente consent">
+                    <label class="marca" for="ranking-ok"><input id="ranking-ok" type="checkbox">
+                        <span>Quero aparecer no ranking de médias da página principal.</span></label>
+                    <small>Se você marcar, guardamos só o nome do canal, a foto e a sua média de views do mês, e mostramos publicamente. Para sair, conecte de novo com a caixa desmarcada: seus dados do ranking são apagados.</small>
+                </div>
                 <button type="button" id="conectar" class="botao rosa grande">Conectar com o YouTube</button>
                 <p class="aviso-beta">Estamos em fase de teste. O Google pode mostrar um aviso de &ldquo;app não verificado&rdquo;, e isso é esperado. Continue só se você chegou aqui pelo site oficial dos Futuros Creators. Para remover o acesso a qualquer momento: myaccount.google.com/permissions</p>
                 <div class="botoes-res"><button type="button" class="botao claro" id="sair-beta">Sair do beta</button></div>
@@ -298,7 +307,8 @@ a { color: inherit; }
                     <p class="res-nota" id="l-nota" hidden></p>
                     <ul class="lista-shorts" id="l-lista"></ul>
                 </section>
-                <p class="res-nota">Acesso ao seu YouTube já encerrado. Nada foi guardado.</p>
+                <p class="res-nota">Acesso ao seu YouTube já encerrado.</p>
+                <p class="ranking-ok" id="ranking-aviso" hidden></p>
                 <div class="botoes-res">
                     <button type="button" class="botao claro" id="de-novo">Calcular de novo</button>
                     <a class="botao rosa" href="index.html">Voltar ao site</a>
@@ -461,9 +471,9 @@ a { color: inherit; }
     /* ---- passo 1: mandar para o Google ---- */
     $('#conectar').addEventListener('click', function () {
         var btn = this; btn.disabled = true;
-        var verifier = aleatorio(48), state = aleatorio(24), mes = Number(document.querySelector('input[name="mes"]:checked').value);
+        var verifier = aleatorio(48), state = aleatorio(24), mes = Number(document.querySelector('input[name="mes"]:checked').value), ranking = $('#ranking-ok').checked;
         desafio(verifier).then(function (ch) {
-            try { sessionStorage.setItem(CHAVE, JSON.stringify({ state: state, verifier: verifier, mes: mes })); }
+            try { sessionStorage.setItem(CHAVE, JSON.stringify({ state: state, verifier: verifier, mes: mes, ranking: ranking })); }
             catch (e) { throw new Error('Seu navegador bloqueou o armazenamento da sessão. Desative a navegação privada e tente de novo.'); }
             return fn({ acao: 'iniciar', redirect_uri: REDIRECT, state: state, code_challenge: ch });
         }).then(function (r) {
@@ -505,7 +515,7 @@ a { color: inherit; }
                 erro('Não consegui confirmar essa conexão. Comece de novo pelo botão.');
             } else {
                 vista('carregando');
-                return fn({ acao: 'calcular', redirect_uri: REDIRECT, code: code, code_verifier: guardado.verifier, mes: guardado.mes }).then(mostrar);
+                return fn({ acao: 'calcular', redirect_uri: REDIRECT, code: code, code_verifier: guardado.verifier, mes: guardado.mes, ranking: guardado.ranking === true }).then(mostrar);
             }
         }).catch(falha);
     } else {
@@ -551,6 +561,16 @@ a { color: inherit; }
         var foto = $('#res-foto');
         if (/^https:\/\//.test((r.canal && r.canal.foto) || '')) { foto.src = r.canal.foto; foto.hidden = false; } else foto.hidden = true;
         preencher('s', r.shorts); preencher('l', r.longos);
+        var av = $('#ranking-aviso'); av.replaceChildren(); av.hidden = true;
+        if (r.ranking === 'salvo') {
+            av.appendChild(document.createTextNode('Você está no ranking! '));
+            var lk = criar('a', null, 'Ver o ranking no site'); lk.href = 'index.html#ranking'; av.appendChild(lk);
+            av.hidden = false;
+        } else if (r.ranking === 'removido') {
+            av.textContent = 'Seus dados foram removidos do ranking, como você pediu.'; av.hidden = false;
+        } else if (r.ranking === 'poucos') {
+            av.textContent = 'Você ainda não aparece no ranking: ele pede ao menos 3 vídeos do tipo no mês.'; av.hidden = false;
+        }
         vista('resultado');
     }
     $('#de-novo').addEventListener('click', function () { vista('inicio'); });

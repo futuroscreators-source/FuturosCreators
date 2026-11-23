@@ -358,6 +358,22 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
 .conquistas .selo { background: var(--ceu); }
 .destaque-numeros { margin: 14px 0 0; font-weight: 800; }
 .destaque-frase { margin: 10px 0 0; max-width: 36em; overflow-wrap: anywhere; }
+/* ---------- Ranking de médias ---------- */
+.rk-filtros { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 0 0 24px; }
+.rk-lista { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; max-width: 760px; }
+.rk-item { display: flex; gap: 14px; align-items: center; padding: 12px 16px; background: #fff; color: var(--tinta); border: 4px solid var(--tinta); border-radius: 18px; }
+.rk-pos { flex: none; width: 2.2em; font: 400 1.7rem/1 var(--titulo); text-align: center; }
+.rk-item:nth-child(1) { background: var(--sol); box-shadow: 0 6px 0 var(--tinta); }
+.rk-item:nth-child(2) { background: var(--ceu); }
+.rk-item:nth-child(3) { background: var(--rosa); color: #fff; }
+.rk-foto { flex: none; width: 58px; height: 58px; object-fit: cover; border: 3px solid var(--tinta); border-radius: 50%; background: var(--papel); }
+.rk-foto.rk-inicial { display: grid; place-items: center; font: 400 1.6rem/1 var(--titulo); color: #fff; background: var(--uva); }
+.rk-nome { flex: 1; min-width: 0; }
+.rk-nome a, .rk-nome strong { display: block; font-weight: 800; line-height: 1.2; overflow-wrap: anywhere; color: inherit; }
+.rk-nome small { display: block; font-weight: 700; opacity: .8; }
+.rk-media { flex: none; text-align: right; font: 400 1.5rem/1.1 var(--titulo); }
+.rk-media small { display: block; font: 700 .75rem var(--texto); opacity: .8; }
+.rk-rodape { margin: 18px 0 0; font-weight: 700; }
 .destaque-antigos { margin-top: 44px; }
 .destaque-antigos h3 { margin: 0 0 14px; font: 400 1.6rem var(--titulo); }
 .hall { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
@@ -414,6 +430,7 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
         <a href="#academy">Academy</a>
         <a href="#yoan-news" id="menu-yoan-news" hidden>Yoan News</a>
         <a href="#destaque" id="menu-destaque" hidden>Destaque</a>
+        <a href="#ranking" id="menu-ranking" hidden>Ranking</a>
         <a href="#comunidade">Comunidade</a>
         <a href="#pngs">PNGs</a>
         <a href="#equipe">Quem administra</a>
@@ -524,6 +541,30 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
             <h3>Destaques anteriores</h3>
             <div class="hall" id="lista-destaques"></div>
         </div>
+    </div>
+</section>
+
+<section class="secao escura" id="ranking" hidden>
+    <div class="miolo">
+        <div class="cabeca">
+            <div>
+                <h2 class="adesivo">Ranking de Médias</h2>
+                <p class="intro">Média de views dos criadores que escolheram aparecer. Quer entrar? Faça a sua conta na <a href="beta.html">área beta</a> e marque a caixa do ranking.</p>
+            </div>
+        </div>
+        <div class="rk-filtros">
+            <div class="chips" role="radiogroup" aria-label="Tipo de vídeo">
+                <label class="chip"><input type="radio" name="rk-tipo" value="s" checked><span>Shorts</span></label>
+                <label class="chip"><input type="radio" name="rk-tipo" value="l"><span>Vídeos longos</span></label>
+            </div>
+            <div class="chips" role="radiogroup" aria-label="Mês">
+                <label class="chip"><input type="radio" name="rk-mes" value="0" checked><span>Este mês</span></label>
+                <label class="chip"><input type="radio" name="rk-mes" value="-1"><span>Mês passado</span></label>
+            </div>
+        </div>
+        <ol class="rk-lista" id="rk-lista"></ol>
+        <p class="vazio" id="rk-vazio" hidden>Ninguém no ranking deste período ainda.</p>
+        <p class="rk-rodape">Só entram canais com ao menos 3 vídeos do tipo no mês, e só quem marcou que quer aparecer.</p>
     </div>
 </section>
 
@@ -861,6 +902,43 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
         });
         $('#destaque-antigos').hidden = !resto.length;
     }
+    /* ---------- Ranking de médias (só aparece se alguém tiver entrado) ---------- */
+    var rkTemDados = false;
+    function rkDesenhar(lista) {
+        var ol = $('#rk-lista'); ol.replaceChildren();
+        lista = lista || [];
+        $('#rk-vazio').hidden = lista.length > 0;
+        lista.forEach(function (c, i) {
+            var li = criar('li', 'rk-item');
+            li.appendChild(criar('span', 'rk-pos', String(i + 1)));
+            if (/^https:\/\//i.test(c.foto || '')) {
+                var im = criar('img', 'rk-foto'); im.src = c.foto; im.alt = ''; im.loading = 'lazy'; im.width = 58; im.height = 58; im.referrerPolicy = 'no-referrer';
+                li.appendChild(im);
+            } else li.appendChild(criar('span', 'rk-foto rk-inicial', (c.nome || '?').trim().charAt(0).toUpperCase()));
+            var t = criar('div', 'rk-nome');
+            if (/^https:\/\//i.test(c.link || '')) { var a = criar('a', null, c.nome); a.href = c.link; a.target = '_blank'; a.rel = 'noopener noreferrer'; t.appendChild(a); }
+            else t.appendChild(criar('strong', null, c.nome));
+            t.appendChild(criar('small', null, c.total + (c.total === 1 ? ' vídeo' : ' vídeos') + ' no mês'));
+            li.appendChild(t);
+            var m = criar('div', 'rk-media', Number(c.media || 0).toLocaleString('pt-BR', { maximumFractionDigits: 1 }));
+            m.appendChild(criar('small', null, 'views em média'));
+            li.appendChild(m);
+            ol.appendChild(li);
+        });
+    }
+    function rkCarregar(primeira) {
+        var tipo = document.querySelector('input[name="rk-tipo"]:checked').value, mes = Number(document.querySelector('input[name="rk-mes"]:checked').value);
+        FC.rpc('publico_ranking', { p_tipo: tipo, p_mes: mes }).then(function (l) {
+            l = l || [];
+            if (primeira && !l.length) return;   /* sem ninguém no ranking: a seção continua escondida */
+            if (l.length) rkTemDados = true;
+            $('#ranking').hidden = !rkTemDados; $('#menu-ranking').hidden = !rkTemDados;
+            rkDesenhar(l);
+        }).catch(function () { /* sem banco ou sem a função: seção escondida */ });
+    }
+    document.querySelectorAll('input[name="rk-tipo"], input[name="rk-mes"]').forEach(function (r) { r.addEventListener('change', function () { rkCarregar(false); }); });
+    rkCarregar(true);
+
     FC.rpc('publico_destaques').then(mostrarDestaques).catch(function () { /* sem banco: a seção continua escondida */ });
 
     /* ---------- Contagem de acessos (sem IP: só um código aleatório por navegador) ---------- */
