@@ -937,7 +937,21 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
         }).catch(function () { /* sem banco ou sem a função: seção escondida */ });
     }
     document.querySelectorAll('input[name="rk-tipo"], input[name="rk-mes"]').forEach(function (r) { r.addEventListener('change', function () { rkCarregar(false); }); });
-    rkCarregar(true);
+    /* ao abrir: procura a primeira combinação com gente (Shorts/longos, este mês/passado) e já marca os filtros nela */
+    (function rkInicio() {
+        var combos = [['s', 0], ['l', 0], ['s', -1], ['l', -1]];
+        (function prox(i) {
+            if (i >= combos.length) return;
+            FC.rpc('publico_ranking', { p_tipo: combos[i][0], p_mes: combos[i][1] }).then(function (l) {
+                if (!l || !l.length) return prox(i + 1);
+                rkTemDados = true;
+                document.querySelector('input[name="rk-tipo"][value="' + combos[i][0] + '"]').checked = true;
+                document.querySelector('input[name="rk-mes"][value="' + combos[i][1] + '"]').checked = true;
+                $('#ranking').hidden = false; $('#menu-ranking').hidden = false;
+                rkDesenhar(l);
+            }).catch(function () { /* sem banco ou sem a função: seção escondida */ });
+        })(0);
+    })();
 
     FC.rpc('publico_destaques').then(mostrarDestaques).catch(function () { /* sem banco: a seção continua escondida */ });
 
