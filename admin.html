@@ -136,6 +136,9 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 .chat-opcoes label { font-weight: 800; }
 .chat-opcoes input[type=date] { width: auto; min-height: 0; padding: .3em .6em; }
 .chat-opcoes input[type=file] { display: none; }
+.b-novo { margin: 14px 0; padding: 14px 18px; background: var(--sol); border: 3px solid var(--tinta); border-radius: 16px; }
+.b-codigo { margin: 8px 0; font: 400 2rem/1.2 var(--titulo); letter-spacing: .08em; overflow-wrap: anywhere; user-select: all; -webkit-user-select: all; }
+.b-novo p { margin: 6px 0; font-weight: 700; overflow-wrap: anywhere; }
 </style>
 </head>
 <body>
@@ -173,6 +176,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
             <button type="button" role="tab" data-aba="chat" id="aba-chat">Chat</button>
             <button type="button" role="tab" data-aba="feedbacks" id="aba-feedbacks">Feedbacks</button>
             <button type="button" role="tab" data-aba="stats" id="aba-stats" hidden>Estatísticas</button>
+            <button type="button" role="tab" data-aba="beta" id="aba-beta" hidden>Beta</button>
             <button type="button" role="tab" data-aba="admins" id="aba-admins" hidden>Admins</button>
             <button type="button" role="tab" data-aba="conta">Minha conta</button>
         </div>
@@ -366,6 +370,32 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
             <p class="nota" id="st-msg" role="status"></p>
         </section>
 
+        <section id="tab-beta" hidden>
+            <h2>Acesso ao Beta</h2>
+            <p>Só líderes veem esta aba. O <strong>beta.html</strong> só abre para quem tem um código. Cada pessoa recebe um código só dela, que você pode desativar ou trocar quando quiser. O código aparece <strong>uma única vez</strong>, na hora em que é criado.</p>
+            <form class="form-caixa" id="form-beta" novalidate>
+                <div><label for="b-nome">Nome do testador</label><input id="b-nome" type="text" maxlength="40" autocomplete="off"></div>
+                <div><label for="b-dias">Validade do acesso</label>
+                    <select id="b-dias"><option value="7">7 dias</option><option value="30" selected>30 dias</option><option value="90">90 dias</option><option value="">Sem prazo</option></select></div>
+                <div class="btns"><button type="submit" class="rosa" id="b-criar">Gerar código</button></div>
+            </form>
+            <div class="b-novo" id="b-novo" hidden>
+                <strong id="b-novo-titulo"></strong>
+                <div class="b-codigo" id="b-codigo"></div>
+                <p>Link do beta: <span id="b-link"></span></p>
+                <div class="btns"><button type="button" class="rosa" id="b-copiar">Copiar mensagem pronta</button><button type="button" id="b-fechar">Já copiei</button></div>
+                <p>Copie agora: depois de fechar, este código não aparece de novo. Se perder, gere um novo.</p>
+            </div>
+            <p class="nota" id="b-msg" role="status"></p>
+            <div class="caixa">
+                <table style="min-width:640px">
+                    <thead><tr><th>Testador</th><th>Último acesso</th><th>Validade</th><th>Status</th><th>Ações</th></tr></thead>
+                    <tbody id="b-linhas"></tbody>
+                </table>
+                <p class="vazio-tab" id="b-vazio" hidden>Ninguém tem acesso ao beta ainda.</p>
+            </div>
+        </section>
+
         <section id="tab-admins" hidden>
             <h2>Admins</h2>
             <p>Só o líder cria contas. Anote a senha e passe para a pessoa; ela pode trocar em "Minha conta".</p>
@@ -508,7 +538,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
     function abrirPainel() {
         ping().then(function () {
             $('#tela-login').hidden = true; $('#tela-painel').hidden = false;
-            $('#aba-admins').hidden = !S.lider; $('#aba-stats').hidden = !S.lider;
+            $('#aba-admins').hidden = !S.lider; $('#aba-stats').hidden = !S.lider; $('#aba-beta').hidden = !S.lider;
             atualizarTudo();
             clearInterval(S.timer);
             S.timer = setInterval(function () { ping().then(atualizarTudo).catch(function () {}); }, 25000);
@@ -520,8 +550,8 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
     function ping() {
         return chamar('admin_ping').then(function (r) {
             S.usuario = r.usuario; S.lider = !!r.lider; S.online = r.online || [];
-            $('#aba-stats').hidden = !S.lider;
-            if (!S.lider && S.aba === 'stats') abrirAba('inscricoes');
+            $('#aba-stats').hidden = !S.lider; $('#aba-beta').hidden = !S.lider;
+            if (!S.lider && (S.aba === 'stats' || S.aba === 'beta')) abrirAba('inscricoes');
             $('#eu-nome').textContent = S.usuario;
             $('#eu-lider').hidden = !S.lider;
             $('#online-texto').textContent = 'Admins online: ' + S.online.length + (S.online.length ? ' (' + S.online.join(', ') + ')' : '');
@@ -536,11 +566,12 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
         b.addEventListener('click', function () { abrirAba(b.dataset.aba); });
     });
     function abrirAba(nome) {
-        if (nome === 'stats' && !S.lider) nome = 'inscricoes';
+        if ((nome === 'stats' || nome === 'beta') && !S.lider) nome = 'inscricoes';
         S.aba = nome;
         if (nome === 'pngs' && !S.pngsCarregados) carregarPngs();
         if (nome === 'stats') carregarStats();
-        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'chat', 'feedbacks', 'stats', 'admins', 'conta'].forEach(function (a) {
+        if (nome === 'beta') carregarBeta();
+        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'chat', 'feedbacks', 'stats', 'beta', 'admins', 'conta'].forEach(function (a) {
             var sec = $('#tab-' + a); if (sec) sec.hidden = a !== nome;
             var bt = $('.abas button[data-aba="' + a + '"]'); if (bt) bt.classList.toggle('ativa', a === nome);
         });
@@ -885,6 +916,81 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
                     if (S.editDestaque === d.id) limparDestaque();
                     dmsg.textContent = 'Destaque apagado.'; return carregarDestaques();
                 }).catch(function (e) { dmsg.textContent = e.message; });
+            });
+            ac.appendChild(rm);
+            corpo.appendChild(tr);
+        });
+    }
+
+    /* ---------- Acesso ao Beta (só líderes) ---------- */
+    S.beta = []; S.codigoNovo = null;
+    function linkBeta() { return location.origin + location.pathname.replace(/[^\/]*$/, '') + 'beta.html'; }
+    function carregarBeta() {
+        return chamar('admin_beta_listar').then(function (l) { S.beta = l || []; desenharBeta(); })
+            .catch(function (e) { $('#b-msg').textContent = e.message; });
+    }
+    function mostrarCodigoNovo(nome, codigo) {
+        S.codigoNovo = { nome: nome, codigo: codigo };
+        $('#b-novo-titulo').textContent = 'Código de ' + nome;
+        $('#b-codigo').textContent = codigo; $('#b-link').textContent = linkBeta(); $('#b-novo').hidden = false;
+        $('#b-novo').scrollIntoView({ block: 'nearest' });
+    }
+    function copiarTexto(t) {
+        if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(t);
+        return new Promise(function (res, rej) {
+            var a = document.createElement('textarea'); a.value = t; a.style.position = 'fixed'; a.style.opacity = '0';
+            document.body.appendChild(a); a.select();
+            try { document.execCommand('copy') ? res() : rej(new Error('x')); } catch (e) { rej(e); } a.remove();
+        });
+    }
+    $('#b-copiar').addEventListener('click', function () {
+        var n = S.codigoNovo; if (!n) return;
+        var texto = 'Oi, ' + n.nome + '! Você foi liberado(a) no beta dos Futuros Creators.\nEntre em: ' + linkBeta() + '\nSeu código: ' + n.codigo + '\nNão compartilhe com ninguém.';
+        copiarTexto(texto).then(function () { $('#b-msg').textContent = 'Mensagem copiada. É só colar no WhatsApp ou no Discord.'; })
+            .catch(function () { $('#b-msg').textContent = 'Não consegui copiar sozinho. Segure o código na tela e copie.'; });
+    });
+    $('#b-fechar').addEventListener('click', function () { S.codigoNovo = null; $('#b-novo').hidden = true; $('#b-codigo').textContent = ''; });
+    $('#form-beta').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var nome = $('#b-nome').value.trim(), msg = $('#b-msg'), b = $('#b-criar'); msg.textContent = '';
+        if (nome.length < 2) { msg.textContent = 'Escreva o nome do testador.'; return; }
+        b.disabled = true;
+        chamar('admin_beta_criar', { p_nome: nome, p_dias: $('#b-dias').value ? Number($('#b-dias').value) : null }).then(function (r) {
+            $('#b-nome').value = ''; mostrarCodigoNovo(nome, r.codigo); return carregarBeta();
+        }).catch(function (e) { msg.textContent = e.message; }).then(function () { b.disabled = false; });
+    });
+    function desenharBeta() {
+        var corpo = $('#b-linhas'); corpo.replaceChildren();
+        $('#b-vazio').hidden = S.beta.length > 0;
+        S.beta.forEach(function (t) {
+            var tr = document.createElement('tr');
+            function td() { var c = document.createElement('td'); tr.appendChild(c); return c; }
+            var exp = t.expira_em && new Date(t.expira_em) < new Date();
+            td().appendChild(criar('strong', null, t.nome));
+            td().textContent = t.ultimo_acesso ? fmtData(t.ultimo_acesso) : 'nunca';
+            td().textContent = t.expira_em ? new Date(t.expira_em).toLocaleDateString('pt-BR') : 'sem prazo';
+            var st = !t.ativo ? ['Desativado', 'problema'] : exp ? ['Expirado', 'problema'] : ['Ativo', 'elogio'];
+            td().appendChild(criar('span', 'etq t-' + st[1], st[0]));
+            var ac = criar('div', 'acoes'); td().appendChild(ac);
+            var at = criar('button', null, t.ativo ? 'Desativar' : 'Ativar'); at.type = 'button';
+            at.addEventListener('click', function () {
+                chamar('admin_beta_ativar', { p_id: t.id, p_ativo: !t.ativo }).then(carregarBeta).catch(function (e) { $('#b-msg').textContent = e.message; });
+            });
+            ac.appendChild(at);
+            var nv = criar('button', null, S.apagando === 'bn' + t.id ? 'Confirmar?' : 'Novo código'); nv.type = 'button';
+            nv.addEventListener('click', function () {
+                if (S.apagando !== 'bn' + t.id) { S.apagando = 'bn' + t.id; desenharBeta(); return; }
+                S.apagando = null;
+                chamar('admin_beta_novo_codigo', { p_id: t.id }).then(function (r) { mostrarCodigoNovo(t.nome, r.codigo); return carregarBeta(); })
+                    .catch(function (e) { $('#b-msg').textContent = e.message; });
+            });
+            ac.appendChild(nv);
+            var rm = criar('button', 'perigo', S.apagando === 'b' + t.id ? 'Confirmar?' : 'Apagar'); rm.type = 'button';
+            rm.addEventListener('click', function () {
+                if (S.apagando !== 'b' + t.id) { S.apagando = 'b' + t.id; desenharBeta(); return; }
+                S.apagando = null;
+                chamar('admin_beta_apagar', { p_id: t.id }).then(function () { $('#b-msg').textContent = 'Testador apagado.'; return carregarBeta(); })
+                    .catch(function (e) { $('#b-msg').textContent = e.message; });
             });
             ac.appendChild(rm);
             corpo.appendChild(tr);
