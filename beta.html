@@ -398,7 +398,7 @@ a { color: inherit; }
     var cfg = window.FUTUROS_CONFIG || {};
     var CHAVE = 'fc_beta_oauth';
     var BETA = 'fc_beta_token';   /* sessão do beta (vale por até 24 h) */
-    var TIKTOK_ATIVO = false;   /* mude para true quando o app do TikTok for aprovado e as chaves estiverem na função */
+    var TIKTOK_ATIVO = true;   /* mude para true quando o app do TikTok for aprovado e as chaves estiverem na função */
     var REDIRECT = location.origin + location.pathname;   /* precisa estar na lista do Google Cloud e do Supabase */
 
     $('#conectar-tiktok').hidden = !TIKTOK_ATIVO;
