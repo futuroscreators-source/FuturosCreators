@@ -184,8 +184,12 @@ function uid(){try{return JSON.parse(atob(sessao.at.split('.')[1].replace(/-/g,'
 
 /* ---------- Login (só Google/YouTube; TikTok em breve) ---------- */
 $('#google').addEventListener('click',function(){
-    /* Login Google para identidade/sessão da Comunidade. Não solicita acesso à API do YouTube. */
-    location.href=base+'/auth/v1/authorize?provider=google&redirect_to='+encodeURIComponent(location.origin+location.pathname);
+    /* Login Google apenas para identidade da Comunidade (sem escopos do YouTube). */
+    var b=this; b.disabled=true; msg('#msg-acesso','Abrindo o Google...');
+    if(!base||!cfg.chave){b.disabled=false;msg('#msg-acesso','Configuração do Supabase ausente. Confira o config.js.',true);return}
+    var destino=location.origin+location.pathname;
+    var params=new URLSearchParams({provider:'google',redirect_to:destino,scopes:'openid email profile'});
+    location.href=base+'/auth/v1/authorize?'+params.toString();
 });
 $('#entrar').addEventListener('click',function(){
     if(!sessao)return abrir($('#d-acesso'));
@@ -352,16 +356,33 @@ function desenhar(mais){
             $('#mais').hidden=l.length<12;
         }).catch(function(){vazio('Não consegui carregar agora.')});
     }else if(aba==='ranking'){
-        L.appendChild(criar('p','rk-intro','Ranking das médias: quem tem a maior média de visualizações por vídeo no canal.'));
-        rpc('publico_comunidade_ranking').then(function(l){
-            (l||[]).forEach(function(r,i){
-                var d=criar('div','rk');d.appendChild(criar('span','pos',['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'][i]||String(i+1)));
-                d.appendChild(avatar(r.nome,'p'));var n=criar('div'),b=criar('b',null,r.usuario);
-                if(r.selo!=='nenhum')b.appendChild(criar('span','selo '+r.selo,'\u2714'));n.appendChild(b);n.appendChild(criar('small',null,r.nome));d.appendChild(n);
-                var v=criar('div','v',fmt(r.media_views));v.appendChild(criar('small',null,'views por vídeo'));d.appendChild(v);L.appendChild(d);
-            });
-            if(!l||!l.length)vazio('O ranking ainda está vazio.');
-        }).catch(function(){vazio('Não consegui carregar o ranking.')});
+        L.appendChild(criar('p','rk-intro','Ranking das médias: mesmos dados, critérios e filtros do ranking da página inicial.'));
+        var filtros=criar('div','rk-filtros');
+        filtros.innerHTML='<div class="chips" id="com-rk-plat" hidden><label><input type="radio" name="com-rk-plat" value="youtube" checked> YouTube</label><label><input type="radio" name="com-rk-plat" value="tiktok"> TikTok</label></div><div class="chips" id="com-rk-tipo"><label><input type="radio" name="com-rk-tipo" value="s" checked> Shorts</label><label><input type="radio" name="com-rk-tipo" value="l"> Vídeos longos</label></div><div class="chips" id="com-rk-mes"><label><input type="radio" name="com-rk-mes" value="0" checked> Este mês</label><label><input type="radio" name="com-rk-mes" value="-1"> Mês passado</label></div>';
+        L.appendChild(filtros);
+        L.querySelector('input[name="com-rk-plat"][value="'+rkPlat+'"]').checked=true;
+        L.querySelector('input[name="com-rk-tipo"][value="'+rkTipo+'"]').checked=true;
+        L.querySelector('input[name="com-rk-mes"][value="'+rkMes+'"]').checked=true;
+        if(rkPlat==='tiktok')L.querySelector('#com-rk-plat').hidden=false;
+        function marcar(grupo,valor){var el=L.querySelector('input[name="'+grupo+'"][value="'+valor+'"]').checked=true;}
+        function argumentos(){var a={p_tipo:rkTipo,p_mes:rkMes};if(rkPlat==='tiktok')a.p_plataforma='tiktok';return a;}
+        function ajustarTipo(){L.querySelector('#com-rk-tipo').hidden=rkPlat==='tiktok';}
+        function carregarRanking(){ajustarTipo();rpc('publico_ranking',argumentos()).then(function(lista){
+            L.querySelectorAll('.rk-item').forEach(function(e){e.remove()});
+            (lista||[]).forEach(function(c,i){
+                var d=criar('div','rk rk-item');d.appendChild(criar('span','pos',['\uD83E\uDD47','\uD83E\uDD48','\uD83E\uDD49'][i]||String(i+1)));
+                if(/^https:\/\//i.test(c.foto||'')){var im=criar('img','av p');im.src=c.foto;im.alt='';im.loading='lazy';im.onerror=function(){this.replaceWith(avatar(c.nome,'p'))};d.appendChild(im)}else d.appendChild(avatar(c.nome,'p'));
+                var n=criar('div','rk-canal');if(/^https:\/\//i.test(c.link||'')){var a=criar('a',null,c.nome);a.href=c.link;a.target='_blank';a.rel='noopener noreferrer';n.appendChild(a)}else n.appendChild(criar('b',null,c.nome||'Canal'));
+                n.appendChild(criar('small',null,(c.total||0)+((Number(c.total)===1)?' vídeo no mês':' vídeos no mês')));d.appendChild(n);
+                var v=criar('div','v',fmt(c.media));v.appendChild(criar('small',null,'views em média'));d.appendChild(v);L.appendChild(d);
+            });if(!lista||!lista.length)vazio('Ninguém no ranking deste período ainda.');else vazio('');
+        }).catch(function(){vazio('Não consegui carregar o ranking agora.')});}
+        L.querySelectorAll('input[name="com-rk-plat"]').forEach(function(x){x.addEventListener('change',function(){rkPlat=x.value;ajustarTipo();carregarRanking()})});
+        L.querySelectorAll('input[name="com-rk-tipo"]').forEach(function(x){x.addEventListener('change',function(){rkTipo=x.value;carregarRanking()})});
+        L.querySelectorAll('input[name="com-rk-mes"]').forEach(function(x){x.addEventListener('change',function(){rkMes=Number(x.value);carregarRanking()})});
+        if(!rkInicial){rkInicial=true;var combos=[['youtube','s',0],['youtube','l',0],['tiktok','s',0],['youtube','s',-1],['youtube','l',-1],['tiktok','s',-1]];
+            function proximo(i){if(i>=combos.length){carregarRanking();return}var c=combos[i],a={p_tipo:c[1],p_mes:c[2]};if(c[0]==='tiktok')a.p_plataforma='tiktok';rpc('publico_ranking',a).then(function(l){if(l&&l.length){rkPlat=c[0];rkTipo=c[1];rkMes=c[2];marcar('com-rk-plat',rkPlat);marcar('com-rk-tipo',rkTipo);marcar('com-rk-mes',String(rkMes));if(c[0]==='tiktok')L.querySelector('#com-rk-plat').hidden=false;carregarRanking()}else proximo(i+1)}).catch(function(){proximo(i+1)})}proximo(0);
+        }else carregarRanking();
     }else if(aba==='eu'&&perfil){
         var e=criar('div','eu'),an=criar('span','anel eu');an.appendChild(avatar(perfil.nome));e.appendChild(an);
         var n=criar('div');n.appendChild(criar('b',null,perfil.nome));n.appendChild(criar('div',null,'@'+perfil.usuario+(perfil.selo!=='nenhum'?' \u2714 '+perfil.selo:'')));if(perfil.bio)n.appendChild(criar('div',null,perfil.bio));
@@ -387,11 +408,11 @@ function iniciar(){
 }
 (function(){
     if(!cfg.url||!cfg.chave||/COLOQUE/.test(cfg.url+cfg.chave)){msg('#msg-acesso','O site ainda não foi ligado ao banco de dados (config.js).',true);abrir($('#d-acesso'));return}
-    var h=location.hash.replace(/^#/,'');
-    if(/(^|&)(access_token|error)=/.test(h)){
-        var q=new URLSearchParams(h);history.replaceState(null,'',location.pathname+location.search);
+    var h=location.hash.replace(/^#/,''),q=new URLSearchParams(h);
+    if(q.has('access_token')||q.has('error')||q.has('error_description')){
+        history.replaceState(null,'',location.pathname+location.search);
         if(q.get('access_token'))receber({access_token:q.get('access_token'),refresh_token:q.get('refresh_token'),expires_in:q.get('expires_in')});
-        else{abrir($('#d-acesso'));msg('#msg-acesso','Não consegui entrar. Tente de novo.',true)}
+        else{abrir($('#d-acesso'));var detalhe=q.get('error_description')||q.get('error')||'Erro desconhecido';msg('#msg-acesso','Login Google não concluído: '+detalhe.replace(/[+]/g,' '),true)}
     }else sessao=ler();
     tela();carregarStories();desenhar();iniciar();
 })();
