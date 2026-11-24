@@ -180,6 +180,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
             <button type="button" role="tab" data-aba="destaque">Destaque da Semana</button>
             <button type="button" role="tab" data-aba="chat" id="aba-chat">Chat</button>
             <button type="button" role="tab" data-aba="feedbacks" id="aba-feedbacks">Feedbacks</button>
+            <button type="button" role="tab" data-aba="comunidade" id="aba-comunidade">Comunidade</button>
             <button type="button" role="tab" data-aba="stats" id="aba-stats" hidden>Estatísticas</button>
             <button type="button" role="tab" data-aba="beta" id="aba-beta" hidden>Beta</button>
             <button type="button" role="tab" data-aba="admins" id="aba-admins" hidden>Admins</button>
@@ -357,6 +358,18 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
             <div id="fb-lista"></div>
             <p class="vazio-tab" id="fb-vazio" hidden>Nenhum feedback por aqui ainda.</p>
             <p class="nota" id="fb-msg" role="status"></p>
+        </section>
+
+        <section id="tab-comunidade" hidden>
+            <h2>Comunidade</h2>
+            <p>Postagens enviadas na página da comunidade. Só aparecem para o público depois que você aprova.</p>
+            <div class="resumo" id="co-resumo"></div>
+            <div id="co-lista"></div>
+            <p class="vazio-tab" id="co-vazio" hidden>Nada por aqui.</p>
+            <h3>Perfis</h3>
+            <p>Líderes dão o selo (Verificado ou Oficial). Perfil oficial publica sem passar pela aprovação. Banir impede de postar.</p>
+            <div id="co-perfis"></div>
+            <p class="nota" id="co-msg" role="status"></p>
         </section>
 
         <section id="tab-stats" hidden>
@@ -569,7 +582,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
     }
 
     function atualizarTudo() {
-        carregarInscricoes(); carregarVideos(); carregarNoticias(); carregarEquipe(); carregarFestas(); carregarDestaques(); carregarFeedbacks(); if (S.aba !== 'chat') buscarChat(); if (S.lider) carregarAdmins();
+        carregarInscricoes(); carregarVideos(); carregarNoticias(); carregarEquipe(); carregarFestas(); carregarDestaques(); carregarFeedbacks(); carregarComunidade(); if (S.aba !== 'chat') buscarChat(); if (S.lider) carregarAdmins();
     }
 
     document.querySelectorAll('.abas button').forEach(function (b) {
@@ -581,7 +594,8 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
         if (nome === 'pngs' && !S.pngsCarregados) carregarPngs();
         if (nome === 'stats') carregarStats();
         if (nome === 'beta') carregarBeta();
-        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'chat', 'feedbacks', 'stats', 'beta', 'admins', 'conta'].forEach(function (a) {
+        if (nome === 'comunidade') carregarComunidade();
+        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'chat', 'feedbacks', 'comunidade', 'stats', 'beta', 'admins', 'conta'].forEach(function (a) {
             var sec = $('#tab-' + a); if (sec) sec.hidden = a !== nome;
             var bt = $('.abas button[data-aba="' + a + '"]'); if (bt) bt.classList.toggle('ativa', a === nome);
         });
@@ -1311,6 +1325,96 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
                   .catch(function (e) { $('#fb-msg').textContent = e.message; });
             });
             ac.appendChild(rm); c.appendChild(ac); caixa.appendChild(c);
+        });
+    }
+
+    /* ---------- Comunidade ---------- */
+    S.coFiltro = 'pendente'; S.coPosts = []; S.coPend = 0; S.coPerfis = []; S.coRecusando = null;
+    function carregarComunidade() {
+        if (S.aba === 'comunidade') chamar('admin_comunidade_perfis').then(function (l) { S.coPerfis = l || []; desenharPerfisCom(); }).catch(function () {});
+        return chamar('admin_comunidade_posts', { p_status: S.coFiltro }).then(function (r) {
+            S.coPosts = (r && r.lista) || []; S.coPend = (r && r.pendentes) || 0; desenharComunidade();
+        }).catch(function () {});
+    }
+    function comAviso(r, ok) {
+        $('#co-msg').textContent = (r && r.ok === false) ? (r.erro || 'Não deu certo.') : (ok || '');
+    }
+    function desenharComunidade() {
+        $('#aba-comunidade').textContent = S.coPend ? 'Comunidade (' + S.coPend + ')' : 'Comunidade';
+        var resumo = $('#co-resumo'); resumo.replaceChildren();
+        [['pendente', 'Para aprovar (' + S.coPend + ')'], ['aprovado', 'Aprovadas'], ['recusado', 'Recusadas']].forEach(function (f) {
+            var b = criar('button', S.coFiltro === f[0] ? 'ativa' : '', f[1]); b.type = 'button';
+            b.addEventListener('click', function () { S.coFiltro = f[0]; carregarComunidade(); });
+            resumo.appendChild(b);
+        });
+        var caixa = $('#co-lista'); caixa.replaceChildren();
+        $('#co-vazio').hidden = S.coPosts.length > 0;
+        S.coPosts.forEach(function (p) {
+            var c = criar('article', 'fb-cartao' + (p.status === 'pendente' ? ' novo' : '')), t = criar('div', 'fb-topo');
+            t.appendChild(criar('span', 'etq', p.tipo === 'dica' ? 'Dica' : 'Postagem'));
+            t.appendChild(criar('span', null, p.nome + ' (@' + p.usuario + ')' + (p.selo && p.selo !== 'nenhum' ? ' - ' + p.selo : '')));
+            t.appendChild(criar('time', null, fmtData(p.criado_em)));
+            if (p.moderado_por) t.appendChild(criar('span', null, 'por ' + p.moderado_por));
+            c.appendChild(t); c.appendChild(criar('p', 'fb-msg', p.texto));
+            if (p.motivo) c.appendChild(criar('p', 'fb-msg', 'Motivo: ' + p.motivo));
+            var ac = criar('div', 'acoes');
+            if (p.status !== 'aprovado') {
+                var ok = criar('button', null, 'Aprovar'); ok.type = 'button';
+                ok.addEventListener('click', function () {
+                    chamar('admin_comunidade_moderar', { p_id: p.id, p_status: 'aprovado' }).then(function (r) { comAviso(r, 'Postagem aprovada.'); return carregarComunidade(); }).catch(function (e) { $('#co-msg').textContent = e.message; });
+                });
+                ac.appendChild(ok);
+            }
+            if (p.status !== 'recusado') {
+                if (S.coRecusando === p.id) {
+                    var mi = criar('input'); mi.type = 'text'; mi.maxLength = 300; mi.placeholder = 'Motivo (a pessoa vai ver)'; mi.setAttribute('aria-label', 'Motivo da recusa');
+                    var cf = criar('button', 'perigo', 'Confirmar recusa'); cf.type = 'button';
+                    cf.addEventListener('click', function () {
+                        S.coRecusando = null;
+                        chamar('admin_comunidade_moderar', { p_id: p.id, p_status: 'recusado', p_motivo: mi.value }).then(function (r) { comAviso(r, 'Postagem recusada.'); return carregarComunidade(); }).catch(function (e) { $('#co-msg').textContent = e.message; });
+                    });
+                    ac.appendChild(mi); ac.appendChild(cf);
+                } else {
+                    var no = criar('button', 'perigo', 'Recusar'); no.type = 'button';
+                    no.addEventListener('click', function () { S.coRecusando = p.id; desenharComunidade(); });
+                    ac.appendChild(no);
+                }
+            }
+            var rm = criar('button', 'perigo', S.apagando === 'c' + p.id ? 'Confirmar?' : 'Apagar'); rm.type = 'button';
+            rm.addEventListener('click', function () {
+                if (S.apagando !== 'c' + p.id) { S.apagando = 'c' + p.id; desenharComunidade(); return; }
+                S.apagando = null;
+                chamar('admin_comunidade_apagar', { p_id: p.id }).then(function () { $('#co-msg').textContent = 'Postagem apagada.'; return carregarComunidade(); }).catch(function (e) { $('#co-msg').textContent = e.message; });
+            });
+            ac.appendChild(rm); c.appendChild(ac); caixa.appendChild(c);
+        });
+    }
+    function desenharPerfisCom() {
+        var caixa = $('#co-perfis'); caixa.replaceChildren();
+        if (!S.coPerfis.length) { caixa.appendChild(criar('p', 'vazio-tab', 'Ninguém criou perfil ainda.')); return; }
+        S.coPerfis.forEach(function (f) {
+            var c = criar('article', 'fb-cartao'), t = criar('div', 'fb-topo');
+            t.appendChild(criar('span', null, f.nome + ' (@' + f.usuario + ')'));
+            t.appendChild(criar('span', null, f.posts + (f.posts === 1 ? ' postagem' : ' postagens')));
+            t.appendChild(criar('time', null, fmtData(f.criado_em)));
+            if (f.banido) t.appendChild(criar('span', 'etq', 'Banido'));
+            c.appendChild(t);
+            var ac = criar('div', 'acoes');
+            if (S.lider) {
+                var sel = criar('select'); sel.setAttribute('aria-label', 'Selo de ' + f.usuario);
+                [['nenhum', 'Sem selo'], ['verificado', 'Verificado'], ['oficial', 'Oficial']].forEach(function (o) {
+                    var op = criar('option', null, o[1]); op.value = o[0]; if (f.selo === o[0]) op.selected = true; sel.appendChild(op);
+                });
+                sel.addEventListener('change', function () {
+                    chamar('admin_comunidade_perfil_definir', { p_id: f.id, p_selo: sel.value }).then(function (r) { comAviso(r, 'Selo atualizado.'); return carregarComunidade(); }).catch(function (e) { $('#co-msg').textContent = e.message; });
+                });
+                ac.appendChild(sel);
+            } else ac.appendChild(criar('span', null, 'Selo: ' + (f.selo === 'nenhum' ? 'sem selo' : f.selo)));
+            var bn = criar('button', f.banido ? null : 'perigo', f.banido ? 'Desbanir' : 'Banir'); bn.type = 'button';
+            bn.addEventListener('click', function () {
+                chamar('admin_comunidade_perfil_definir', { p_id: f.id, p_banido: !f.banido }).then(function (r) { comAviso(r, f.banido ? 'Perfil liberado.' : 'Perfil banido.'); return carregarComunidade(); }).catch(function (e) { $('#co-msg').textContent = e.message; });
+            });
+            ac.appendChild(bn); c.appendChild(ac); caixa.appendChild(c);
         });
     }
 

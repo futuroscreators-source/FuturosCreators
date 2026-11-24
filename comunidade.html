@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Comunidade | Futuros Creators</title>
+<meta name="theme-color" content="#FFC93C">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root { --sol:#FFC93C; --uva:#2B0A57; --rosa:#FF4FA3; --ceu:#35D6E0; --tinta:#17101F; --papel:#FFF6DD;
+    --titulo:'Lilita One','Trebuchet MS',sans-serif; --texto:'Nunito',system-ui,sans-serif; }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin:0; font:500 1.0625rem/1.55 var(--texto); color:var(--tinta); background:var(--sol); -webkit-font-smoothing:antialiased; }
+[hidden] { display:none !important; }
+a { color:inherit; }
+:focus-visible { outline:4px solid var(--ceu); outline-offset:3px; }
+header { padding:18px 20px 0; }
+.menu { display:flex; justify-content:flex-end; flex-wrap:wrap; gap:10px; max-width:760px; margin:0 auto; }
+.menu a, .menu button { padding:.45em 1.05em; font:800 1rem var(--texto); text-decoration:none; background:#fff; border:3px solid var(--tinta); border-radius:999px; box-shadow:0 4px 0 var(--tinta); cursor:pointer; color:inherit; }
+main { max-width:760px; margin:0 auto; padding:24px 20px 60px; }
+.adesivo { margin:0 0 .3em; font:400 clamp(2.3rem,6vw,3.6rem)/1.02 var(--titulo); color:#fff; -webkit-text-stroke:9px var(--tinta); paint-order:stroke fill; text-shadow:4px 5px 0 var(--tinta); transform:rotate(-1.5deg); transform-origin:left center; }
+h2 { font:400 1.7rem/1.1 var(--titulo); margin:28px 0 12px; }
+.cartao { margin:0 0 18px; padding:18px 20px; background:#fff; border:4px solid var(--tinta); border-radius:18px; box-shadow:0 6px 0 var(--tinta); }
+.botao { display:inline-block; padding:.65em 1.3em; font:400 1.2rem/1 var(--titulo); border:4px solid var(--tinta); border-radius:999px; box-shadow:0 5px 0 var(--tinta); cursor:pointer; background:#fff; color:var(--tinta); }
+.botao:active { transform:translateY(5px); box-shadow:none; }
+.botao.rosa { background:var(--rosa); color:#fff; }
+.botao.cheio { width:100%; }
+.botao[disabled] { opacity:.6; cursor:wait; }
+.campo { margin:0 0 14px; }
+.campo label { display:block; font-weight:800; margin:0 0 4px; }
+.campo input[type=text], .campo input[type=email], .campo input[type=password], .campo textarea, .campo select { width:100%; padding:.6em .8em; font:inherit; background:var(--papel); border:3px solid var(--tinta); border-radius:12px; }
+.campo textarea { min-height:120px; resize:vertical; }
+.campo small { display:block; margin-top:4px; font-weight:700; opacity:.75; }
+.marca { display:flex; gap:10px; align-items:flex-start; font-weight:700; }
+.marca input { width:22px; height:22px; margin-top:3px; flex:none; accent-color:var(--rosa); }
+.abas { display:flex; gap:10px; margin:0 0 16px; }
+.abas button { flex:1; padding:.5em; font:800 1rem var(--texto); background:var(--papel); border:3px solid var(--tinta); border-radius:999px; cursor:pointer; }
+.abas button[aria-pressed=true] { background:var(--rosa); color:#fff; }
+.ou { text-align:center; margin:14px 0; font-weight:800; opacity:.7; }
+.msg { margin:10px 0 0; font-weight:800; min-height:1.4em; }
+.msg.erro { color:#B00030; }
+.post { margin:0 0 14px; padding:14px 18px; background:#fff; border:3px solid var(--tinta); border-radius:16px; }
+.post-topo { display:flex; gap:12px; align-items:center; margin:0 0 8px; }
+.avatar { flex:none; width:44px; height:44px; display:grid; place-items:center; font:400 1.4rem/1 var(--titulo); color:#fff; background:var(--uva); border:3px solid var(--tinta); border-radius:50%; }
+.post-nome { font-weight:800; line-height:1.2; }
+.post-nome small { display:block; font-weight:700; opacity:.7; }
+.selo { display:inline-block; margin-left:6px; padding:0 .55em; font:800 .75rem/1.6 var(--texto); color:#fff; background:var(--ceu); color:var(--tinta); border:2px solid var(--tinta); border-radius:999px; vertical-align:middle; }
+.selo.oficial { background:var(--sol); }
+.etq { display:inline-block; margin-left:6px; padding:0 .6em; font:800 .75rem/1.6 var(--texto); background:var(--papel); border:2px solid var(--tinta); border-radius:999px; }
+.etq.dica { background:var(--rosa); color:#fff; }
+.etq.pendente { background:var(--sol); } .etq.recusado { background:#ffd0d8; } .etq.aprovado { background:#c9f5c0; }
+.post-texto { margin:0; white-space:pre-wrap; overflow-wrap:anywhere; }
+.post-rodape { display:flex; gap:12px; align-items:center; margin-top:10px; font-weight:700; opacity:.8; }
+.post-rodape button { font:800 .9rem var(--texto); background:none; border:0; text-decoration:underline; cursor:pointer; color:inherit; }
+.vazio { font-weight:800; opacity:.8; }
+.intro { font-weight:700; max-width:56ch; }
+</style>
+</head>
+<body>
+<header>
+    <nav class="menu" aria-label="Principal">
+        <a href="index.html">&larr; Voltar para o site</a>
+        <button type="button" id="sair" hidden>Sair</button>
+    </nav>
+</header>
+
+<main>
+    <h1 class="adesivo">Comunidade</h1>
+    <p class="intro">Aqui o pessoal compartilha ideias e dicas. Toda postagem passa pela equipe antes de aparecer.</p>
+
+    <section class="cartao" id="acesso" hidden>
+        <div class="abas" role="group" aria-label="Entrar ou criar conta">
+            <button type="button" data-modo="entrar" aria-pressed="true">Entrar</button>
+            <button type="button" data-modo="criar" aria-pressed="false">Criar conta</button>
+        </div>
+        <button type="button" class="botao cheio" id="google">Continuar com o Google</button>
+        <p class="ou">ou com e-mail e senha</p>
+        <form id="f-acesso" novalidate>
+            <div class="campo"><label for="email">E-mail</label><input id="email" type="email" autocomplete="email" required></div>
+            <div class="campo"><label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password" minlength="8" required>
+                <small id="dica-senha" hidden>Pelo menos 8 caracteres.</small></div>
+            <button type="submit" class="botao rosa cheio" id="enviar-acesso">Entrar</button>
+        </form>
+        <p class="msg" id="msg-acesso" role="status"></p>
+    </section>
+
+    <section class="cartao" id="perfil" hidden>
+        <h2 style="margin-top:0" id="perfil-titulo">Crie seu perfil</h2>
+        <form id="f-perfil" novalidate>
+            <div class="campo"><label for="p-usuario">Nome de usuário</label><input id="p-usuario" type="text" maxlength="20" autocomplete="off" autocapitalize="none">
+                <small>De 3 a 20 caracteres: letras minúsculas, números, ponto e sublinhado. Não dá para trocar depois.</small></div>
+            <div class="campo"><label for="p-nome">Seu nome</label><input id="p-nome" type="text" maxlength="40"></div>
+            <div class="campo"><label for="p-bio">Bio (opcional)</label><input id="p-bio" type="text" maxlength="160"></div>
+            <div class="campo" id="p-ciente-caixa"><label class="marca"><input id="p-ciente" type="checkbox">
+                <span>Tenho 18 anos ou mais, ou meu responsável sabe e concorda com o meu cadastro. Li e aceito que minhas postagens passam por aprovação da equipe.</span></label></div>
+            <button type="submit" class="botao rosa" id="enviar-perfil">Salvar perfil</button>
+        </form>
+        <p class="msg" id="msg-perfil" role="status"></p>
+    </section>
+
+    <section id="logado" hidden>
+        <div class="cartao">
+            <p style="margin:0 0 12px"><strong id="eu"></strong> <button type="button" id="editar" style="font:800 .9rem var(--texto);background:none;border:0;text-decoration:underline;cursor:pointer">Editar perfil</button></p>
+            <form id="f-post" novalidate>
+                <div class="campo" id="tipo-caixa" hidden><label for="tipo">Tipo</label>
+                    <select id="tipo"><option value="post">Postagem</option><option value="dica">Dica oficial</option></select></div>
+                <div class="campo"><label for="texto">O que você quer compartilhar?</label>
+                    <textarea id="texto" maxlength="1000"></textarea><small id="cont">0/1000</small></div>
+                <button type="submit" class="botao rosa" id="enviar-post">Enviar para aprovação</button>
+            </form>
+            <p class="msg" id="msg-post" role="status"></p>
+        </div>
+        <h2>Meus envios</h2>
+        <div id="meus"></div>
+    </section>
+
+    <h2>Postagens da comunidade</h2>
+    <div id="feed"></div>
+    <p class="vazio" id="feed-vazio" hidden>Ainda não há postagens aprovadas.</p>
+    <button type="button" class="botao" id="mais" hidden>Ver mais</button>
+</main>
+
+<script src="config.js"></script>
+<script>
+(function () {
+    'use strict';
+    var cfg = window.FUTUROS_CONFIG || {}, CH = 'fc_com_sessao';
+    var base = (cfg.url || '').replace(/\/+$/, '');
+    var sessao = null, perfil = null, modo = 'entrar', ultimoId = null, editando = false, apagando = null;
+    function $(s) { return document.querySelector(s); }
+    function criar(t, c, x) { var e = document.createElement(t); if (c) e.className = c; if (x != null) e.textContent = x; return e; }
+    function ler() { try { return JSON.parse(localStorage.getItem(CH) || 'null'); } catch (e) { return null; } }
+    function guardar(s) { sessao = s; try { if (s) localStorage.setItem(CH, JSON.stringify(s)); else localStorage.removeItem(CH); } catch (e) {} }
+    function msg(id, t, erro) { var m = $(id); m.textContent = t || ''; m.className = 'msg' + (erro ? ' erro' : ''); }
+    function data(ts) { try { return new Date(ts).toLocaleDateString('pt-BR'); } catch (e) { return ''; } }
+
+    /* ---------- Conexão com o Supabase (login e banco), sem biblioteca ---------- */
+    function cab(token) {
+        var h = { 'Content-Type': 'application/json', apikey: cfg.chave };
+        var t = token || (/^eyJ/.test(cfg.chave || '') ? cfg.chave : '');
+        if (t) h.Authorization = 'Bearer ' + t;
+        return h;
+    }
+    function traduz(m) {
+        m = String(m || '');
+        if (/invalid login/i.test(m)) return 'E-mail ou senha incorretos.';
+        if (/not confirmed/i.test(m)) return 'Confirme seu e-mail primeiro: abra o link que enviamos.';
+        if (/already (been )?registered/i.test(m)) return 'Esse e-mail já tem conta. Use a aba Entrar.';
+        if (/password/i.test(m)) return 'A senha precisa de pelo menos 8 caracteres.';
+        if (/rate limit|too many|security purposes/i.test(m)) return 'Muitas tentativas. Espere um pouco e tente de novo.';
+        return 'Não deu certo agora. Tente de novo.';
+    }
+    function auth(caminho, corpo) {
+        return fetch(base + '/auth/v1/' + caminho, { method: 'POST', headers: cab(), body: JSON.stringify(corpo) }).then(function (r) {
+            return r.json().catch(function () { return {}; }).then(function (j) {
+                if (!r.ok) throw new Error(traduz(j.msg || j.error_description || j.message));
+                return j;
+            });
+        });
+    }
+    function receber(j) {
+        if (!j || !j.access_token) return false;
+        guardar({ at: j.access_token, rt: j.refresh_token, ate: Date.now() + (Number(j.expires_in) || 3600) * 1000 });
+        return true;
+    }
+    function renovar() {
+        if (!sessao) return Promise.reject(new Error('sem sessão'));
+        if (sessao.ate - Date.now() > 60000) return Promise.resolve();
+        return auth('token?grant_type=refresh_token', { refresh_token: sessao.rt })
+            .then(function (j) { if (!receber(j)) throw new Error('sessão'); })
+            .catch(function (e) { guardar(null); throw e; });
+    }
+    function rpc(nome, args, logado) {
+        return (logado ? renovar() : Promise.resolve()).then(function () {
+            return fetch(base + '/rest/v1/rpc/' + nome, { method: 'POST', headers: cab(logado ? sessao.at : null), body: JSON.stringify(args || {}) });
+        }).then(function (r) {
+            return r.json().catch(function () { return null; }).then(function (j) {
+                if (!r.ok) throw new Error('Não consegui falar com o servidor. Tente de novo.');
+                return j;
+            });
+        });
+    }
+
+    /* ---------- Entrar e criar conta ---------- */
+    document.querySelectorAll('.abas button').forEach(function (b) {
+        b.addEventListener('click', function () {
+            modo = b.dataset.modo;
+            document.querySelectorAll('.abas button').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+            $('#enviar-acesso').textContent = modo === 'entrar' ? 'Entrar' : 'Criar conta';
+            $('#dica-senha').hidden = modo === 'entrar';
+            $('#senha').autocomplete = modo === 'entrar' ? 'current-password' : 'new-password';
+            msg('#msg-acesso', '');
+        });
+    });
+    $('#google').addEventListener('click', function () {
+        location.href = base + '/auth/v1/authorize?provider=google&redirect_to=' + encodeURIComponent(location.origin + location.pathname);
+    });
+    $('#f-acesso').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var email = $('#email').value.trim(), senha = $('#senha').value, b = $('#enviar-acesso');
+        if (!/^\S+@\S+\.\S+$/.test(email)) return msg('#msg-acesso', 'Escreva um e-mail válido.', true);
+        if (senha.length < 8) return msg('#msg-acesso', 'A senha precisa de pelo menos 8 caracteres.', true);
+        b.disabled = true; msg('#msg-acesso', '');
+        var p = modo === 'entrar'
+            ? auth('token?grant_type=password', { email: email, password: senha })
+            : auth('signup', { email: email, password: senha });
+        p.then(function (j) {
+            if (receber(j)) { $('#senha').value = ''; return iniciar(); }
+            msg('#msg-acesso', 'Enviamos um link de confirmação para o seu e-mail. Abra o link e depois entre aqui.');
+        }).catch(function (e) { msg('#msg-acesso', e.message, true); }).then(function () { b.disabled = false; });
+    });
+    $('#sair').addEventListener('click', function () {
+        var t = sessao && sessao.at; guardar(null); perfil = null;
+        if (t) fetch(base + '/auth/v1/logout', { method: 'POST', headers: cab(t) }).catch(function () {});
+        tela();
+    });
+
+    /* ---------- Perfil ---------- */
+    $('#f-perfil').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var b = $('#enviar-perfil'); b.disabled = true; msg('#msg-perfil', '');
+        rpc('comunidade_salvar_perfil', { p_usuario: $('#p-usuario').value, p_nome: $('#p-nome').value, p_bio: $('#p-bio').value, p_ciente: $('#p-ciente').checked }, true)
+            .then(function (r) {
+                if (!r || !r.ok) return msg('#msg-perfil', (r && r.erro) || 'Não deu certo.', true);
+                editando = false; return iniciar();
+            }).catch(function (e) { msg('#msg-perfil', e.message, true); }).then(function () { b.disabled = false; });
+    });
+    $('#editar').addEventListener('click', function () { editando = true; tela(); });
+
+    /* ---------- Postar ---------- */
+    $('#texto').addEventListener('input', function () { $('#cont').textContent = this.value.length + '/1000'; });
+    $('#f-post').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var b = $('#enviar-post'); b.disabled = true; msg('#msg-post', '');
+        rpc('comunidade_postar', { p_texto: $('#texto').value, p_tipo: $('#tipo').value }, true).then(function (r) {
+            if (!r || !r.ok) return msg('#msg-post', (r && r.erro) || 'Não deu certo.', true);
+            $('#texto').value = ''; $('#cont').textContent = '0/1000';
+            msg('#msg-post', r.status === 'aprovado' ? 'Publicado!' : 'Enviado! A equipe vai analisar antes de aparecer.');
+            carregarMeus(); if (r.status === 'aprovado') carregarFeed(false);
+        }).catch(function (e) { msg('#msg-post', e.message, true); }).then(function () { b.disabled = false; });
+    });
+
+    /* ---------- Desenho das postagens ---------- */
+    function cartao(p, meu) {
+        var c = criar('article', 'post'), t = criar('div', 'post-topo');
+        if (!meu) {
+            t.appendChild(criar('span', 'avatar', (p.nome || '?').trim().charAt(0).toUpperCase()));
+            var n = criar('div', 'post-nome', p.nome);
+            if (p.selo === 'oficial' || p.selo === 'verificado') n.appendChild(criar('span', 'selo ' + p.selo, (p.selo === 'oficial' ? '\u2714 Oficial' : '\u2714 Verificado')));
+            n.appendChild(criar('small', null, '@' + p.usuario)); t.appendChild(n);
+        } else {
+            var rot = { pendente: 'Em análise', aprovado: 'Publicado', recusado: 'Não aprovado' };
+            t.appendChild(criar('span', 'etq ' + p.status, rot[p.status] || p.status));
+        }
+        if (p.tipo === 'dica') t.appendChild(criar('span', 'etq dica', 'Dica'));
+        c.appendChild(t); c.appendChild(criar('p', 'post-texto', p.texto));
+        var r = criar('div', 'post-rodape'); r.appendChild(criar('span', null, data(p.criado_em)));
+        if (meu && p.status === 'recusado' && p.motivo) r.appendChild(criar('span', null, 'Motivo: ' + p.motivo));
+        if (meu) {
+            var ap = criar('button', null, apagando === p.id ? 'Confirmar?' : 'Apagar'); ap.type = 'button';
+            ap.addEventListener('click', function () {
+                if (apagando !== p.id) { apagando = p.id; return carregarMeus(); }
+                apagando = null; rpc('comunidade_apagar_meu', { p_id: p.id }, true).then(function () { carregarMeus(); carregarFeed(false); });
+            });
+            r.appendChild(ap);
+        }
+        c.appendChild(r); return c;
+    }
+    function carregarFeed(mais) {
+        rpc('publico_comunidade_feed', { p_antes: mais ? ultimoId : null, p_limite: 20 }).then(function (l) {
+            l = l || []; var f = $('#feed');
+            if (!mais) f.replaceChildren();
+            l.forEach(function (p) { f.appendChild(cartao(p, false)); });
+            if (l.length) ultimoId = l[l.length - 1].id;
+            $('#feed-vazio').hidden = f.children.length > 0; $('#mais').hidden = l.length < 20;
+        }).catch(function () { $('#feed-vazio').hidden = false; $('#feed-vazio').textContent = 'Não consegui carregar as postagens agora.'; });
+    }
+    $('#mais').addEventListener('click', function () { carregarFeed(true); });
+    function carregarMeus() {
+        rpc('comunidade_meus_posts', {}, true).then(function (l) {
+            var m = $('#meus'); m.replaceChildren();
+            if (!l || !l.length) m.appendChild(criar('p', 'vazio', 'Você ainda não enviou nada.'));
+            (l || []).forEach(function (p) { m.appendChild(cartao(p, true)); });
+        }).catch(function () {});
+    }
+
+    /* ---------- Qual tela mostrar ---------- */
+    function tela() {
+        var logado = !!sessao;
+        $('#acesso').hidden = logado; $('#sair').hidden = !logado;
+        $('#perfil').hidden = !(logado && (!perfil || editando));
+        $('#logado').hidden = !(logado && perfil);
+        if (logado && perfil) {
+            $('#eu').textContent = perfil.nome + ' (@' + perfil.usuario + ')';
+            $('#tipo-caixa').hidden = perfil.selo !== 'oficial';
+            $('#f-post').hidden = !!perfil.banido;
+            if (perfil.banido) msg('#msg-post', 'Sua conta não pode postar agora.', true);
+        }
+        if (logado && perfil && editando) {
+            $('#perfil-titulo').textContent = 'Editar perfil';
+            $('#p-usuario').value = perfil.usuario; $('#p-usuario').readOnly = true;
+            $('#p-nome').value = perfil.nome; $('#p-bio').value = perfil.bio || '';
+            $('#p-ciente-caixa').hidden = true;
+        } else {
+            $('#perfil-titulo').textContent = 'Crie seu perfil'; $('#p-usuario').readOnly = false; $('#p-ciente-caixa').hidden = false;
+        }
+    }
+    function iniciar() {
+        if (!sessao) { tela(); return Promise.resolve(); }
+        return rpc('comunidade_meu_perfil', {}, true).then(function (p) {
+            perfil = p || null; tela(); if (perfil) carregarMeus();
+        }).catch(function () { guardar(null); perfil = null; tela(); });
+    }
+
+    /* ---------- Começo: volta do Google, link do e-mail ou sessão guardada ---------- */
+    (function () {
+        if (!cfg.url || !cfg.chave || /COLOQUE/.test(cfg.url + cfg.chave)) {
+            msg('#msg-acesso', 'O site ainda não foi ligado ao banco de dados (config.js).', true); $('#acesso').hidden = false; return;
+        }
+        var h = location.hash.replace(/^#/, '');
+        if (/(^|&)(access_token|error)=/.test(h)) {
+            var q = new URLSearchParams(h);
+            history.replaceState(null, '', location.pathname + location.search);
+            if (q.get('access_token')) receber({ access_token: q.get('access_token'), refresh_token: q.get('refresh_token'), expires_in: q.get('expires_in') });
+            else { $('#acesso').hidden = false; msg('#msg-acesso', 'Não consegui entrar. Tente de novo.', true); }
+        } else sessao = ler();
+        iniciar(); carregarFeed(false);
+    })();
+})();
+</script>
+</body>
+</html>
