@@ -116,7 +116,7 @@ dialog h2{margin:0 0 10px;font:400 1.6rem var(--titulo)}
 
 <dialog id="d-acesso">
     <h2>Entre na comunidade</h2>
-    <p>Use a conta do Google (a mesma do seu canal do YouTube). Assim a gente liga seu perfil ao seu canal para o ranking.</p>
+    <p>Entre com a conta do Google do seu canal do YouTube. Usamos só o nome e a foto do canal para criar sua conta. Não vemos seus vídeos nem guardamos seu acesso ao Google.</p>
     <button type="button" class="btn rosa" id="google">Continuar com Google / YouTube</button>
     <button type="button" class="btn" disabled>TikTok &middot; em breve</button>
     <p class="msg" id="msg-acesso" role="status"></p>
@@ -188,10 +188,37 @@ function rpc(nome,args,logado){
 }
 function uid(){try{return JSON.parse(atob(sessao.at.split('.')[1].replace(/-/g,'+').replace(/_/g,'/'))).sub}catch(e){return ''}}
 
-/* ---------- Login (só Google/YouTube; TikTok em breve) ---------- */
+/* ---------- Login (Google/YouTube pela função youtube-login; TikTok em breve) ---------- */
+var REDIRECT=location.origin+location.pathname,CHO='fc_com_oauth';
+function b64url(b){return btoa(String.fromCharCode.apply(null,b)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')}
+function aleatorio(n){var b=new Uint8Array(n);crypto.getRandomValues(b);return b64url(b)}
+function desafio(v){return crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)).then(function(h){return b64url(new Uint8Array(h))})}
+function fnLogin(corpo){
+    return fetch(base+'/functions/v1/youtube-login',{method:'POST',headers:cab(),body:JSON.stringify(corpo)})
+        .then(function(r){return r.json().catch(function(){return null}).then(function(j){if(!r.ok)throw new Error((j&&j.erro)||'Erro '+r.status+'. Tente de novo.');return j})});
+}
 $('#google').addEventListener('click',function(){
-    location.href=base+'/auth/v1/authorize?provider=google&scopes='+encodeURIComponent('https://www.googleapis.com/auth/youtube.readonly')+'&redirect_to='+encodeURIComponent(location.origin+location.pathname);
+    var b=this,v=aleatorio(48),st=aleatorio(24);b.disabled=true;msg('#msg-acesso','');
+    desafio(v).then(function(ch){
+        try{sessionStorage.setItem(CHO,JSON.stringify({state:st,verifier:v}))}catch(e){throw new Error('Seu navegador bloqueou o armazenamento. Saia da aba anônima e tente de novo.')}
+        return fnLogin({acao:'iniciar',redirect_uri:REDIRECT,state:st,code_challenge:ch});
+    }).then(function(r){
+        if(!r||!/^https:\/\/accounts\.google\.com\//.test(r.url||''))throw new Error('Resposta inesperada do servidor.');
+        location.href=r.url;
+    }).catch(function(e){msg('#msg-acesso',e.message,true);b.disabled=false});
 });
+/* volta do Google: ?code=... na barra de endereço */
+function voltarGoogle(q){
+    var code=q.get('code'),st=q.get('state'),err=q.get('error'),g=null;
+    history.replaceState(null,'',location.pathname);
+    try{g=JSON.parse(sessionStorage.getItem(CHO)||'null');sessionStorage.removeItem(CHO)}catch(e){g=null}
+    function falhou(t){abrir($('#d-acesso'));msg('#msg-acesso',t,true)}
+    if(err)return Promise.resolve(falhou(err==='access_denied'?'Você cancelou o login. É só tentar de novo quando quiser.':'O Google não completou o login. Tente de novo.'));
+    if(!code||!g||!st||st!==g.state)return Promise.resolve(falhou('Não consegui confirmar o login. Comece de novo pelo botão.'));
+    return fnLogin({acao:'entrar',redirect_uri:REDIRECT,code:code,code_verifier:g.verifier})
+        .then(function(r){if(!r||!receber(r.sessao))throw new Error('Não consegui criar sua sessão.')})
+        .catch(function(e){falhou(e.message)});
+}
 $('#entrar').addEventListener('click',function(){
     if(!sessao)return abrir($('#d-acesso'));
     guardar(null);perfil=null;apagando=null;tela();desenhar();
@@ -409,13 +436,11 @@ function iniciar(){
 }
 (function(){
     if(!cfg.url||!cfg.chave||/COLOQUE/.test(cfg.url+cfg.chave)){msg('#msg-acesso','O site ainda não foi ligado ao banco de dados (config.js).',true);abrir($('#d-acesso'));return}
-    var h=location.hash.replace(/^#/,'');
-    if(/(^|&)(access_token|error)=/.test(h)){
-        var q=new URLSearchParams(h);history.replaceState(null,'',location.pathname+location.search);
-        if(q.get('access_token'))receber({access_token:q.get('access_token'),refresh_token:q.get('refresh_token'),expires_in:q.get('expires_in')});
-        else{abrir($('#d-acesso'));msg('#msg-acesso','Não consegui entrar. Tente de novo.',true)}
-    }else sessao=ler();
-    tela();carregarStories();desenhar();iniciar();
+    var qs=new URLSearchParams(location.search),entrando=null;
+    sessao=ler();
+    if(qs.has('code')||qs.has('error'))entrando=voltarGoogle(qs);
+    tela();carregarStories();desenhar();
+    Promise.resolve(entrando).then(iniciar);
 })();
 })();
 </script>
