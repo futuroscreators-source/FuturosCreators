@@ -1351,11 +1351,15 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
         $('#co-vazio').hidden = S.coPosts.length > 0;
         S.coPosts.forEach(function (p) {
             var c = criar('article', 'fb-cartao' + (p.status === 'pendente' ? ' novo' : '')), t = criar('div', 'fb-topo');
-            t.appendChild(criar('span', 'etq', p.tipo === 'dica' ? 'Dica' : 'Postagem'));
+            t.appendChild(criar('span', 'etq', { dica: 'Dica', video: 'Vídeo', story: 'Story' }[p.tipo] || 'Postagem'));
             t.appendChild(criar('span', null, p.nome + ' (@' + p.usuario + ')' + (p.selo && p.selo !== 'nenhum' ? ' - ' + p.selo : '')));
             t.appendChild(criar('time', null, fmtData(p.criado_em)));
             if (p.moderado_por) t.appendChild(criar('span', null, 'por ' + p.moderado_por));
             c.appendChild(t); c.appendChild(criar('p', 'fb-msg', p.texto));
+            if (p.midia) {
+                if (p.midia.indexOf('img:') === 0) { var fi = criar('img'); fi.alt = 'Foto enviada'; fi.style.maxWidth = '240px'; fi.style.borderRadius = '12px'; fi.src = String((window.FUTUROS_CONFIG || {}).url || '').replace(/\/+$/, '') + '/storage/v1/object/public/comunidade/' + p.midia.slice(4); c.appendChild(fi); }
+                else { var la = criar('a', null, 'Ver vídeo no YouTube'); la.href = 'https://www.youtube.com/shorts/' + p.midia.slice(3); la.target = '_blank'; la.rel = 'noopener'; c.appendChild(la); }
+            }
             if (p.motivo) c.appendChild(criar('p', 'fb-msg', 'Motivo: ' + p.motivo));
             var ac = criar('div', 'acoes');
             if (p.status !== 'aprovado') {
