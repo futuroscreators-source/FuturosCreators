@@ -359,6 +359,9 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
 .destaque-numeros { margin: 14px 0 0; font-weight: 800; }
 .destaque-frase { margin: 10px 0 0; max-width: 36em; overflow-wrap: anywhere; }
 /* ---------- Ranking de médias ---------- */
+.idioma { display: flex; gap: 10px; margin-top: 16px; }
+.idioma .botao.pequeno { margin-top: 0; }
+.idioma [aria-pressed="true"] { background: var(--rosa); color: #fff; }
 .rk-filtros { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 0 0 24px; }
 .rk-lista { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; max-width: 760px; }
 .rk-item { display: flex; gap: 14px; align-items: center; padding: 12px 16px; background: #fff; color: var(--tinta); border: 4px solid var(--tinta); border-radius: 18px; }
@@ -553,7 +556,11 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
             </div>
         </div>
         <div class="rk-filtros">
-            <div class="chips" role="radiogroup" aria-label="Tipo de vídeo">
+            <div class="chips" id="rk-plat-grupo" role="radiogroup" aria-label="Plataforma" hidden>
+                <label class="chip"><input type="radio" name="rk-plat" value="youtube" checked><span>YouTube</span></label>
+                <label class="chip"><input type="radio" name="rk-plat" value="tiktok"><span>TikTok</span></label>
+            </div>
+            <div class="chips" id="rk-tipo-grupo" role="radiogroup" aria-label="Tipo de vídeo">
                 <label class="chip"><input type="radio" name="rk-tipo" value="s" checked><span>Shorts</span></label>
                 <label class="chip"><input type="radio" name="rk-tipo" value="l"><span>Vídeos longos</span></label>
             </div>
@@ -615,13 +622,17 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
 <section class="secao sol" id="inscricao">
     <div class="miolo duas-colunas">
         <div class="inscricao-texto">
-            <h2 class="adesivo">Quero entrar no grupo</h2>
-            <p class="intro">Conte quem você é e por que quer participar. A gente lê todas as inscrições e chama você pelo Instagram que informar.</p>
+            <h2 class="adesivo" data-t="titulo">Quero entrar no grupo</h2>
+            <p class="intro" data-t="intro">Conte quem você é e por que quer participar. A gente lê todas as inscrições e chama você pelo Instagram que informar.</p>
+            <div class="idioma" role="group" aria-label="Idioma / Language">
+                <button type="button" class="botao claro pequeno" data-lang="pt" aria-pressed="true">Português</button>
+                <button type="button" class="botao claro pequeno" data-lang="en" aria-pressed="false">English</button>
+            </div>
         </div>
         <div class="folha">
             <form id="form-inscricao" novalidate>
                 <fieldset class="campo">
-                    <legend>Onde você posta vídeos?</legend>
+                    <legend data-t="onde">Onde você posta vídeos?</legend>
                     <div class="chips">
                         <label class="chip"><input type="checkbox" name="plataformas" value="YouTube"><span>YouTube</span></label>
                         <label class="chip"><input type="checkbox" name="plataformas" value="TikTok"><span>TikTok</span></label>
@@ -630,33 +641,33 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
                     <p class="erro" data-erro="plataformas"></p>
                 </fieldset>
                 <div class="campo">
-                    <label for="canal">Nome do seu canal</label>
-                    <input id="canal" name="canal" type="text" maxlength="120" autocomplete="off" placeholder="Como o canal aparece na plataforma">
+                    <label for="canal" data-t="canal">Nome do seu canal</label>
+                    <input id="canal" name="canal" type="text" maxlength="120" autocomplete="off" data-tp="canalPh" placeholder="Como o canal aparece na plataforma">
                     <p class="erro" data-erro="canal"></p>
                 </div>
                 <div class="campo">
-                    <label for="instagram">Seu Instagram para contato</label>
-                    <div class="arroba"><span>@</span><input id="instagram" name="instagram" type="text" maxlength="31" autocomplete="off" autocapitalize="none" placeholder="seu.usuario"></div>
+                    <label for="instagram" data-t="insta">Seu Instagram para contato</label>
+                    <div class="arroba"><span>@</span><input id="instagram" name="instagram" type="text" maxlength="31" autocomplete="off" autocapitalize="none" data-tp="instaPh" placeholder="seu.usuario"></div>
                     <p class="erro" data-erro="instagram"></p>
                 </div>
                 <div class="campo">
-                    <label for="motivo">Por que você quer participar?</label>
-                    <textarea id="motivo" name="motivo" rows="5" maxlength="1000" placeholder="Conte um pouco sobre você e o que espera do grupo"></textarea>
+                    <label for="motivo" data-t="motivo">Por que você quer participar?</label>
+                    <textarea id="motivo" name="motivo" rows="5" maxlength="1000" data-tp="motivoPh" placeholder="Conte um pouco sobre você e o que espera do grupo"></textarea>
                     <p class="erro" data-erro="motivo"></p>
                 </div>
                 <div class="campo ciente">
                     <label class="marca"><input id="ciente" type="checkbox" name="ciente" value="1">
-                        <span>Aceito ser chamado pelo Instagram informado. Se tenho menos de 18 anos, meu responsável sabe da inscrição.</span></label>
+                        <span data-t="ciente">Aceito ser chamado pelo Instagram informado. Se tenho menos de 18 anos, meu responsável sabe da inscrição.</span></label>
                     <p class="erro" data-erro="ciente"></p>
                 </div>
                 <!-- Campo-armadilha contra robôs: deve ficar vazio -->
                 <div class="isca" aria-hidden="true"><label>Site <input type="text" name="site" tabindex="-1" autocomplete="off"></label></div>
-                <button type="submit" id="enviar" class="botao rosa grande">Enviar inscrição</button>
+                <button type="submit" id="enviar" class="botao rosa grande" data-t="enviar">Enviar inscrição</button>
                 <p class="erro geral" data-erro="geral" role="alert"></p>
             </form>
             <div class="enviado" id="enviado" hidden>
-                <h3>Inscrição enviada!</h3>
-                <p>Recebemos seus dados. Fique de olho no Instagram, é por lá que vamos chamar você.</p>
+                <h3 data-t="okTitulo">Inscrição enviada!</h3>
+                <p data-t="okTexto">Recebemos seus dados. Fique de olho no Instagram, é por lá que vamos chamar você.</p>
             </div>
         </div>
     </div>
@@ -903,7 +914,6 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
         $('#destaque-antigos').hidden = !resto.length;
     }
     /* ---------- Ranking de médias (só aparece se alguém tiver entrado) ---------- */
-    var rkTemDados = false;
     function rkDesenhar(lista) {
         var ol = $('#rk-lista'); ol.replaceChildren();
         lista = lista || [];
@@ -913,6 +923,7 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
             li.appendChild(criar('span', 'rk-pos', String(i + 1)));
             if (/^https:\/\//i.test(c.foto || '')) {
                 var im = criar('img', 'rk-foto'); im.src = c.foto; im.alt = ''; im.loading = 'lazy'; im.width = 58; im.height = 58; im.referrerPolicy = 'no-referrer';
+                im.onerror = function () { this.replaceWith(criar('span', 'rk-foto rk-inicial', (c.nome || '?').trim().charAt(0).toUpperCase())); };
                 li.appendChild(im);
             } else li.appendChild(criar('span', 'rk-foto rk-inicial', (c.nome || '?').trim().charAt(0).toUpperCase()));
             var t = criar('div', 'rk-nome');
@@ -926,27 +937,35 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
             ol.appendChild(li);
         });
     }
-    function rkCarregar(primeira) {
-        var tipo = document.querySelector('input[name="rk-tipo"]:checked').value, mes = Number(document.querySelector('input[name="rk-mes"]:checked').value);
-        FC.rpc('publico_ranking', { p_tipo: tipo, p_mes: mes }).then(function (l) {
-            l = l || [];
-            if (primeira && !l.length) return;   /* sem ninguém no ranking: a seção continua escondida */
-            if (l.length) rkTemDados = true;
-            $('#ranking').hidden = !rkTemDados; $('#menu-ranking').hidden = !rkTemDados;
-            rkDesenhar(l);
-        }).catch(function () { /* sem banco ou sem a função: seção escondida */ });
+    function rkMarcado(nome) { return document.querySelector('input[name="' + nome + '"]:checked').value; }
+    function rkArgs(plat, tipo, mes) {
+        var a = { p_tipo: tipo, p_mes: mes };
+        if (plat === 'tiktok') a.p_plataforma = 'tiktok';   /* youtube segue sem o parâmetro */
+        return a;
     }
-    document.querySelectorAll('input[name="rk-tipo"], input[name="rk-mes"]').forEach(function (r) { r.addEventListener('change', function () { rkCarregar(false); }); });
-    /* ao abrir: procura a primeira combinação com gente (Shorts/longos, este mês/passado) e já marca os filtros nela */
+    function rkAjustar() { $('#rk-tipo-grupo').hidden = rkMarcado('rk-plat') === 'tiktok'; }   /* TikTok tem um tipo só */
+    function rkCarregar() {
+        rkAjustar();
+        FC.rpc('publico_ranking', rkArgs(rkMarcado('rk-plat'), rkMarcado('rk-tipo'), Number(rkMarcado('rk-mes'))))
+            .then(rkDesenhar).catch(function () { /* sem banco ou sem a função: mantém o que estava */ });
+    }
+    document.querySelectorAll('input[name="rk-plat"], input[name="rk-tipo"], input[name="rk-mes"]').forEach(function (r) { r.addEventListener('change', rkCarregar); });
+
+    /* ao abrir: procura a primeira combinação com gente e já marca os filtros nela; mostra o filtro de plataforma se o TikTok tiver gente */
     (function rkInicio() {
-        var combos = [['s', 0], ['l', 0], ['s', -1], ['l', -1]];
+        [0, -1].forEach(function (m) {
+            FC.rpc('publico_ranking', rkArgs('tiktok', 's', m)).then(function (l) { if (l && l.length) $('#rk-plat-grupo').hidden = false; }).catch(function () {});
+        });
+        var combos = [['youtube', 's', 0], ['youtube', 'l', 0], ['tiktok', 's', 0], ['youtube', 's', -1], ['youtube', 'l', -1], ['tiktok', 's', -1]];
         (function prox(i) {
             if (i >= combos.length) return;
-            FC.rpc('publico_ranking', { p_tipo: combos[i][0], p_mes: combos[i][1] }).then(function (l) {
+            var c = combos[i];
+            FC.rpc('publico_ranking', rkArgs(c[0], c[1], c[2])).then(function (l) {
                 if (!l || !l.length) return prox(i + 1);
-                rkTemDados = true;
-                document.querySelector('input[name="rk-tipo"][value="' + combos[i][0] + '"]').checked = true;
-                document.querySelector('input[name="rk-mes"][value="' + combos[i][1] + '"]').checked = true;
+                document.querySelector('input[name="rk-plat"][value="' + c[0] + '"]').checked = true;
+                document.querySelector('input[name="rk-tipo"][value="' + c[1] + '"]').checked = true;
+                document.querySelector('input[name="rk-mes"][value="' + c[2] + '"]').checked = true;
+                rkAjustar();
                 $('#ranking').hidden = false; $('#menu-ranking').hidden = false;
                 rkDesenhar(l);
             }).catch(function () { /* sem banco ou sem a função: seção escondida */ });
@@ -1099,7 +1118,43 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
     });
 
     /* ---------- Inscrição ---------- */
-    var form = $('#form-inscricao'), enviado = $('#enviado'), botao = $('#enviar');
+    var form = $('#form-inscricao'), enviado = $('#enviado'), botao = $('#enviar'), secInsc = $('#inscricao');
+    var TXT = {
+        pt: {
+            titulo: 'Quero entrar no grupo',
+            intro: 'Conte quem você é e por que quer participar. A gente lê todas as inscrições e chama você pelo Instagram que informar.',
+            onde: 'Onde você posta vídeos?', canal: 'Nome do seu canal', canalPh: 'Como o canal aparece na plataforma',
+            insta: 'Seu Instagram para contato', instaPh: 'seu.usuario',
+            motivo: 'Por que você quer participar?', motivoPh: 'Conte um pouco sobre você e o que espera do grupo',
+            ciente: 'Aceito ser chamado pelo Instagram informado. Se tenho menos de 18 anos, meu responsável sabe da inscrição.',
+            enviar: 'Enviar inscrição', enviando: 'Enviando...',
+            okTitulo: 'Inscrição enviada!', okTexto: 'Recebemos seus dados. Fique de olho no Instagram, é por lá que vamos chamar você.',
+            erros: {
+                plataformas: 'Marque pelo menos uma plataforma.', canal: 'Escreva o nome do seu canal.',
+                instagram: 'Use só letras, números, ponto e sublinhado. Exemplo: seu.usuario',
+                motivo: 'Conte um pouco mais (pelo menos 10 letras).', ciente: 'Marque a caixinha para continuar.',
+                geral: 'Algo deu errado. Tente de novo.', rede: 'Não consegui falar com o servidor. Confira a internet.'
+            }
+        },
+        en: {
+            titulo: 'I want to join the group',
+            intro: 'Tell us who you are and why you want to join. We read every application and will contact you on the Instagram handle you give us.',
+            onde: 'Where do you post videos?', canal: 'Your channel name', canalPh: 'How your channel appears on the platform',
+            insta: 'Your Instagram handle (we contact you there)', instaPh: 'your.username',
+            motivo: 'Why do you want to join?', motivoPh: 'Tell us a bit about yourself and what you expect from the group',
+            ciente: 'I agree to be contacted on the Instagram handle above. If I am under 18, my parent or guardian knows about this application.',
+            enviar: 'Send application', enviando: 'Sending...',
+            okTitulo: 'Application sent!', okTexto: 'We got your details. Keep an eye on Instagram, that is where we will reach out to you.',
+            erros: {
+                plataformas: 'Pick at least one platform.', canal: 'Enter your channel name.',
+                instagram: 'Use only letters, numbers, dots and underscores. Example: your.username',
+                motivo: 'Tell us a little more (at least 10 characters).', ciente: 'Tick the box to continue.',
+                geral: 'Something went wrong. Please try again.', rede: 'Could not reach the server. Check your connection and try again.'
+            }
+        }
+    };
+    var idioma = 'pt';
+    function L() { return TXT[idioma]; }
     function limpar() {
         form.querySelectorAll('[data-erro]').forEach(function (p) { p.textContent = ''; });
         form.querySelectorAll('.com-erro').forEach(function (c) { c.classList.remove('com-erro'); });
@@ -1110,6 +1165,16 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
         p.textContent = msg;
         var c = p.closest('.campo'); if (c) c.classList.add('com-erro');
     }
+    function aplicarIdioma(l) {
+        idioma = l; var d = TXT[l];
+        secInsc.lang = l === 'en' ? 'en' : 'pt-BR';
+        secInsc.querySelectorAll('[data-t]').forEach(function (e) { e.textContent = d[e.getAttribute('data-t')]; });
+        secInsc.querySelectorAll('[data-tp]').forEach(function (e) { e.placeholder = d[e.getAttribute('data-tp')]; });
+        secInsc.querySelectorAll('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === l)); });
+        limpar();
+    }
+    secInsc.querySelectorAll('[data-lang]').forEach(function (b) { b.addEventListener('click', function () { aplicarIdioma(b.getAttribute('data-lang')); }); });
+    aplicarIdioma(/^en/i.test(navigator.language || '') ? 'en' : 'pt');   /* navegador em inglês abre em inglês; dá para trocar no botão */
     function focarPrimeiroErro() {
         var f = form.querySelector('.com-erro input, .com-erro textarea');
         if (f) f.focus();
@@ -1121,22 +1186,22 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
         var plat = Array.prototype.map.call(form.querySelectorAll('input[name=plataformas]:checked'), function (i) { return i.value; });
         var canal = form.canal.value.trim(), insta = form.instagram.value.trim().replace(/^@/, ''), motivo = form.motivo.value.trim();
         var tem = false;
-        if (!plat.length) { erro('plataformas', 'Marque pelo menos uma plataforma.'); tem = true; }
-        if (canal.length < 2) { erro('canal', 'Escreva o nome do seu canal.'); tem = true; }
-        if (!/^[A-Za-z0-9._]{1,30}$/.test(insta)) { erro('instagram', 'Use só letras, números, ponto e sublinhado. Exemplo: seu.usuario'); tem = true; }
-        if (motivo.length < 10) { erro('motivo', 'Conte um pouco mais (pelo menos 10 letras).'); tem = true; }
-        if (!form.ciente.checked) { erro('ciente', 'Marque a caixinha para continuar.'); tem = true; }
+        if (!plat.length) { erro('plataformas', L().erros.plataformas); tem = true; }
+        if (canal.length < 2) { erro('canal', L().erros.canal); tem = true; }
+        if (!/^[A-Za-z0-9._]{1,30}$/.test(insta)) { erro('instagram', L().erros.instagram); tem = true; }
+        if (motivo.length < 10) { erro('motivo', L().erros.motivo); tem = true; }
+        if (!form.ciente.checked) { erro('ciente', L().erros.ciente); tem = true; }
         if (tem) { focarPrimeiroErro(); return; }
 
-        botao.disabled = true; var rotulo = botao.textContent; botao.textContent = 'Enviando...';
+        botao.disabled = true; var rotulo = botao.textContent; botao.textContent = L().enviando;
         FC.rpc('publico_inscrever', { p_plataformas: plat, p_canal: canal, p_instagram: insta, p_motivo: motivo })
             .then(function (r) {
                 if (r && r.ok) { form.hidden = true; enviado.hidden = false; enviado.scrollIntoView({ block: 'center' }); return; }
-                var erros = (r && r.erros) || { geral: 'Algo deu errado. Tente de novo.' };
-                Object.keys(erros).forEach(function (k) { erro(k, erros[k]); });
+                var erros = (r && r.erros) || { geral: L().erros.geral };
+                Object.keys(erros).forEach(function (k) { erro(k, idioma === 'en' ? (L().erros[k] || L().erros.geral) : erros[k]); });
                 focarPrimeiroErro();
             })
-            .catch(function (e) { erro('geral', e.message); })
+            .catch(function (e) { erro('geral', idioma === 'en' ? L().erros.rede : e.message); })
             .then(function () { botao.disabled = false; botao.textContent = rotulo; });
     });
 })();

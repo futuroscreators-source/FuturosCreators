@@ -197,6 +197,7 @@ a { color: inherit; }
 .ranking-ok a { color: inherit; }
 .consent { margin-top: 6px; padding: 14px 16px; background: var(--papel); border: 3px solid var(--tinta); border-radius: 14px; }
 .consent small { display: block; margin: 6px 0 0 36px; font-weight: 700; opacity: .8; }
+.botao.grande + .botao.grande { margin-top: 14px; }
 .botoes-res { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
 @media (max-width: 860px) {
     .beta-hero { flex-direction: column; text-align: center; gap: 14px; }
@@ -268,6 +269,7 @@ a { color: inherit; }
                     <small>Se você marcar, guardamos só o nome do canal, a foto e a sua média de views do mês, e mostramos publicamente. Para sair, conecte de novo com a caixa desmarcada: seus dados do ranking são apagados.</small>
                 </div>
                 <button type="button" id="conectar" class="botao rosa grande">Conectar com o YouTube</button>
+                <button type="button" id="conectar-tiktok" class="botao claro grande" hidden>Conectar com o TikTok</button>
                 <p class="aviso-beta">Estamos em fase de teste. O Google pode mostrar um aviso de &ldquo;app não verificado&rdquo;, e isso é esperado. Continue só se você chegou aqui pelo site oficial dos Futuros Creators. Para remover o acesso a qualquer momento: myaccount.google.com/permissions</p>
                 <div class="botoes-res"><button type="button" class="botao claro" id="sair-beta">Sair do beta</button></div>
             </div>
@@ -295,6 +297,15 @@ a { color: inherit; }
                     <p class="res-nota" id="s-nota" hidden></p>
                     <ul class="lista-shorts" id="s-lista"></ul>
                 </section>
+                <section class="bloco-res" id="bloco-tiktok" hidden>
+                    <h3>Vídeos do TikTok</h3>
+                    <div class="res-cards">
+                        <div class="res-card"><small>Vídeos no mês</small><strong id="t-total"></strong></div>
+                        <div class="res-card"><small>Média de views por vídeo</small><strong id="t-media"></strong></div>
+                        <div class="res-card"><small>Total de views</small><strong id="t-soma"></strong></div>
+                    </div>
+                    <ul class="lista-shorts" id="t-lista"></ul>
+                </section>
                 <section class="bloco-res" id="bloco-longos">
                     <h3>Vídeos longos</h3>
                     <div class="res-cards">
@@ -307,7 +318,7 @@ a { color: inherit; }
                     <p class="res-nota" id="l-nota" hidden></p>
                     <ul class="lista-shorts" id="l-lista"></ul>
                 </section>
-                <p class="res-nota">Acesso ao seu YouTube já encerrado.</p>
+                <p class="res-nota">Acesso à sua conta já encerrado.</p>
                 <p class="ranking-ok" id="ranking-aviso" hidden></p>
                 <div class="botoes-res">
                     <button type="button" class="botao claro" id="de-novo">Calcular de novo</button>
@@ -387,8 +398,10 @@ a { color: inherit; }
     var cfg = window.FUTUROS_CONFIG || {};
     var CHAVE = 'fc_beta_oauth';
     var BETA = 'fc_beta_token';   /* sessão do beta (vale por até 24 h) */
+    var TIKTOK_ATIVO = false;   /* mude para true quando o app do TikTok for aprovado e as chaves estiverem na função */
     var REDIRECT = location.origin + location.pathname;   /* precisa estar na lista do Google Cloud e do Supabase */
 
+    $('#conectar-tiktok').hidden = !TIKTOK_ATIVO;
     function vista(nome) {
         ['verificando', 'codigo', 'inicio', 'carregando', 'resultado', 'erro'].forEach(function (v) { $('#vista-' + v).hidden = v !== nome; });
         window.scrollTo(0, 0);
@@ -482,6 +495,18 @@ a { color: inherit; }
         }).catch(falha).then(function () { btn.disabled = false; });
     });
 
+    /* ---- TikTok: passo 1 (o TikTok não usa PKCE na web: só o state) ---- */
+    $('#conectar-tiktok').addEventListener('click', function () {
+        var btn = this; btn.disabled = true;
+        var state = aleatorio(24), mes = Number(document.querySelector('input[name="mes"]:checked').value), ranking = $('#ranking-ok').checked;
+        try { sessionStorage.setItem(CHAVE, JSON.stringify({ state: state, mes: mes, ranking: ranking, plataforma: 'tiktok' })); }
+        catch (e) { falha(new Error('Seu navegador bloqueou o armazenamento da sessão. Desative a navegação privada e tente de novo.')); btn.disabled = false; return; }
+        fn({ acao: 'tiktok_iniciar', redirect_uri: REDIRECT, state: state }).then(function (r) {
+            if (!r || !/^https:\/\/www\.tiktok\.com\//.test(r.url || '')) throw new Error('Resposta inesperada do servidor.');
+            location.href = r.url;
+        }).catch(falha).then(function () { btn.disabled = false; });
+    });
+
     /* ---- entrar no beta com o código ---- */
     $('#codigo').addEventListener('input', function () { this.value = this.value.toUpperCase(); });
     $('#form-codigo').addEventListener('submit', function (ev) {
@@ -515,7 +540,11 @@ a { color: inherit; }
                 erro('Não consegui confirmar essa conexão. Comece de novo pelo botão.');
             } else {
                 vista('carregando');
-                return fn({ acao: 'calcular', redirect_uri: REDIRECT, code: code, code_verifier: guardado.verifier, mes: guardado.mes, ranking: guardado.ranking === true }).then(mostrar);
+                var tik = guardado.plataforma === 'tiktok';
+                return fn(tik
+                    ? { acao: 'tiktok_calcular', redirect_uri: REDIRECT, code: code, mes: guardado.mes, ranking: guardado.ranking === true }
+                    : { acao: 'calcular', redirect_uri: REDIRECT, code: code, code_verifier: guardado.verifier, mes: guardado.mes, ranking: guardado.ranking === true }
+                ).then(mostrar);
             }
         }).catch(falha);
     } else {
@@ -555,12 +584,26 @@ a { color: inherit; }
             ul.appendChild(li);
         });
     }
+    function preencherTik(d) {
+        $('#t-total').textContent = nf(d.total); $('#t-media').textContent = nf(d.media, 1); $('#t-soma').textContent = nf(d.soma);
+        var ul = $('#t-lista'); ul.replaceChildren();
+        (d.lista || []).forEach(function (x) {
+            var li = criar('li'), t = criar('div');
+            t.appendChild(criar('strong', null, x.titulo || 'Sem título'));
+            li.appendChild(t); li.appendChild(criar('span', 'views', nf(x.views) + ' views'));
+            var dt = new Date(x.publicado);
+            li.appendChild(criar('small', null, dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' | ' + dur(x.segundos)));
+            ul.appendChild(li);
+        });
+    }
     function mostrar(r) {
         $('#res-canal').textContent = (r.canal && r.canal.titulo) || 'Seu canal';
         $('#res-periodo').textContent = 'Vídeos de ' + r.periodo.rotulo;
         var foto = $('#res-foto');
         if (/^https:\/\//.test((r.canal && r.canal.foto) || '')) { foto.src = r.canal.foto; foto.hidden = false; } else foto.hidden = true;
-        preencher('s', r.shorts); preencher('l', r.longos);
+        var tik = r.plataforma === 'tiktok';
+        $('#bloco-shorts').hidden = tik; $('#bloco-longos').hidden = tik; $('#bloco-tiktok').hidden = !tik;
+        if (tik) preencherTik(r.videos); else { preencher('s', r.shorts); preencher('l', r.longos); }
         var av = $('#ranking-aviso'); av.replaceChildren(); av.hidden = true;
         if (r.ranking === 'salvo') {
             av.appendChild(document.createTextNode('Você está no ranking! '));
