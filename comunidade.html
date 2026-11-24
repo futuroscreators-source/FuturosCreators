@@ -50,6 +50,12 @@ main{max-width:470px;margin:0 auto;padding:0 0 96px}
 .rk .pos{width:2rem;text-align:center;font:400 1.5rem/1 var(--titulo)}
 .rk .v{margin-left:auto;text-align:right;font:400 1.3rem/1 var(--titulo);color:var(--uva)}.rk .v small{display:block;font:700 .7rem var(--texto);opacity:.7}
 .rk-intro{margin:0;padding:12px 14px;font-weight:700}
+.rk-filtros{display:grid;gap:8px;padding:10px 14px;background:var(--papel);border-bottom:1px solid var(--linha)}
+.rk-filtros .chips{display:flex;flex-wrap:wrap;gap:6px}
+.rk-filtros label{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;background:#fff;border:2px solid var(--tinta);border-radius:999px;font-size:.8rem;font-weight:800}
+.rk-filtros input{accent-color:var(--rosa)}
+.rk-canal{min-width:0;flex:1;overflow-wrap:anywhere}
+.rk-canal small{display:block;font-weight:700;opacity:.7}
 .eu{padding:16px 14px;background:#fff;margin-bottom:8px;display:flex;gap:14px;align-items:center}
 .eu .anel{width:76px;height:76px;flex:none}
 .sub{margin:0;padding:12px 14px 4px;font:400 1.3rem var(--titulo)}
@@ -110,8 +116,8 @@ dialog h2{margin:0 0 10px;font:400 1.6rem var(--titulo)}
 
 <dialog id="d-acesso">
     <h2>Entre na comunidade</h2>
-    <p>Entre com sua conta Google para criar seu perfil e participar da comunidade. Seus posts e stories passam por aprovação da equipe.</p>
-    <button type="button" class="btn rosa" id="google">Entrar com Google</button>
+    <p>Use a conta do Google (a mesma do seu canal do YouTube). Assim a gente liga seu perfil ao seu canal para o ranking.</p>
+    <button type="button" class="btn rosa" id="google">Continuar com Google / YouTube</button>
     <button type="button" class="btn" disabled>TikTok &middot; em breve</button>
     <p class="msg" id="msg-acesso" role="status"></p>
     <button type="button" class="pill" data-fechar>Fechar</button>
@@ -155,7 +161,7 @@ dialog h2{margin:0 0 10px;font:400 1.6rem var(--titulo)}
 (function(){
 'use strict';
 var cfg=window.FUTUROS_CONFIG||{},CH='fc_com_sessao',base=(cfg.url||'').replace(/\/+$/,'');
-var sessao=null,perfil=null,aba='feed',ultimo=null,tipo='post',apagando=null,grupos=[],sv={};
+var sessao=null,perfil=null,aba='feed',ultimo=null,tipo='post',apagando=null,grupos=[],sv={},rkPlat='youtube',rkTipo='s',rkMes=0,rkInicial=false;
 function $(s){return document.querySelector(s)}
 function criar(t,c,x){var e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
 function ler(){try{return JSON.parse(localStorage.getItem(CH)||'null')}catch(e){return null}}
@@ -184,12 +190,7 @@ function uid(){try{return JSON.parse(atob(sessao.at.split('.')[1].replace(/-/g,'
 
 /* ---------- Login (só Google/YouTube; TikTok em breve) ---------- */
 $('#google').addEventListener('click',function(){
-    /* Login Google apenas para identidade da Comunidade (sem escopos do YouTube). */
-    var b=this; b.disabled=true; msg('#msg-acesso','Abrindo o Google...');
-    if(!base||!cfg.chave){b.disabled=false;msg('#msg-acesso','Configuração do Supabase ausente. Confira o config.js.',true);return}
-    var destino=location.origin+location.pathname;
-    var params=new URLSearchParams({provider:'google',redirect_to:destino,scopes:'openid email profile'});
-    location.href=base+'/auth/v1/authorize?'+params.toString();
+    location.href=base+'/auth/v1/authorize?provider=google&scopes='+encodeURIComponent('https://www.googleapis.com/auth/youtube.readonly')+'&redirect_to='+encodeURIComponent(location.origin+location.pathname);
 });
 $('#entrar').addEventListener('click',function(){
     if(!sessao)return abrir($('#d-acesso'));
@@ -408,11 +409,11 @@ function iniciar(){
 }
 (function(){
     if(!cfg.url||!cfg.chave||/COLOQUE/.test(cfg.url+cfg.chave)){msg('#msg-acesso','O site ainda não foi ligado ao banco de dados (config.js).',true);abrir($('#d-acesso'));return}
-    var h=location.hash.replace(/^#/,''),q=new URLSearchParams(h);
-    if(q.has('access_token')||q.has('error')||q.has('error_description')){
-        history.replaceState(null,'',location.pathname+location.search);
+    var h=location.hash.replace(/^#/,'');
+    if(/(^|&)(access_token|error)=/.test(h)){
+        var q=new URLSearchParams(h);history.replaceState(null,'',location.pathname+location.search);
         if(q.get('access_token'))receber({access_token:q.get('access_token'),refresh_token:q.get('refresh_token'),expires_in:q.get('expires_in')});
-        else{abrir($('#d-acesso'));var detalhe=q.get('error_description')||q.get('error')||'Erro desconhecido';msg('#msg-acesso','Login Google não concluído: '+detalhe.replace(/[+]/g,' '),true)}
+        else{abrir($('#d-acesso'));msg('#msg-acesso','Não consegui entrar. Tente de novo.',true)}
     }else sessao=ler();
     tela();carregarStories();desenhar();iniciar();
 })();
