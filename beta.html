@@ -329,6 +329,14 @@ a { color: inherit; }
                     <h3>O que fazer agora</h3>
                     <p class="res-nota">Dicas feitas a partir dos títulos e das views dos seus vídeos. São pistas para testar, não garantia de mais views.</p>
                     <div id="dicas-corpo"></div>
+                    <div id="tend-bloco" hidden>
+                        <h4 class="sub-dicas">Em alta esta semana</h4>
+                        <div id="tend-corpo"></div>
+                    </div>
+                    <h4 class="sub-dicas">Ideias com IA</h4>
+                    <p class="res-nota">Ao clicar, enviamos só títulos, views e duração dos seus vídeos para uma IA criar ideias para você. Nada disso é guardado. Limite de 5 vezes por dia.</p>
+                    <button type="button" class="botao rosa" id="ia-btn">Gerar ideias com IA</button>
+                    <div id="ia-corpo"></div>
                 </section>
                 <p class="res-nota">Acesso à sua conta já encerrado.</p>
                 <p class="ranking-ok" id="ranking-aviso" hidden></p>
@@ -463,13 +471,13 @@ a { color: inherit; }
 
     /* ---- conversa com a função do Supabase ---- */
     function configurado() { return /^https?:\/\//.test(cfg.url || '') && !!cfg.chave && !/COLOQUE/.test((cfg.url || '') + (cfg.chave || '')); }
-    function fn(corpo) {
+    function fn(corpo, nome) {
         if (!configurado()) return Promise.reject(new Error('O site ainda não foi ligado ao Supabase. Preencha o config.js.'));
         corpo = Object.assign({ beta_token: betaToken() }, corpo);
         var h = { 'Content-Type': 'application/json', 'apikey': cfg.chave };
         if (/^eyJ/.test(cfg.chave)) h['Authorization'] = 'Bearer ' + cfg.chave;
         var ctrl = new AbortController(), t = setTimeout(function () { ctrl.abort(); }, 45000);
-        return fetch(cfg.url.replace(/\/$/, '') + '/functions/v1/youtube-shorts', { method: 'POST', headers: h, body: JSON.stringify(corpo), signal: ctrl.signal })
+        return fetch(cfg.url.replace(/\/$/, '') + '/functions/v1/' + (nome || 'youtube-shorts'), { method: 'POST', headers: h, body: JSON.stringify(corpo), signal: ctrl.signal })
             .then(function (r) {
                 clearTimeout(t);
                 return r.json().catch(function () { return null; }).then(function (j) {
@@ -716,7 +724,63 @@ a { color: inherit; }
         }
         return true;
     }
+    var ULTIMO = null;
+    function resumo(l) { return (l || []).slice(0, 30).map(function (x) { return { t: String(x.titulo || '').slice(0, 120), v: Number(x.views) || 0, s: Number(x.segundos) || 0 }; }); }
+    function copiar(b, texto) {
+        try { navigator.clipboard.writeText(texto).then(function () { b.textContent = 'Copiado!'; }); } catch (e) {}
+    }
+    function tendencias() {
+        var box = $('#tend-corpo'); box.replaceChildren(); $('#tend-bloco').hidden = true;
+        var rot = { meme: 'Meme', som: 'Som', formato: 'Formato', jogo: 'PK XD' };
+        fn({ acao: 'tendencias', plataforma: ULTIMO && ULTIMO.plataforma === 'tiktok' ? 'tiktok' : 'youtube' }, 'sugestoes-ia').then(function (j) {
+            var it = (j && j.itens) || []; if (!it.length) return;
+            var ul = criar('ul', 'dicas');
+            it.forEach(function (x) {
+                var li = criar('li'); li.appendChild(criar('strong', null, (rot[x.tipo] || 'Trend') + ': ' + x.titulo));
+                if (x.descricao) li.appendChild(criar('small', null, x.descricao)).style.display = 'block';
+                ul.appendChild(li);
+            });
+            box.appendChild(ul); $('#tend-bloco').hidden = false;
+        }).catch(function () {});
+    }
+    function gerarIA() {
+        var r = ULTIMO, btn = $('#ia-btn'), out = $('#ia-corpo'); if (!r) return;
+        btn.disabled = true; btn.textContent = 'Pensando...'; out.replaceChildren();
+        var c = { acao: 'ideias', plataforma: r.plataforma === 'tiktok' ? 'tiktok' : 'youtube' };
+        if (r.plataforma === 'tiktok') c.tiktok = { lista: resumo(r.videos && r.videos.lista) };
+        else {
+            c.shorts = { lista: resumo(r.shorts && r.shorts.lista), falta: r.shorts && r.shorts.falta, meta: r.shorts && r.shorts.meta };
+            c.longos = { lista: resumo(r.longos && r.longos.lista), falta: r.longos && r.longos.falta, meta: r.longos && r.longos.meta };
+        }
+        fn(c, 'sugestoes-ia').then(function (j) {
+            if (j.resumo) out.appendChild(criar('p', 'res-status falta', j.resumo));
+            if ((j.padroes || []).length) {
+                out.appendChild(criar('h4', 'sub-dicas menor', 'O que eu vi nos seus vídeos'));
+                var pu = criar('ul', 'dicas'); j.padroes.forEach(function (x) { pu.appendChild(criar('li', null, x)); }); out.appendChild(pu);
+            }
+            out.appendChild(criar('h4', 'sub-dicas menor', 'Ideias para você'));
+            var il = criar('ul', 'dicas ideias');
+            (j.ideias || []).forEach(function (i) {
+                var li = criar('li'), t = criar('div');
+                t.appendChild(criar('strong', null, i.titulo));
+                if (i.formato || i.tipo) t.appendChild(criar('small', null, ' (' + [i.tipo, i.formato].filter(Boolean).join(', ') + ')'));
+                li.appendChild(t);
+                var b = criar('button', 'botao claro', 'Copiar'); b.type = 'button';
+                b.addEventListener('click', function () { copiar(b, i.titulo + '\nGancho: ' + i.gancho + '\nRoteiro: ' + (i.roteiro || []).join(' > ')); });
+                li.appendChild(b);
+                li.appendChild(criar('small', null, 'Gancho: ' + i.gancho + (i.roteiro && i.roteiro.length ? ' | Roteiro: ' + i.roteiro.join(' > ') : '')));
+                il.appendChild(li);
+            });
+            out.appendChild(il);
+            if (j.ritmo) out.appendChild(criar('p', 'res-nota', 'Ritmo: ' + j.ritmo));
+            out.appendChild(criar('p', 'res-nota', 'Ideias geradas por IA a partir dos seus números: são pistas para testar, não garantia de views.'));
+        }).catch(function (e) {
+            out.appendChild(criar('p', 'res-status problema', e && e.codigo === 'beta' ? 'Sua sessão expirou. Entre de novo no beta.' : ((e && e.message) || 'Não deu certo agora.')));
+        }).then(function () { btn.disabled = false; btn.textContent = 'Gerar de novo'; });
+    }
+    $('#ia-btn').addEventListener('click', gerarIA);
     function dicas(r) {
+        ULTIMO = r; $('#ia-corpo').replaceChildren(); $('#ia-btn').textContent = 'Gerar ideias com IA'; tendencias();
         var bloco = $('#bloco-dicas'), corpo = $('#dicas-corpo'), ok = false;
         corpo.replaceChildren(); bloco.hidden = true;
         if (r.plataforma === 'tiktok') ok = renderPool(corpo, 'TikTok', r.videos && r.videos.lista, 0, true);
