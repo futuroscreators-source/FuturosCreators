@@ -208,6 +208,13 @@ a { color: inherit; }
     .folha { padding: 22px; box-shadow: 7px 7px 0 var(--uva); }
     .adesivo { -webkit-text-stroke-width: 7px; }
 }
+.dicas { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.dicas li { padding: 12px 14px; background: var(--sol-claro); border: 3px solid var(--tinta); border-radius: 14px; font-weight: 800; }
+.dicas.ideias li { background: var(--papel); display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; }
+.dicas.ideias small { grid-column: 1; font-weight: 700; opacity: .8; }
+.dicas.ideias .botao { grid-row: 1 / span 2; grid-column: 2; padding: 6px 12px; font-size: .9rem; }
+.sub-dicas { margin: 20px 0 4px; font: 400 1.3rem var(--titulo); }
+.sub-dicas.menor { margin-top: 14px; font-size: 1.05rem; }
 </style>
 </head>
 <body>
@@ -317,6 +324,11 @@ a { color: inherit; }
                     <p class="res-status" id="l-status"></p>
                     <p class="res-nota" id="l-nota" hidden></p>
                     <ul class="lista-shorts" id="l-lista"></ul>
+                </section>
+                <section class="bloco-res" id="bloco-dicas" hidden>
+                    <h3>O que fazer agora</h3>
+                    <p class="res-nota">Dicas feitas a partir dos títulos e das views dos seus vídeos. São pistas para testar, não garantia de mais views.</p>
+                    <div id="dicas-corpo"></div>
                 </section>
                 <p class="res-nota">Acesso à sua conta já encerrado.</p>
                 <p class="ranking-ok" id="ranking-aviso" hidden></p>
@@ -596,6 +608,125 @@ a { color: inherit; }
             ul.appendChild(li);
         });
     }
+/* ---- dicas: o que fazer agora (calculado aqui na página, nada é guardado) ---- */
+    var CATS = [
+        { k: 'novidade', nome: 'Novidade do jogo', re: /novidade|atualiza|update|evento|c[oó]digo|vazou|chegou|lan[cç]amento|\bnov[oa]s? (item|itens|skin|pet|jogo|mapa|casa)/i },
+        { k: 'tutorial', nome: 'Tutorial / dica', re: /\bcomo\b|tutorial|dica|truque|segredo|aprenda|guia|ensin/i },
+        { k: 'desafio', nome: 'Desafio', re: /desafio|challenge|tentei|testei|24 horas|\bvs\b/i },
+        { k: 'esquete', nome: 'Esquete / história', re: /esquete|hist[oó]ria|drama|novela|\bpov\b|minha vida|fam[ií]lia|escola/i },
+        { k: 'meme', nome: 'Meme / humor', re: /meme|engra[cç]ad|zoeira|kkk|fail|troll|piada|risada/i },
+        { k: 'trend', nome: 'Trend / dança', re: /trend|tend[eê]ncia|viral|dan[cç]a|dance|m[uú]sica/i }
+    ];
+    var OUTROS = { k: 'outros', nome: 'Gameplay / outros' };
+    var NOME = {}; CATS.concat([OUTROS]).forEach(function (c) { NOME[c.k] = c.nome; });
+    var IDEIAS = {
+        esquete: [['POV: você é o novo aluno no PK XD', 'Comece já na confusão, com a reação do personagem nos 2 primeiros segundos.'], ['Quando seu amigo some e volta com skin nova', 'Abra com o personagem chegando e o amigo irreconhecível.'], ['Minha vida no PK XD em 30 segundos', '3 cenas rápidas e um final engraçado.']],
+        tutorial: [['3 truques que ninguém te contou no PK XD', 'Diga o resultado logo de cara: "com isso você faz X em 10 segundos".'], ['Como conseguir o item mais pedido do momento', 'Mostre o item pronto primeiro e só depois ensine.'], ['Erros que todo iniciante comete', 'Pergunte direto: "você também faz isso?".']],
+        novidade: [['Chegou novidade no PK XD! O que mudou', 'Mostre a melhor mudança no primeiro segundo.'], ['Testei o novo evento: vale a pena?', 'Comece com a sua nota e prove depois.'], ['A atualização inteira em 30 segundos', 'Corte rápido, uma novidade a cada 5 segundos.']],
+        desafio: [['Desafio: 24 horas num lugar só do PK XD', 'Mostre a regra em 3 segundos e já comece.'], ['Tentei zerar sem gastar moedas', 'Comece pelo momento mais difícil.'], ['Eu vs meu amigo: quem faz o melhor visual?', 'Mostre os dois visuais lado a lado e peça o voto.']],
+        meme: [['O meme do momento versão PK XD', 'Use o som em alta e encaixe seu personagem na cena.'], ['Os fails mais engraçados do PK XD', 'Abra com o melhor fail, não com o menor.'], ['Quando você tenta uma coisa e dá tudo errado', 'Mostre o erro cedo e deixe o final surpreender.']],
+        trend: [['A trend da semana com o seu personagem', 'Entre no ritmo do som já no primeiro segundo.'], ['Dancinha do momento no PK XD', 'Plano fixo, personagem centralizado e corte no refrão.'], ['Reagindo ao som viral com a minha skin favorita', 'Comece pela reação mais exagerada.']],
+        outros: [['Meu melhor momento no PK XD hoje', 'Comece pelo clímax e conte como chegou lá.'], ['Mostrando minha casa nova no PK XD', 'Revele o cômodo mais bonito nos 3 primeiros segundos.'], ['Tour pelo meu personagem', 'Um detalhe novo a cada 3 segundos.']]
+    };
+    function classificar(t) {
+        for (var i = 0; i < CATS.length; i++) if (CATS[i].re.test(t || '')) return CATS[i];
+        return OUTROS;
+    }
+    function agrupar(lista) {
+        var g = {}, soma = 0, n = 0;
+        lista.forEach(function (x) {
+            var c = classificar(x.titulo), v = Number(x.views) || 0;
+            if (!g[c.k]) g[c.k] = { k: c.k, n: 0, soma: 0 };
+            g[c.k].n++; g[c.k].soma += v; soma += v; n++;
+        });
+        var arr = Object.keys(g).map(function (k) { g[k].media = g[k].soma / g[k].n; return g[k]; });
+        arr.sort(function (a, b) { return b.media - a.media; });
+        return { arr: arr, mapa: g, n: n, media: n ? soma / n : 0 };
+    }
+    function vezes(x) { return x.toFixed(1).replace('.', ',') + 'x'; }
+    function sortear(arr, q) { return arr.slice().sort(function () { return Math.random() - .5; }).slice(0, q); }
+    function analisar(lista, falta, curto) {
+        var a = agrupar(lista), dicas = [], foco = [], teste = [];
+        if (a.n < 4) {
+            dicas.push('Ainda são poucos vídeos para eu ver o que funciona melhor. Por enquanto vale testar um pouco de cada tipo e comparar depois.');
+            teste = ['esquete', 'tutorial', 'novidade'];
+        } else {
+            var fortes = a.arr.filter(function (x) { return x.n >= 2; });
+            var melhor = fortes[0], pior = fortes.length > 1 ? fortes[fortes.length - 1] : null;
+            if (melhor && melhor.media / a.media >= 1.25) {
+                dicas.push('Seus vídeos de ' + NOME[melhor.k] + ' rendem em média ' + nf(melhor.media) + ' views, ' + vezes(melhor.media / a.media) + ' a sua média geral. Vale fazer mais desse tipo.' + (falta > 0 ? ' Dos ' + nf(falta) + ' que faltam, tente fazer uns ' + Math.max(1, Math.ceil(falta * 0.6)) + ' assim.' : ''));
+                foco.push(melhor.k);
+            } else if (fortes.length < 2) {
+                dicas.push('Ainda tenho poucos vídeos de cada tipo para comparar. Repita alguns formatos para eu descobrir qual rende mais.');
+            } else {
+                dicas.push('Seus tipos de vídeo estão rendendo parecido. Teste formatos novos para descobrir o que faz você crescer mais.');
+            }
+            if (pior && pior !== melhor && pior.media / a.media <= 0.7) {
+                dicas.push('Os de ' + NOME[pior.k] + ' estão abaixo (média de ' + nf(pior.media) + '). Antes de repetir, mude o gancho ou o formato.');
+            }
+            var novos = ['novidade', 'trend', 'desafio', 'esquete', 'meme', 'tutorial'].filter(function (k) { return !a.mapa[k] && foco.indexOf(k) < 0; }).slice(0, 2);
+            if (novos.length) {
+                dicas.push('Você ainda não postou ' + novos.map(function (k) { return NOME[k]; }).join(' nem ') + ' neste período. Vale um teste.');
+                teste = novos;
+            }
+            if (curto) {
+                var c = lista.filter(function (x) { return x.segundos <= 30; }), l = lista.filter(function (x) { return x.segundos > 30; });
+                var mc = c.length >= 2 ? agrupar(c).media : 0, ml = l.length >= 2 ? agrupar(l).media : 0;
+                if (mc && ml && mc / ml >= 1.4) dicas.push('Seus Shorts de até 30 segundos rendem ' + vezes(mc / ml) + ' mais que os maiores. Tente manter curto.');
+                else if (mc && ml && ml / mc >= 1.4) dicas.push('Seus Shorts com mais de 30 segundos rendem ' + vezes(ml / mc) + ' mais que os mais curtos. Vale caprichar na história.');
+            }
+        }
+        var ideias = [];
+        foco.forEach(function (k) { sortear(IDEIAS[k], 2).forEach(function (i) { ideias.push({ k: k, t: i[0], g: i[1] }); }); });
+        teste.forEach(function (k) { sortear(IDEIAS[k], 1).forEach(function (i) { ideias.push({ k: k, t: i[0], g: i[1] }); }); });
+        return { a: a, dicas: dicas, ideias: ideias.slice(0, 4) };
+    }
+    function renderPool(corpo, titulo, lista, falta, curto) {
+        if (!lista || !lista.length) return false;
+        var r = analisar(lista, falta, curto);
+        corpo.appendChild(criar('h4', 'sub-dicas', titulo));
+        var ul = criar('ul', 'dicas');
+        r.dicas.forEach(function (d) { ul.appendChild(criar('li', null, d)); });
+        corpo.appendChild(ul);
+        corpo.appendChild(criar('h4', 'sub-dicas menor', 'Desempenho por tipo'));
+        var tl = criar('ul', 'lista-shorts');
+        r.a.arr.forEach(function (x) {
+            var li = criar('li');
+            li.appendChild(criar('div', null, NOME[x.k] + ' (' + x.n + (x.n === 1 ? ' vídeo' : ' vídeos') + ')'));
+            li.appendChild(criar('span', 'views', nf(x.media) + ' em média'));
+            tl.appendChild(li);
+        });
+        corpo.appendChild(tl);
+        if (r.ideias.length) {
+            corpo.appendChild(criar('h4', 'sub-dicas menor', 'Ideias prontas'));
+            var il = criar('ul', 'dicas ideias');
+            r.ideias.forEach(function (i) {
+                var li = criar('li'), t = criar('div');
+                t.appendChild(criar('strong', null, i.t));
+                li.appendChild(t);
+                var b = criar('button', 'botao claro', 'Copiar'); b.type = 'button';
+                b.addEventListener('click', function () {
+                    try { navigator.clipboard.writeText(i.t + ' | Gancho: ' + i.g).then(function () { b.textContent = 'Copiado!'; }); } catch (e) {}
+                });
+                li.appendChild(b);
+                li.appendChild(criar('small', null, 'Gancho: ' + i.g));
+                il.appendChild(li);
+            });
+            corpo.appendChild(il);
+        }
+        return true;
+    }
+    function dicas(r) {
+        var bloco = $('#bloco-dicas'), corpo = $('#dicas-corpo'), ok = false;
+        corpo.replaceChildren(); bloco.hidden = true;
+        if (r.plataforma === 'tiktok') ok = renderPool(corpo, 'TikTok', r.videos && r.videos.lista, 0, true);
+        else {
+            var s = renderPool(corpo, 'Shorts', r.shorts && r.shorts.lista, r.shorts && r.shorts.falta, true);
+            var l = renderPool(corpo, 'Vídeos longos', r.longos && r.longos.lista, r.longos && r.longos.falta, false);
+            ok = s || l;
+        }
+        bloco.hidden = !ok;
+    }
     function mostrar(r) {
         $('#res-canal').textContent = (r.canal && r.canal.titulo) || 'Seu canal';
         $('#res-periodo').textContent = 'Vídeos de ' + r.periodo.rotulo;
@@ -614,6 +745,7 @@ a { color: inherit; }
         } else if (r.ranking === 'poucos') {
             av.textContent = 'Você ainda não aparece no ranking: ele pede ao menos 3 vídeos do tipo no mês.'; av.hidden = false;
         }
+        try { dicas(r); } catch (e) { $('#bloco-dicas').hidden = true; }
         vista('resultado');
     }
     $('#de-novo').addEventListener('click', function () { vista('inicio'); });
