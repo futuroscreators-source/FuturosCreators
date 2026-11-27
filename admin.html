@@ -178,6 +178,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
             <button type="button" role="tab" data-aba="pngs">PNGs</button>
             <button type="button" role="tab" data-aba="festas">Festas</button>
             <button type="button" role="tab" data-aba="destaque">Destaque da Semana</button>
+            <button type="button" role="tab" data-aba="quests" id="aba-quests">Quests</button>
             <button type="button" role="tab" data-aba="chat" id="aba-chat">Chat</button>
             <button type="button" role="tab" data-aba="feedbacks" id="aba-feedbacks">Feedbacks</button>
             <button type="button" role="tab" data-aba="comunidade" id="aba-comunidade">Comunidade</button>
@@ -325,6 +326,64 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
                     <tbody id="d-linhas"></tbody>
                 </table>
                 <p class="vazio-tab" id="d-vazio" hidden>Nenhum destaque cadastrado ainda.</p>
+            </div>
+        </section>
+
+        <section id="tab-quests" hidden>
+            <h2>Futuros Quests</h2>
+            <p>Publique missões, aprove os envios e veja quem está na frente para o Criador Destaque. A página dos criadores é a <strong>quests.html</strong>. Nada aparece lá sem a sua aprovação.</p>
+            <h3>Missões</h3>
+            <form class="form-caixa" id="form-quest" novalidate>
+                <div><label for="q-titulo">Título da missão</label><input id="q-titulo" type="text" maxlength="80" autocomplete="off"></div>
+                <div><label for="q-tipo">Tipo</label><select id="q-tipo"><option value="video">Vídeo</option><option value="thumb">Thumb</option><option value="criatividade">Criatividade</option></select></div>
+                <div><label for="q-plat">Plataforma <small>opcional</small></label><input id="q-plat" type="text" maxlength="40" autocomplete="off" placeholder="Shorts, TikTok, YouTube..."></div>
+                <div><label for="q-prazo">Prazo <small>opcional</small></label><input id="q-prazo" type="date"></div>
+                <div><label for="q-pontos">Pontos</label><input id="q-pontos" type="number" min="0" max="1000" value="20"></div>
+                <div><label for="q-status">Situação</label><select id="q-status"><option value="ativa">Ativa (aparece no site)</option><option value="rascunho">Rascunho</option><option value="encerrada">Encerrada</option></select></div>
+                <div class="inteira"><label for="q-desc">O que o criador precisa fazer</label><input id="q-desc" type="text" maxlength="300" autocomplete="off"></div>
+                <div class="btns"><button type="submit" class="rosa" id="q-salvar">Salvar missão</button><button type="button" id="q-cancelar" hidden>Cancelar edição</button></div>
+            </form>
+            <p class="nota" id="q-msg" role="status"></p>
+            <div class="caixa">
+                <table style="min-width:640px">
+                    <thead><tr><th>Missão</th><th>Prazo e situação</th><th>Pendentes</th><th>Ações</th></tr></thead>
+                    <tbody id="q-linhas"></tbody>
+                </table>
+                <p class="vazio-tab" id="q-vazio" hidden>Nenhuma missão ainda.</p>
+            </div>
+            <h3>Envios dos criadores</h3>
+            <div class="btns"><select id="e-filtro" aria-label="Filtrar envios"><option value="novo">Só pendentes</option><option value="">Todos</option></select></div>
+            <div class="caixa">
+                <table style="min-width:700px">
+                    <thead><tr><th>Criador</th><th>Missão</th><th>Envio</th><th>Decisão</th></tr></thead>
+                    <tbody id="qe-linhas"></tbody>
+                </table>
+                <p class="vazio-tab" id="qe-vazio" hidden>Nenhum envio aqui.</p>
+            </div>
+            <h3>Recordes</h3>
+            <form class="form-caixa" id="form-rq" hidden novalidate>
+                <div><label for="rq-canal">Canal</label><input id="rq-canal" type="text" maxlength="80" autocomplete="off"></div>
+                <div><label for="rq-titulo">Título do vídeo</label><input id="rq-titulo" type="text" maxlength="120" autocomplete="off"></div>
+                <div><label for="rq-views">Views do vídeo</label><input id="rq-views" type="number" min="0"></div>
+                <div><label for="rq-vezes">Quantas vezes a média do canal</label><input id="rq-vezes" type="number" min="0" step="0.1" placeholder="5.2"></div>
+                <div class="inteira"><label for="rq-dica">O que deu certo <small>você pode editar</small></label><input id="rq-dica" type="text" maxlength="300" autocomplete="off"></div>
+                <div class="btns"><button type="submit" class="rosa" id="rq-aprovar">Aprovar recorde</button><button type="button" id="rq-recusar" class="perigo">Recusar</button><button type="button" id="rq-cancelar">Cancelar</button></div>
+            </form>
+            <div class="caixa">
+                <table style="min-width:640px">
+                    <thead><tr><th>Criador</th><th>Vídeo</th><th>Situação</th><th>Ações</th></tr></thead>
+                    <tbody id="rq-linhas"></tbody>
+                </table>
+                <p class="vazio-tab" id="rq-vazio" hidden>Nenhum recorde enviado ainda.</p>
+            </div>
+            <h3>Ranking de pontos</h3>
+            <p>Soma das missões aprovadas. Ajuda a escolher o Criador Destaque na aba "Destaque da Semana".</p>
+            <div class="caixa">
+                <table style="min-width:420px">
+                    <thead><tr><th>#</th><th>Criador</th><th>Pontos</th><th>Missões aprovadas</th></tr></thead>
+                    <tbody id="rk-linhas"></tbody>
+                </table>
+                <p class="vazio-tab" id="rk-vazio" hidden>Ninguém pontuou ainda.</p>
             </div>
         </section>
 
@@ -594,8 +653,9 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
         if (nome === 'pngs' && !S.pngsCarregados) carregarPngs();
         if (nome === 'stats') carregarStats();
         if (nome === 'beta') carregarBeta();
+        if (nome === 'quests') carregarQuests();
         if (nome === 'comunidade') carregarComunidade();
-        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'chat', 'feedbacks', 'comunidade', 'stats', 'beta', 'admins', 'conta'].forEach(function (a) {
+        ['inscricoes', 'videos', 'noticias', 'equipe', 'pngs', 'festas', 'destaque', 'quests', 'chat', 'feedbacks', 'comunidade', 'stats', 'beta', 'admins', 'conta'].forEach(function (a) {
             var sec = $('#tab-' + a); if (sec) sec.hidden = a !== nome;
             var bt = $('.abas button[data-aba="' + a + '"]'); if (bt) bt.classList.toggle('ativa', a === nome);
         });
@@ -942,6 +1002,118 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
                 }).catch(function (e) { dmsg.textContent = e.message; });
             });
             ac.appendChild(rm);
+            corpo.appendChild(tr);
+        });
+    }
+
+    /* ---------- Futuros Quests (missões, envios, recordes e ranking) ---------- */
+    S.quests = []; S.envios = []; S.recs = []; S.rank = []; S.editQuest = null; S.revRec = null;
+    var TIPOQ = { video: 'Vídeo', thumb: 'Thumb', criatividade: 'Criatividade' }, SITQ = { ativa: 'Ativa', rascunho: 'Rascunho', encerrada: 'Encerrada', novo: 'Pendente', aprovado: 'Aprovado', recusado: 'Recusado' };
+    var qmsg = $('#q-msg');
+    function linkSeguro(u, t) {
+        var a = criar('a', null, t || 'Abrir');
+        if (/^https:\/\/\S{4,}$/i.test(u || '')) { a.href = u; a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+        return a;
+    }
+    function carregarQuests() {
+        chamar('admin_quests_listar').then(function (l) { S.quests = l || []; desenharQuests(); }).catch(function (e) { qmsg.textContent = e.message; });
+        chamar('admin_quest_envios').then(function (l) { S.envios = l || []; desenharEnvios(); desenharQuests(); }).catch(function () {});
+        chamar('admin_recordes_listar').then(function (l) { S.recs = l || []; desenharRecs(); }).catch(function () {});
+        chamar('admin_quests_ranking').then(function (l) { S.rank = l || []; desenharRank(); }).catch(function () {});
+    }
+    function limparQuest() { S.editQuest = null; $('#form-quest').reset(); $('#q-salvar').textContent = 'Salvar missão'; $('#q-cancelar').hidden = true; }
+    $('#q-cancelar').addEventListener('click', function () { limparQuest(); qmsg.textContent = ''; });
+    $('#form-quest').addEventListener('submit', function (ev) {
+        ev.preventDefault(); qmsg.textContent = '';
+        var t = $('#q-titulo').value.trim();
+        if (t.length < 3) { qmsg.textContent = 'Escreva o título da missão.'; return; }
+        var b = $('#q-salvar'), editando = !!S.editQuest; b.disabled = true;
+        chamar('admin_quest_salvar', { p_id: S.editQuest, p_titulo: t, p_descricao: $('#q-desc').value.trim(), p_tipo: $('#q-tipo').value, p_plataforma: $('#q-plat').value.trim(), p_prazo: $('#q-prazo').value || null, p_pontos: parseInt($('#q-pontos').value, 10) || 0, p_status: $('#q-status').value })
+            .then(function () { limparQuest(); qmsg.textContent = editando ? 'Missão atualizada.' : 'Missão salva.'; carregarQuests(); })
+            .catch(function (e) { qmsg.textContent = e.message; })
+            .then(function () { b.disabled = false; });
+    });
+    function desenharQuests() {
+        var corpo = $('#q-linhas'); corpo.replaceChildren(); $('#q-vazio').hidden = S.quests.length > 0;
+        S.quests.forEach(function (q) {
+            var tr = document.createElement('tr');
+            function td() { var t = document.createElement('td'); tr.appendChild(t); return t; }
+            var t1 = td(); t1.appendChild(criar('strong', null, q.titulo)); t1.appendChild(document.createElement('br')); t1.appendChild(document.createTextNode((TIPOQ[q.tipo] || '') + ' · ' + (q.pontos || 0) + ' pontos'));
+            td().textContent = (q.prazo ? 'Até ' + String(q.prazo).slice(8, 10) + '/' + String(q.prazo).slice(5, 7) : 'Sem prazo') + ' · ' + (SITQ[q.status] || q.status);
+            td().textContent = String(S.envios.filter(function (e) { return e.quest_id === q.id && e.status === 'novo'; }).length);
+            var ac = criar('div', 'acoes'); td().appendChild(ac);
+            var ed = criar('button', null, 'Editar'); ed.type = 'button';
+            ed.addEventListener('click', function () {
+                S.editQuest = q.id; $('#q-titulo').value = q.titulo; $('#q-tipo').value = q.tipo; $('#q-plat').value = q.plataforma || '';
+                $('#q-prazo').value = q.prazo ? String(q.prazo).slice(0, 10) : ''; $('#q-pontos').value = q.pontos || 0; $('#q-status').value = q.status; $('#q-desc').value = q.descricao || '';
+                $('#q-salvar').textContent = 'Salvar alterações'; $('#q-cancelar').hidden = false; qmsg.textContent = 'Editando a missão "' + q.titulo + '".';
+                $('#form-quest').scrollIntoView({ block: 'start' });
+            });
+            ac.appendChild(ed);
+            var rm = criar('button', 'perigo', S.apagando === 'q' + q.id ? 'Confirmar?' : 'Apagar'); rm.type = 'button';
+            rm.addEventListener('click', function () {
+                if (S.apagando !== 'q' + q.id) { S.apagando = 'q' + q.id; desenharQuests(); return; }
+                S.apagando = null;
+                chamar('admin_quest_apagar', { p_id: q.id }).then(function () { qmsg.textContent = 'Missão apagada.'; carregarQuests(); }).catch(function (e) { qmsg.textContent = e.message; });
+            });
+            ac.appendChild(rm); corpo.appendChild(tr);
+        });
+    }
+    $('#e-filtro').addEventListener('change', desenharEnvios);
+    function decidirEnvio(e, st, pts) {
+        chamar('admin_quest_envio_decidir', { p_id: e.id, p_status: st, p_pontos: pts }).then(carregarQuests).catch(function (er) { qmsg.textContent = er.message; });
+    }
+    function desenharEnvios() {
+        var corpo = $('#qe-linhas'), f = $('#e-filtro').value; corpo.replaceChildren();
+        var l = S.envios.filter(function (e) { return !f || e.status === f; });
+        $('#qe-vazio').hidden = l.length > 0;
+        l.forEach(function (e) {
+            var tr = document.createElement('tr');
+            function td() { var t = document.createElement('td'); tr.appendChild(t); return t; }
+            var t1 = td(); t1.appendChild(criar('strong', null, e.apelido)); t1.appendChild(document.createElement('br')); t1.appendChild(document.createTextNode(fmtData(e.criado)));
+            td().textContent = e.quest_titulo || '(missão apagada)';
+            var t3 = td(); t3.appendChild(linkSeguro(e.link, 'Abrir envio')); if (e.texto) { t3.appendChild(document.createElement('br')); t3.appendChild(document.createTextNode(e.texto)); }
+            var t4 = td(); t4.appendChild(criar('div', null, SITQ[e.status] + (e.status === 'aprovado' ? ' (' + e.pontos + ' pts)' : '')));
+            var ac = criar('div', 'acoes'); t4.appendChild(ac);
+            var pt = criar('input'); pt.type = 'number'; pt.min = 0; pt.max = 1000; pt.value = e.status === 'aprovado' ? e.pontos : (e.quest_pontos || 0); pt.style.width = '70px'; pt.setAttribute('aria-label', 'Pontos'); ac.appendChild(pt);
+            var ok = criar('button', 'rosa', 'Aprovar'); ok.type = 'button'; ok.addEventListener('click', function () { decidirEnvio(e, 'aprovado', parseInt(pt.value, 10) || 0); }); ac.appendChild(ok);
+            var no = criar('button', 'perigo', 'Recusar'); no.type = 'button'; no.addEventListener('click', function () { decidirEnvio(e, 'recusado', 0); }); ac.appendChild(no);
+            corpo.appendChild(tr);
+        });
+    }
+    function fecharRec() { S.revRec = null; $('#form-rq').hidden = true; }
+    $('#rq-cancelar').addEventListener('click', fecharRec);
+    function salvarRec(st) {
+        var r = S.revRec; if (!r) return;
+        if (st === 'aprovado' && (!$('#rq-canal').value.trim() || !$('#rq-titulo').value.trim())) { qmsg.textContent = 'Para aprovar, preencha o canal e o título do vídeo.'; return; }
+        chamar('admin_recorde_decidir', { p_id: r.id, p_status: st, p_canal: $('#rq-canal').value.trim(), p_titulo: $('#rq-titulo').value.trim(), p_views: parseInt($('#rq-views').value, 10) || null, p_vezes: parseFloat($('#rq-vezes').value) || null, p_dica: $('#rq-dica').value.trim() })
+            .then(function () { fecharRec(); qmsg.textContent = st === 'aprovado' ? 'Recorde aprovado. Já aparece nos Quests.' : 'Recorde recusado.'; carregarQuests(); })
+            .catch(function (e) { qmsg.textContent = e.message; });
+    }
+    $('#form-rq').addEventListener('submit', function (ev) { ev.preventDefault(); salvarRec('aprovado'); });
+    $('#rq-recusar').addEventListener('click', function () { salvarRec('recusado'); });
+    function desenharRecs() {
+        var corpo = $('#rq-linhas'); corpo.replaceChildren(); $('#rq-vazio').hidden = S.recs.length > 0;
+        S.recs.forEach(function (r) {
+            var tr = document.createElement('tr');
+            function td() { var t = document.createElement('td'); tr.appendChild(t); return t; }
+            var t1 = td(); t1.appendChild(criar('strong', null, r.apelido)); t1.appendChild(document.createElement('br')); t1.appendChild(document.createTextNode(fmtData(r.criado)));
+            var t2 = td(); t2.appendChild(linkSeguro(r.link, 'Abrir vídeo')); if (r.dica) { t2.appendChild(document.createElement('br')); t2.appendChild(document.createTextNode(r.dica)); }
+            td().textContent = SITQ[r.status] + (r.vezes ? ' · ' + r.vezes + 'x a média' : '');
+            var ac = criar('div', 'acoes'); td().appendChild(ac);
+            var rv = criar('button', null, r.status === 'novo' ? 'Revisar' : 'Editar'); rv.type = 'button';
+            rv.addEventListener('click', function () {
+                S.revRec = r; $('#rq-canal').value = r.canal || ''; $('#rq-titulo').value = r.titulo || ''; $('#rq-views').value = r.views || ''; $('#rq-vezes').value = r.vezes || ''; $('#rq-dica').value = r.dica || '';
+                $('#form-rq').hidden = false; $('#form-rq').scrollIntoView({ block: 'center' }); qmsg.textContent = 'Revisando o recorde de ' + r.apelido + '. Confira o vídeo antes de aprovar.';
+            });
+            ac.appendChild(rv); corpo.appendChild(tr);
+        });
+    }
+    function desenharRank() {
+        var corpo = $('#rk-linhas'); corpo.replaceChildren(); $('#rk-vazio').hidden = S.rank.length > 0;
+        S.rank.forEach(function (x, i) {
+            var tr = document.createElement('tr');
+            [String(i + 1), x.apelido, String(x.pontos), String(x.envios)].forEach(function (v) { var t = document.createElement('td'); t.textContent = v; tr.appendChild(t); });
             corpo.appendChild(tr);
         });
     }
