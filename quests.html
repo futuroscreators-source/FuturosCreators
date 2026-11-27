@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Futuros Quests | Futuros Creators</title>
+<meta name="theme-color" content="#FFC93C">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+
+
+:root {
+    --sol: #FFC93C;
+    --sol-claro: #FFD966;
+    --uva: #2B0A57;
+    --rosa: #FF4FA3;
+    --ceu: #35D6E0;
+    --tinta: #17101F;
+    --papel: #FFF6DD;
+    --raio: 18px;
+    --titulo: 'Lilita One', 'Trebuchet MS', sans-serif;
+    --texto: 'Nunito', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+body {
+    margin: 0;
+    font: 500 1.0625rem/1.55 var(--texto);
+    color: var(--tinta);
+    background: var(--sol);
+    -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; height: auto; display: block; }
+a { color: inherit; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+:focus-visible { outline: 4px solid var(--ceu); outline-offset: 3px; }
+
+/* ---------- Título no estilo da logo: branco, contorno preto grosso ---------- */
+.adesivo {
+    margin: 0 0 .35em;
+    font: 400 clamp(2.3rem, 6vw, 3.8rem)/1.02 var(--titulo);
+    color: #fff;
+    -webkit-text-stroke: 9px var(--tinta);
+    paint-order: stroke fill;
+    text-shadow: 4px 5px 0 var(--tinta);
+    letter-spacing: .01em;
+    transform: rotate(-1.5deg);
+    transform-origin: left center;
+}
+
+/* ---------- Botões ---------- */
+.botao {
+    display: inline-block;
+    padding: .7em 1.4em;
+    font: 400 1.25rem/1 var(--titulo);
+    text-decoration: none;
+    border: 4px solid var(--tinta);
+    border-radius: 999px;
+    box-shadow: 0 6px 0 var(--tinta);
+    cursor: pointer;
+    transition: transform .12s, box-shadow .12s;
+}
+.botao:hover { transform: translateY(2px); box-shadow: 0 4px 0 var(--tinta); }
+.botao:active { transform: translateY(6px); box-shadow: 0 0 0 var(--tinta); }
+.botao.rosa { background: var(--rosa); color: #fff; }
+.botao.claro { background: #fff; color: var(--tinta); }
+.botao.grande { width: 100%; font-size: 1.5rem; padding: .8em 1em; }
+
+.menu { position: relative; display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; max-width: 1180px; margin: 0 auto; }
+.menu a {
+    padding: .45em 1.05em; font-weight: 800; text-decoration: none;
+    background: #fff; border: 3px solid var(--tinta); border-radius: 999px;
+    box-shadow: 0 4px 0 var(--tinta);
+}
+.menu a:hover { background: var(--papel); }
+/* ---------- Seções ---------- */
+.secao { padding: 80px 20px; }
+.secao.escura { background: var(--uva); color: #fff; }
+.secao.papel { background: var(--papel); }
+.secao.sol { background: var(--sol); }
+.miolo { max-width: 1180px; margin: 0 auto; }
+.cabeca { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; margin-bottom: 36px; }
+.intro { max-width: 32em; margin: 0; font-size: 1.15rem; font-weight: 700; }
+.logo-secao { width: min(380px, 80vw); margin: -6% 0 -7% -12px; }
+.vazio { padding: 40px 24px; border: 4px dashed currentColor; border-radius: var(--raio); font-weight: 800; text-align: center; opacity: .85; }
+
+.botao.pequeno { margin-top: 14px; padding: .55em 1.1em; font-size: 1rem; box-shadow: 0 4px 0 var(--tinta); }
+.duas-colunas { display: grid; grid-template-columns: .85fr 1.15fr; gap: 56px; align-items: start; }
+.folha {
+    padding: 34px; background: #fff;
+    border: 5px solid var(--tinta); border-radius: 26px;
+    box-shadow: 10px 10px 0 var(--uva);
+}
+.campo { margin: 0 0 22px; padding: 0; border: 0; min-width: 0; }
+.campo label, .campo legend { display: block; margin-bottom: 8px; padding: 0; font-weight: 800; font-size: 1.05rem; }
+.campo input[type=text], .campo textarea {
+    width: 100%; padding: .75em .9em;
+    font: 600 1.05rem/1.4 var(--texto); color: var(--tinta);
+    background: var(--papel); border: 3px solid var(--tinta); border-radius: 14px;
+}
+.campo textarea { resize: vertical; min-height: 130px; }
+.campo input::placeholder, .campo textarea::placeholder { color: #8b8296; font-weight: 500; }
+.campo input[type=text]:focus, .campo textarea:focus { outline: none; background: #fff; box-shadow: 0 0 0 4px var(--ceu); }
+
+.arroba { display: flex; align-items: stretch; }
+.arroba span {
+    display: grid; place-items: center; padding: 0 .9em;
+    font: 400 1.4rem var(--titulo); background: var(--sol);
+    border: 3px solid var(--tinta); border-right: 0; border-radius: 14px 0 0 14px;
+}
+.arroba input { border-radius: 0 14px 14px 0 !important; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 10px; }
+.chip input { position: absolute; opacity: 0; pointer-events: none; }
+.chip span {
+    display: inline-block; padding: .5em 1.1em; margin: 0;
+    font-weight: 800; background: var(--papel);
+    border: 3px solid var(--tinta); border-radius: 999px; cursor: pointer;
+    transition: background .12s, transform .12s;
+}
+.chip input:checked + span { background: var(--rosa); color: #fff; transform: rotate(-2deg); box-shadow: 0 3px 0 var(--tinta); }
+.chip input:focus-visible + span { outline: 4px solid var(--ceu); outline-offset: 3px; }
+
+.campo.ciente .marca { display: flex; gap: 12px; align-items: flex-start; font-weight: 600; font-size: .98rem; cursor: pointer; }
+.marca input { width: 24px; height: 24px; flex: none; margin: 2px 0 0; accent-color: var(--rosa); }
+
+.erro { min-height: 0; margin: 6px 0 0; font-weight: 800; font-size: .95rem; color: #C4125F; }
+.erro:empty { display: none; }
+.campo.com-erro input[type=text], .campo.com-erro textarea { border-color: #C4125F; }
+.erro.geral { margin-top: 14px; text-align: center; }
+.isca { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.enviado { text-align: center; padding: 28px 8px; }
+.enviado h3 { margin: 0 0 10px; font: 400 2.4rem/1.1 var(--titulo); }
+.enviado p { margin: 0 auto; max-width: 24em; font-weight: 700; }
+
+/* ---------- Rodapé ---------- */
+.rodape { padding: 40px 20px; text-align: center; background: var(--tinta); color: #cfc6dc; }
+.rodape img { width: 170px; margin: 0 auto 6px; }
+.rodape p { margin: 0; font-size: .95rem; }
+
+
+/* ---------- Página de feedback ---------- */
+.fb-topo { padding: 20px 20px 0; background: var(--sol); }
+.fb-topo .menu { margin-bottom: 0; }
+.secao.fb { padding-top: 40px; min-height: 80vh; }
+.fb-texto .intro { margin-bottom: 14px; }
+.fb-texto ul { margin: 18px 0 0; padding-left: 1.2em; font-weight: 700; }
+.fb-texto li { margin-bottom: 6px; }
+.campo textarea { min-height: 170px; }
+.contagem { margin: 6px 0 0; font-size: .92rem; font-weight: 700; opacity: .75; text-align: right; }
+.notas { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.notas .ponta { font-size: .9rem; font-weight: 700; opacity: .75; }
+.botoes-ok { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 22px; }
+
+/* ---------- Calculadora de Shorts (beta) ---------- */
+.beta-miolo { max-width: 840px; margin: 0 auto; }
+.beta-hero { display: flex; gap: 26px; align-items: center; margin-bottom: 8px; }
+.beta-hero .intro { margin-bottom: 18px; }
+.beta-avatar { flex: none; width: 150px; height: 150px; object-fit: cover; background: #fff; border: 5px solid var(--tinta); border-radius: 50%; box-shadow: 6px 6px 0 var(--uva); }
+.bloco-res { margin-top: 26px; }
+.bloco-res h3 { margin: 0 0 12px; font: 400 1.6rem var(--titulo); }
+.beta-tag { display: inline-block; margin-left: 10px; padding: .1em .6em; font: 400 1rem var(--titulo); color: #fff; background: var(--uva); border-radius: 999px; vertical-align: middle; }
+.passos { margin: 0 0 18px; padding-left: 1.2em; font-weight: 700; }
+.passos li { margin-bottom: 6px; }
+.aviso-beta { margin: 14px 0 0; font-size: .95rem; font-weight: 700; opacity: .85; }
+.res-cabeca { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
+.res-cabeca img { flex: none; width: 64px; height: 64px; object-fit: cover; border: 4px solid var(--tinta); border-radius: 50%; }
+.res-cabeca h2 { margin: 0; font: 400 1.8rem/1.1 var(--titulo); overflow-wrap: anywhere; }
+.res-cabeca p { margin: 0; font-weight: 700; }
+.res-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 0 0 16px; }
+.res-card { padding: 12px 14px; background: var(--papel); border: 3px solid var(--tinta); border-radius: 16px; }
+.res-card small { display: block; font-weight: 800; opacity: .75; }
+.res-card strong { font: 400 1.9rem/1.15 var(--titulo); }
+.barra { height: 26px; overflow: hidden; background: #fff; border: 4px solid var(--tinta); border-radius: 999px; }
+.barra div { height: 100%; width: 0; background: var(--rosa); transition: width .6s; }
+.res-status { margin: 12px 0; padding: 12px 16px; font-weight: 800; border: 3px solid var(--tinta); border-radius: 14px; }
+.res-status.ok { background: #9be9a8; }
+.res-status.falta { background: var(--sol); }
+.res-status.problema { background: #ffb3c9; }
+.res-nota { margin: 8px 0; font-weight: 700; }
+.lista-shorts { margin: 16px 0 0; padding: 0; list-style: none; }
+.lista-shorts li { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 10px 0; border-top: 2px dashed var(--tinta); }
+.lista-shorts a { font-weight: 800; color: inherit; overflow-wrap: anywhere; }
+.lista-shorts small { font-weight: 700; opacity: .75; }
+.lista-shorts .views { grid-row: 1 / span 2; grid-column: 2; align-self: center; font: 400 1.3rem var(--titulo); }
+.estimado { display: inline-block; margin-left: 6px; padding: 0 .5em; font-size: .75rem; font-weight: 800; background: var(--sol); border: 2px solid var(--tinta); border-radius: 999px; }
+.carregando { padding: 30px 0; text-align: center; font-size: 1.2rem; font-weight: 800; }
+.ranking-ok { padding: 12px 16px; margin: 14px 0 0; font-weight: 800; background: var(--ceu); border: 3px solid var(--tinta); border-radius: 14px; }
+.ranking-ok a { color: inherit; }
+.consent { margin-top: 6px; padding: 14px 16px; background: var(--papel); border: 3px solid var(--tinta); border-radius: 14px; }
+.consent small { display: block; margin: 6px 0 0 36px; font-weight: 700; opacity: .8; }
+.botao.grande + .botao.grande { margin-top: 14px; }
+.botoes-res { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 22px; }
+@media (max-width: 860px) {
+    .beta-hero { flex-direction: column; text-align: center; gap: 14px; }
+    .beta-avatar { width: 120px; height: 120px; }
+    .menu { justify-content: center; }
+    .secao { padding: 56px 18px; }
+    .secao.fb { padding-top: 32px; }
+    .folha { padding: 22px; box-shadow: 7px 7px 0 var(--uva); }
+    .adesivo { -webkit-text-stroke-width: 7px; }
+}
+.dicas { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+.dicas li { padding: 12px 14px; background: var(--sol-claro); border: 3px solid var(--tinta); border-radius: 14px; font-weight: 800; }
+.dicas.ideias li { background: var(--papel); display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; align-items: center; }
+.dicas.ideias small { grid-column: 1; font-weight: 700; opacity: .8; }
+.dicas.ideias .botao { grid-row: 1 / span 2; grid-column: 2; padding: 6px 12px; font-size: .9rem; }
+.sub-dicas { margin: 20px 0 4px; font: 400 1.3rem var(--titulo); }
+.sub-dicas.menor { margin-top: 14px; font-size: 1.05rem; }
+
+.q-miolo{max-width:1000px;margin:0 auto}
+.q-miolo>.intro{margin:14px 0 20px}
+.q-abas{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 20px}
+.q-abas button{font:400 1.1rem var(--titulo);padding:.5em 1.1em;border:3px solid var(--tinta);border-radius:999px;background:#fff;color:var(--tinta);cursor:pointer}
+.q-abas button[aria-selected=true]{background:var(--rosa);color:#fff}
+.q-topo{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.q-grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
+.q-card{display:flex;flex-direction:column;gap:8px;padding:16px;background:#fff;border:4px solid var(--tinta);border-radius:var(--raio);box-shadow:6px 6px 0 var(--tinta)}
+.q-card h3{margin:0;font:400 1.35rem/1.15 var(--titulo);overflow-wrap:anywhere}
+.q-card p{margin:0;font-weight:700;overflow-wrap:anywhere}
+.q-card .botao{margin-top:auto;align-self:flex-start}
+.q-tipo{align-self:flex-start;padding:.15em .7em;border:3px solid var(--tinta);border-radius:999px;font:400 .95rem var(--titulo)}
+.q-tipo.video{background:var(--ceu)}.q-tipo.thumb{background:var(--sol-claro)}.q-tipo.criatividade{background:var(--rosa);color:#fff}
+.q-meta{font-size:.92rem;font-weight:800;opacity:.8}
+.q-aviso{margin:0 0 16px;padding:10px 14px;border:3px dashed var(--tinta);border-radius:14px;font-weight:800}
+.q-dest{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:20px;background:var(--sol-claro);border:4px solid var(--tinta);border-radius:var(--raio);box-shadow:7px 7px 0 var(--rosa)}
+.q-foto{flex:none;width:110px;height:110px;display:grid;place-items:center;border:5px solid var(--tinta);border-radius:50%;background:var(--papel);font:400 3rem var(--titulo);overflow:hidden}
+.q-foto img{width:100%;height:100%;object-fit:cover}
+.q-dest h3{margin:0;font:400 2rem/1.05 var(--titulo);overflow-wrap:anywhere}
+.q-selos{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;padding:0;list-style:none}
+.q-selos span{display:inline-block;padding:.1em .7em;background:#fff;border:3px solid var(--tinta);border-radius:999px;font-weight:800}
+.q-form{margin-top:18px;padding:16px;background:var(--papel);border:4px solid var(--tinta);border-radius:var(--raio)}
+.q-form h3{margin:0 0 12px;font:400 1.4rem var(--titulo)}
+.q-sub{margin:26px 0 10px;font:400 1.4rem var(--titulo)}
+.q-ok{font-weight:800;color:#0a6b43}
+@media(max-width:560px){.q-dest{justify-content:center;text-align:center}}
+</style>
+</head>
+<body>
+
+<header class="fb-topo">
+    <nav class="menu" aria-label="Principal">
+        <a href="index.html">&larr; Voltar para o site</a>
+    </nav>
+</header>
+
+<main class="secao sol fb">
+<div class="q-miolo">
+    <h1 class="adesivo">Futuros Quests <span class="beta-tag">BETA</span></h1>
+    <p class="intro" id="q-intro">Acesso só para quem a equipe liberou.</p>
+    <div class="folha">
+        <div id="vista-verificando"><p class="carregando">Verificando seu acesso...</p></div>
+        <div id="vista-codigo" hidden>
+            <p class="res-nota">Os Quests são fechados por enquanto. Digite o código de acesso que a equipe te passou.</p>
+            <form id="form-codigo" novalidate>
+                <div class="campo"><label for="codigo">Código de acesso</label>
+                <input id="codigo" type="text" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX"></div>
+                <button type="submit" class="botao rosa grande" id="entrar-beta">Entrar nos Quests</button>
+                <p class="erro geral" id="codigo-erro" role="alert"></p>
+            </form>
+        </div>
+        <div id="vista-quests" hidden>
+            <div class="q-topo"><p class="res-nota" id="ola"></p><button type="button" class="botao claro pequeno" id="sair-beta">Sair</button></div>
+            <div class="q-abas" role="tablist" aria-label="Seções">
+                <button type="button" role="tab" data-aba="missoes" aria-selected="true">Missões</button>
+                <button type="button" role="tab" data-aba="destaque" aria-selected="false">Criador Destaque</button>
+                <button type="button" role="tab" data-aba="recordes" aria-selected="false">Recordes</button>
+            </div>
+            <section id="aba-missoes">
+                <p class="intro">Cumpra missões de vídeo, thumb e criatividade. A equipe confere tudo e as melhores entram na disputa pelo <strong>Criador Destaque</strong>!</p>
+                <div id="m-aviso"></div>
+                <div class="q-grade" id="m-lista"></div>
+                <div id="m-form"></div>
+            </section>
+            <section id="aba-destaque" hidden>
+                <p class="intro">Quem mais brilhou nas missões e nos vídeos da semana.</p>
+                <div id="d-corpo"></div>
+            </section>
+            <section id="aba-recordes" hidden>
+                <p class="intro">Vídeos que bateram a média do próprio canal! Conte o que você acha que deu certo para inspirar os outros.</p>
+                <div id="r-aviso"></div>
+                <div class="q-grade" id="r-lista"></div>
+                <p><button type="button" class="botao rosa pequeno" id="r-enviar">Enviar meu recorde</button></p>
+                <div id="r-form"></div>
+            </section>
+        </div>
+    </div>
+</div>
+</main>
+
+<footer class="rodape">
+    <img src="logo-creators.png" alt="Futuros Creators" width="1000" height="607">
+    <p>&copy; 2026 Futuros Creators</p>
+</footer>
+<script src="config.js"></script>
+<script>
+/* Conversa com o banco de dados (Supabase) chamando as funções do banco.sql */
+(function (w) {
+    'use strict';
+    var cfg = w.FUTUROS_CONFIG || {};
+
+    function configurado() {
+        return /^https?:\/\//.test(cfg.url || '') && !/COLOQUE/.test((cfg.url || '') + (cfg.chave || '')) && !!cfg.chave;
+    }
+
+    function rpc(nome, args) {
+        if (!configurado()) return Promise.reject(new Error('O site ainda não foi ligado ao banco de dados. Preencha o config.js.'));
+        var h = { 'Content-Type': 'application/json', 'apikey': cfg.chave };
+        if (/^eyJ/.test(cfg.chave)) h['Authorization'] = 'Bearer ' + cfg.chave; // chave antiga (JWT)
+        var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+        var t = setTimeout(function () { if (ctrl) ctrl.abort(); }, 20000);
+        var opcoes = { method: 'POST', headers: h, body: JSON.stringify(args || {}) };
+        if (ctrl) opcoes.signal = ctrl.signal;
+
+        return fetch(cfg.url.replace(/\/$/, '') + '/rest/v1/rpc/' + nome, opcoes).then(function (r) {
+            clearTimeout(t);
+            return r.json().catch(function () { return null; }).then(function (j) {
+                if (!r.ok) {
+                    var msg = (j && j.message) || '';
+                    var cod = (j && j.code) || '';
+                    if (r.status === 404 || cod === 'PGRST202' || /Could not find the function/i.test(msg)) {
+                        msg = 'O banco ainda não foi preparado. Rode o banco.sql no Supabase (SQL Editor).';
+                    } else if (r.status === 401 || /api key/i.test(msg)) {
+                        msg = 'A chave do Supabase no config.js está errada.';
+                    } else if (!msg) {
+                        msg = 'Erro ' + r.status + '. Tente de novo.';
+                    }
+                    var e = new Error(msg);
+                    e.codigo = cod; e.status = r.status; throw e;
+                }
+                return j;
+            });
+        }, function (err) {
+            clearTimeout(t);
+            if (err && err.name === 'AbortError') {
+                throw new Error('O banco demorou demais para responder. Espere 2 minutos e tente de novo.');
+            }
+            throw new Error('Não consegui falar com o banco. Confira a internet e o endereço (Project URL) no config.js.');
+        });
+    }
+
+    w.FC = { rpc: rpc, configurado: configurado };
+})(window);
+
+</script>
+<script>
+(function () {
+    'use strict';
+    var $ = function (s) { return document.querySelector(s); };
+    var BETA = 'fc_beta_token';
+    function criar(tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+    function nf(n) { return Number(n || 0).toLocaleString('pt-BR', { maximumFractionDigits: 0 }); }
+    function betaToken() { try { return localStorage.getItem(BETA) || ''; } catch (e) { return ''; } }
+    function guardarBeta(t) { try { localStorage.setItem(BETA, t); } catch (e) {} }
+    function limparBeta() { try { localStorage.removeItem(BETA); } catch (e) {} }
+    function vista(n) { ['verificando', 'codigo', 'quests'].forEach(function (v) { $('#vista-' + v).hidden = v !== n; }); }
+    function mostrarCodigo(msg) { $('#q-intro').textContent = 'Acesso só para quem a equipe liberou.'; $('#codigo-erro').textContent = msg || ''; vista('codigo'); }
+    function sessao() {
+        var tk = betaToken();
+        var c = tk ? FC.rpc('publico_beta_sessao', { p_token: tk }).catch(function () { return null; }) : Promise.resolve(null);
+        return c.then(function (r) {
+            if (r && r.ok) return r;
+            limparBeta();
+            return FC.rpc('publico_beta_estado').catch(function () { return null; }).then(function (e) {
+                if (!e || !e.aberto) return { ok: false };
+                return FC.rpc('publico_beta_visitante').then(function (v) {
+                    if (v && v.ok) { guardarBeta(v.token); return { ok: true, nome: null }; }
+                    return { ok: false };
+                }).catch(function () { return { ok: false }; });
+            });
+        });
+    }
+    $('#codigo').addEventListener('input', function () { this.value = this.value.toUpperCase(); });
+    $('#form-codigo').addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var cod = $('#codigo').value.trim(), btn = $('#entrar-beta');
+        $('#codigo-erro').textContent = '';
+        if (cod.replace(/[^A-Za-z0-9]/g, '').length < 12) { $('#codigo-erro').textContent = 'Digite o código completo (12 letras e números).'; return; }
+        btn.disabled = true;
+        FC.rpc('publico_beta_entrar', { p_codigo: cod }).then(function (r) {
+            if (!r || !r.ok) throw new Error((r && r.erro) || 'Código inválido ou sem acesso.');
+            guardarBeta(r.token); $('#codigo').value = ''; entrou(r.nome);
+        }).catch(function (e) { $('#codigo-erro').textContent = e.message; }).then(function () { btn.disabled = false; });
+    });
+    $('#sair-beta').addEventListener('click', function () {
+        var t = betaToken(); limparBeta();
+        if (t) FC.rpc('publico_beta_sair', { p_token: t }).catch(function () {});
+        mostrarCodigo('');
+    });
+
+    /* ---- abas ---- */
+    var ABAS = ['missoes', 'destaque', 'recordes'];
+    function aba(n) {
+        ABAS.forEach(function (a) { $('#aba-' + a).hidden = a !== n; });
+        document.querySelectorAll('.q-abas button').forEach(function (b) { b.setAttribute('aria-selected', String(b.dataset.aba === n)); });
+    }
+    document.querySelectorAll('.q-abas button').forEach(function (b) { b.addEventListener('click', function () { aba(b.dataset.aba); }); });
+
+    /* ---- formulário de envio (vai para a fila de aprovação da equipe) ---- */
+    function formEnvio(box, o) {
+        box.replaceChildren();
+        var f = criar('form', 'q-form'); f.noValidate = true;
+        f.appendChild(criar('h3', null, o.titulo));
+        var campos = {};
+        o.campos.forEach(function (c) {
+            var d = criar('div', 'campo'), l = criar('label', null, c.label), i = criar(c.area ? 'textarea' : 'input');
+            if (!c.area) i.type = 'text';
+            i.maxLength = c.max; i.placeholder = c.ph || ''; i.autocomplete = 'off'; i.id = 'f-' + c.k; l.htmlFor = i.id;
+            d.appendChild(l); d.appendChild(i); f.appendChild(d); campos[c.k] = i;
+        });
+        var cd = criar('div', 'campo ciente'), lm = criar('label', 'marca'), ck = criar('input'); ck.type = 'checkbox';
+        lm.appendChild(ck); lm.appendChild(criar('span', null, 'Meu responsável sabe que estou enviando. Uso só apelido, sem dados pessoais.'));
+        cd.appendChild(lm); f.appendChild(cd);
+        var bt = criar('button', 'botao rosa', 'Enviar'); bt.type = 'submit'; f.appendChild(bt);
+        var msg = criar('p', 'erro geral'); msg.setAttribute('role', 'alert'); f.appendChild(msg);
+        f.addEventListener('submit', function (ev) {
+            ev.preventDefault(); msg.className = 'erro geral'; msg.textContent = '';
+            var v = {}; Object.keys(campos).forEach(function (k) { v[k] = campos[k].value.trim(); });
+            if (!v.apelido || v.apelido.length < 2) { msg.textContent = 'Coloque um apelido.'; return; }
+            if (!/^https:\/\//i.test(v.link || '')) { msg.textContent = 'Cole o link completo, começando com https://'; return; }
+            if (!ck.checked) { msg.textContent = 'Marque a caixinha para enviar.'; return; }
+            bt.disabled = true;
+            var args = { p_token: betaToken(), p_apelido: v.apelido, p_link: v.link, p_texto: v.texto || '' };
+            Object.keys(o.extra || {}).forEach(function (k) { args[k] = o.extra[k]; });
+            FC.rpc(o.rpc, args).then(function (r) {
+                if (r && r.ok === false) throw new Error(r.erro || 'Não deu certo.');
+                f.replaceChildren(criar('p', 'q-ok', 'Enviado! A equipe vai olhar antes de aparecer aqui. Valeu por participar!'));
+            }).catch(function (e) { msg.textContent = (e && e.message) || 'O envio ainda não está ligado. Avise a equipe.'; bt.disabled = false; });
+        });
+        box.appendChild(f); f.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    /* ---- missões ---- */
+    var TIPO = { video: 'Vídeo', thumb: 'Thumb', criatividade: 'Criatividade' };
+    var DEMO_M = [
+        { id: 0, titulo: 'Um vídeo em 15 segundos', descricao: 'Conte uma história inteira no PK XD em até 15 segundos.', tipo: 'video', plataforma: 'Shorts ou TikTok', pontos: 30 },
+        { id: 0, titulo: 'A thumb mais colorida', descricao: 'Crie uma thumb chamativa para um vídeo seu, com texto curto.', tipo: 'thumb', plataforma: 'YouTube', pontos: 20 },
+        { id: 0, titulo: 'Invente um personagem novo', descricao: 'Mostre um personagem criado por você, com nome e bordão.', tipo: 'criatividade', plataforma: 'Qualquer', pontos: 25 }
+    ];
+    function fmtPrazo(p) {
+        var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(p || ''); return m ? 'Até ' + m[3] + '/' + m[2] : 'Sem prazo';
+    }
+    function missoes() {
+        var lista = $('#m-lista'); lista.replaceChildren(); $('#m-aviso').replaceChildren();
+        FC.rpc('publico_quests').then(function (l) { return { l: l || [], demo: false }; }, function () { return { l: DEMO_M, demo: true }; }).then(function (r) {
+            if (r.demo) $('#m-aviso').appendChild(criar('p', 'q-aviso', 'Prévia: estas são missões de exemplo. As reais aparecem quando a equipe publicar.'));
+            if (!r.l.length) { lista.appendChild(criar('p', 'vazio', 'Nenhuma missão ativa agora. Fique de olho, vem novidade!')); return; }
+            r.l.forEach(function (m) {
+                var c = criar('article', 'q-card'), t = TIPO[m.tipo] ? m.tipo : 'criatividade';
+                c.appendChild(criar('span', 'q-tipo ' + t, TIPO[t]));
+                c.appendChild(criar('h3', null, m.titulo));
+                if (m.descricao) c.appendChild(criar('p', null, m.descricao));
+                c.appendChild(criar('p', 'q-meta', [fmtPrazo(m.prazo), m.plataforma, m.pontos ? nf(m.pontos) + ' pontos' : ''].filter(Boolean).join(' · ')));
+                var b = criar('button', 'botao rosa pequeno', 'Enviar missão'); b.type = 'button';
+                b.addEventListener('click', function () {
+                    formEnvio($('#m-form'), { titulo: 'Enviar: ' + m.titulo, rpc: 'publico_quest_enviar', extra: { p_quest: m.id || null }, campos: [
+                        { k: 'apelido', label: 'Seu apelido', max: 30 },
+                        { k: 'link', label: 'Link do vídeo, thumb ou ideia', max: 300, ph: 'https://...' },
+                        { k: 'texto', label: 'Quer contar algo? (opcional)', max: 300, area: true }] });
+                });
+                c.appendChild(b); lista.appendChild(c);
+            });
+        });
+    }
+
+    /* ---- Criador Destaque (mesmos dados do site) ---- */
+    function semana(ini) {
+        var m = /^(\d{4})-(\d{2})-(\d{2})/.exec(ini || ''); return m ? 'Semana de ' + m[3] + '/' + m[2] : '';
+    }
+    function cartaoDestaque(d, grande) {
+        var c = criar('div', grande ? 'q-dest' : 'q-card'), f = criar('div', 'q-foto');
+        if (/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(d.foto || '')) { var im = criar('img'); im.alt = 'Foto do canal ' + d.canal; im.src = d.foto; f.appendChild(im); }
+        else f.textContent = (d.nome || '?').trim().charAt(0).toUpperCase();
+        if (grande) c.appendChild(f);
+        var i = criar('div');
+        i.appendChild(criar(grande ? 'h3' : 'h3', null, (grande ? '\u2605 ' : '') + d.nome));
+        i.appendChild(criar('p', 'q-meta', [d.canal, semana(d.semana_inicio)].filter(Boolean).join(' · ')));
+        var cq = Array.isArray(d.conquistas) ? d.conquistas.filter(Boolean) : [];
+        if (cq.length) { var ul = criar('ul', 'q-selos'); cq.forEach(function (t) { var li = criar('li'); li.appendChild(criar('span', null, t)); ul.appendChild(li); }); i.appendChild(ul); }
+        if (grande && d.numeros) i.appendChild(criar('p', null, d.numeros));
+        if (grande && d.frase) i.appendChild(criar('p', null, d.frase));
+        if (/^https:\/\//i.test(d.link || '')) { var a = criar('a', 'botao rosa pequeno', 'Ver canal'); a.href = d.link; a.target = '_blank'; a.rel = 'noopener noreferrer'; i.appendChild(a); }
+        c.appendChild(i); return c;
+    }
+    function destaque() {
+        var box = $('#d-corpo'); box.replaceChildren();
+        FC.rpc('publico_destaques').then(function (l) {
+            l = l || [];
+            if (!l.length) { box.appendChild(criar('p', 'vazio', 'O primeiro Criador Destaque ainda vai ser escolhido. Cumpra missões e entre na disputa!')); return; }
+            box.appendChild(cartaoDestaque(l[0], true));
+            if (l.length > 1) {
+                box.appendChild(criar('h3', 'q-sub', 'Destaques anteriores'));
+                var g = criar('div', 'q-grade'); l.slice(1, 7).forEach(function (d) { g.appendChild(cartaoDestaque(d, false)); }); box.appendChild(g);
+            }
+        }).catch(function () { box.appendChild(criar('p', 'vazio', 'Não deu para carregar o destaque agora. Tente de novo mais tarde.')); });
+    }
+
+    /* ---- recordes ---- */
+    var DEMO_R = [{ apelido: 'Exemplo', canal: 'Canal de exemplo', titulo: 'Meu vídeo que viajou', vezes: 5.2, dica: 'Comecei já mostrando a parte mais engraçada.' }];
+    function recordes() {
+        var lista = $('#r-lista'); lista.replaceChildren(); $('#r-aviso').replaceChildren();
+        FC.rpc('publico_recordes').then(function (l) { return { l: l || [], demo: false }; }, function () { return { l: DEMO_R, demo: true }; }).then(function (r) {
+            if (r.demo) $('#r-aviso').appendChild(criar('p', 'q-aviso', 'Prévia: este é um recorde de exemplo. Os reais aparecem depois da aprovação da equipe.'));
+            if (!r.l.length) { lista.appendChild(criar('p', 'vazio', 'Ainda não tem recordes aqui. Que tal ser o primeiro?')); return; }
+            r.l.forEach(function (x) {
+                var c = criar('article', 'q-card');
+                if (x.vezes) c.appendChild(criar('span', 'q-tipo video', Number(x.vezes).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'x a média do canal'));
+                c.appendChild(criar('h3', null, x.titulo || 'Vídeo'));
+                c.appendChild(criar('p', 'q-meta', [x.apelido, x.canal, x.views ? nf(x.views) + ' views' : ''].filter(Boolean).join(' · ')));
+                if (x.dica) c.appendChild(criar('p', null, '\u201C' + x.dica + '\u201D'));
+                if (/^https:\/\//i.test(x.link || '')) { var a = criar('a', 'botao claro pequeno', 'Ver vídeo'); a.href = x.link; a.target = '_blank'; a.rel = 'noopener noreferrer'; c.appendChild(a); }
+                lista.appendChild(c);
+            });
+        });
+    }
+    $('#r-enviar').addEventListener('click', function () {
+        formEnvio($('#r-form'), { titulo: 'Enviar meu recorde', rpc: 'publico_recorde_enviar', campos: [
+            { k: 'apelido', label: 'Seu apelido', max: 30 },
+            { k: 'link', label: 'Link do vídeo que bombou', max: 300, ph: 'https://...' },
+            { k: 'texto', label: 'O que você acha que deu certo?', max: 300, area: true }] });
+    });
+
+    function entrou(nome) {
+        $('#q-intro').textContent = 'Quem quer aparecer no Criador Destaque? Bora cumprir missões!';
+        $('#ola').textContent = nome ? 'Olá, ' + nome + '!' : 'Boas-vindas aos Quests!';
+        $('#sair-beta').hidden = !nome;
+        aba('missoes'); vista('quests'); missoes(); destaque(); recordes();
+    }
+    sessao().then(function (r) { if (r.ok) entrou(r.nome); else mostrarCodigo(r.erro || ''); });
+})();
+</script>
+</body>
+</html>
