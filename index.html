@@ -451,7 +451,7 @@ dialog#player.vertical .player-caixa { aspect-ratio: 9 / 16; height: min(78vh, 7
 </div>
 <script>
 (function () {
-    var ligado = true;   /* mude para false para reabrir o site */
+    var ligado = false;   /* mude para false para reabrir o site */
     var el = document.getElementById('manutencao');
     if (!ligado) { el.parentNode.removeChild(el); return; }
     function travar() {
