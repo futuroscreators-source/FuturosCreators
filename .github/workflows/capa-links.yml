@@ -1,0 +1,93 @@
+# Coloca a capa (capa.jpg) na pré-visualização do link de TODAS as páginas (WhatsApp, Instagram, Facebook, Telegram, X...).
+# Só adiciona informações invisíveis no <head>. Pode rodar de novo quando trocar a capa.
+# Como usar: Actions > "Capa dos links" > Run workflow.
+name: Capa dos links
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  capa:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Colocar a capa nas páginas
+        run: |
+          python3 - <<'PY'
+          import re, html, pathlib
+
+          SITE = 'https://futuroscreators.site'
+          IMG = SITE + '/capa.jpg'
+          IGNORAR = {'.git', '.github', 'node_modules'}
+          PULAR = {'404.html', 'admin.html'}     # 404 e painel de admin ficam sem capa
+          BLOCO = re.compile(r'<!--capa-inicio-->.*?<!--capa-fim-->[ \t]*\n?', re.S)
+          ANTIGAS = re.compile(r'[ \t]*<meta\s+(?:property|name)="(?:og|twitter):[^"]*"[^>]*>[ \t]*\n?', re.I)
+          CHARSET = re.compile(r'<meta\s+charset[^>]*>', re.I)
+          HEAD = re.compile(r'<head[^>]*>', re.I)
+
+          def pega(t, padrao):
+              m = re.search(padrao, t, re.I | re.S)
+              return html.unescape(m.group(1)).strip() if m else ''
+
+          def esc(s):
+              return html.escape(s, quote=True)
+
+          feitos = []
+          for f in sorted(pathlib.Path('.').rglob('*.html')):
+              if IGNORAR & set(f.parts) or f.name in PULAR:
+                  continue
+              t = f.read_text(encoding='utf-8')
+              titulo = (pega(t, r'<meta\s+property="og:title"\s+content="([^"]*)"')
+                        or pega(t, r'<title>(.*?)</title>') or 'Futuros Creators')
+              desc = (pega(t, r'<meta\s+property="og:description"\s+content="([^"]*)"')
+                      or pega(t, r'<meta\s+name="description"\s+content="([^"]*)"')
+                      or 'Comunidade de criadores de conteúdo.')
+              titulo, desc = titulo[:90], desc[:200]
+              novo = BLOCO.sub('', t)
+              novo = ANTIGAS.sub('', novo)
+              bloco = '\n'.join([
+                  '<!--capa-inicio-->',
+                  '<meta property="og:type" content="website">',
+                  '<meta property="og:site_name" content="Futuros Creators">',
+                  '<meta property="og:locale" content="pt_BR">',
+                  f'<meta property="og:title" content="{esc(titulo)}">',
+                  f'<meta property="og:description" content="{esc(desc)}">',
+                  f'<meta property="og:image" content="{IMG}">',
+                  '<meta property="og:image:type" content="image/jpeg">',
+                  '<meta property="og:image:width" content="1200">',
+                  '<meta property="og:image:height" content="630">',
+                  '<meta property="og:image:alt" content="Futuros Creators: comunidade de criadores de conteúdo">',
+                  '<meta name="twitter:card" content="summary_large_image">',
+                  f'<meta name="twitter:title" content="{esc(titulo)}">',
+                  f'<meta name="twitter:description" content="{esc(desc)}">',
+                  f'<meta name="twitter:image" content="{IMG}">',
+                  '<!--capa-fim-->'])
+              m = CHARSET.search(novo) or HEAD.search(novo)
+              if not m:
+                  continue
+              novo = novo[:m.end()] + '\n' + bloco + novo[m.end():]
+              if novo != t:
+                  f.write_text(novo, encoding='utf-8')
+                  feitos.append(str(f))
+
+          print('Páginas com a capa:', len(feitos))
+          for f in feitos: print('  -', f)
+          if not pathlib.Path('capa.jpg').exists():
+              print('\nATENÇÃO: não existe capa.jpg na raiz do repositório. Suba o capa.jpg, senão a imagem não aparece.')
+          PY
+
+      - name: Salvar as mudanças
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "Coloca a capa na pré-visualização dos links"
+            git push
+          else
+            echo "Nada para mudar."
+          fi
