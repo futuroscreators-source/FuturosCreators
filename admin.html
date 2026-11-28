@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
+<script data-sem-html>(function(){var l=location;if(!/(^|\.)futuroscreators\.site$/.test(l.hostname)||!/\.html$/i.test(l.pathname))return;var n=l.pathname.replace(/(^|\/)index\.html$/i,'$1').replace(/\.html$/i,'');l.replace((n||'/')+l.search+l.hash);})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
@@ -165,7 +166,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
         <div class="grupo">
             <span class="online" role="status"><i aria-hidden="true"></i><span id="online-texto">Admins online: ...</span></span>
             <span class="eu"><span id="eu-nome"></span><span class="lider-selo" id="eu-lider" hidden>líder</span></span>
-            <a class="btn" href="index.html" target="_blank" rel="noopener">Ver o site</a>
+            <a class="btn" href="./" target="_blank" rel="noopener">Ver o site</a>
             <button type="button" id="btn-sair">Sair</button>
         </div>
     </header>
@@ -331,7 +332,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 
         <section id="tab-quests" hidden>
             <h2>Futuros Quests</h2>
-            <p>Publique missões, aprove os envios e veja quem está na frente para o Criador Destaque. A página dos criadores é a <strong>quests.html</strong>. Nada aparece lá sem a sua aprovação.</p>
+            <p>Publique missões, aprove os envios e veja quem está na frente para o Criador Destaque. A página dos criadores é a <strong>/quests</strong>. Nada aparece lá sem a sua aprovação.</p>
             <h3>Missões</h3>
             <form class="form-caixa" id="form-quest" novalidate>
                 <div><label for="q-titulo">Título da missão</label><input id="q-titulo" type="text" maxlength="80" autocomplete="off"></div>
@@ -449,7 +450,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 
         <section id="tab-beta" hidden>
             <h2>Acesso ao Beta</h2>
-            <p>Só líderes veem esta aba. Com o beta <strong>fechado</strong>, o <strong>beta.html</strong> só abre para quem tem um código. Com ele <strong>aberto</strong>, qualquer pessoa com o link entra sem código. Os códigos abaixo continuam guardados e voltam a valer quando você fechar de novo. Cada código aparece <strong>uma única vez</strong>, na hora em que é criado.</p>
+            <p>Só líderes veem esta aba. Com o beta <strong>fechado</strong>, o <strong>/beta</strong> só abre para quem tem um código. Com ele <strong>aberto</strong>, qualquer pessoa com o link entra sem código. Os códigos abaixo continuam guardados e voltam a valer quando você fechar de novo. Cada código aparece <strong>uma única vez</strong>, na hora em que é criado.</p>
             <div class="b-estado" id="b-estado">
                 <strong id="b-estado-txt">Carregando...</strong>
                 <p id="b-estado-desc"></p>
@@ -1120,7 +1121,7 @@ input[type=date]::-webkit-date-and-time-value { text-align: left; min-height: 1.
 
     /* ---------- Acesso ao Beta (só líderes) ---------- */
     S.beta = []; S.codigoNovo = null;
-    function linkBeta() { return location.origin + location.pathname.replace(/[^\/]*$/, '') + 'beta.html'; }
+    function linkBeta() { return location.origin + location.pathname.replace(/[^\/]*$/, '') + 'beta'; }
     function carregarBeta() {
         carregarEstadoBeta();
         return chamar('admin_beta_listar').then(function (l) { S.beta = l || []; desenharBeta(); })

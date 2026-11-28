@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
+<script data-sem-html>(function(){var l=location;if(!/(^|\.)futuroscreators\.site$/.test(l.hostname)||!/\.html$/i.test(l.pathname))return;var n=l.pathname.replace(/(^|\/)index\.html$/i,'$1').replace(/\.html$/i,'');l.replace((n||'/')+l.search+l.hash);})();</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
@@ -244,7 +245,7 @@ a { color: inherit; }
 </div>
 <script>
 (function () {
-    var ligado = false;   /* mude para false para reabrir o site */
+    var ligado = true;   /* mude para false para reabrir o site */
     var el = document.getElementById('manutencao');
     if (!ligado) { el.parentNode.removeChild(el); return; }
     function travar() {
@@ -259,7 +260,7 @@ a { color: inherit; }
 
 <header class="fb-topo">
     <nav class="menu" aria-label="Principal">
-        <a href="index.html">&larr; Voltar para o site</a>
+        <a href="./">&larr; Voltar para o site</a>
     </nav>
 </header>
 
@@ -372,7 +373,7 @@ a { color: inherit; }
                 <p class="ranking-ok" id="ranking-aviso" hidden></p>
                 <div class="botoes-res">
                     <button type="button" class="botao claro" id="de-novo">Calcular de novo</button>
-                    <a class="botao rosa" href="index.html">Voltar ao site</a>
+                    <a class="botao rosa" href="./">Voltar ao site</a>
                 </div>
             </div>
 
@@ -776,7 +777,7 @@ a { color: inherit; }
         var av = $('#ranking-aviso'); av.replaceChildren(); av.hidden = true;
         if (r.ranking === 'salvo') {
             av.appendChild(document.createTextNode('Você está no ranking! '));
-            var lk = criar('a', null, 'Ver o ranking no site'); lk.href = 'index.html#ranking'; av.appendChild(lk);
+            var lk = criar('a', null, 'Ver o ranking no site'); lk.href = './#ranking'; av.appendChild(lk);
             av.hidden = false;
         } else if (r.ranking === 'removido') {
             av.textContent = 'Seus dados foram removidos do ranking, como você pediu.'; av.hidden = false;
