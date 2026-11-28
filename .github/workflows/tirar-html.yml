@@ -1,0 +1,74 @@
+# Tira o ".html" dos links internos de TODAS as páginas do repositório, de uma vez.
+# Como usar: Actions > "Tirar .html dos links" > Run workflow.
+name: Tirar .html dos links
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  limpar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reescrever os links
+        run: |
+          python3 - <<'PY'
+          import re, pathlib
+
+          IGNORAR = {'.git', '.github', 'node_modules'}
+          EXTERNO = ('http:', 'https:', '//', 'mailto:', 'tel:', 'javascript:', 'data:', 'sms:', 'whatsapp:', '#')
+          HREF = re.compile(r'''(\bhref\s*=\s*)(["'])([^"'\n]*)\2''')
+
+          def limpar(v):
+              if not v or v.lower().startswith(EXTERNO):
+                  return v
+              m = re.match(r'^([^?#]*)([?#].*)?$', v, re.S)
+              caminho, resto = m.group(1), m.group(2) or ''
+              if not caminho.lower().endswith('.html'):
+                  return v
+              base = caminho[:-5]
+              if base == 'index' or base.endswith('/index'):
+                  base = base[:-5]
+                  if base == '':
+                      base = './'
+              if base == '':
+                  return v
+              return base + resto
+
+          def troca(m):
+              return m.group(1) + m.group(2) + limpar(m.group(3)) + m.group(2)
+
+          mudou, sobrou = [], []
+          for f in sorted(pathlib.Path('.').rglob('*.html')):
+              if IGNORAR & set(f.parts):
+                  continue
+              t = f.read_text(encoding='utf-8')
+              novo = HREF.sub(troca, t)
+              if novo != t:
+                  f.write_text(novo, encoding='utf-8')
+                  mudou.append(str(f))
+              for x in re.findall(r'''["'/][\w./-]*\.html\b[^"'\s<]*''', novo):
+                  sobrou.append(f'{f}: {x}')
+
+          print('Arquivos alterados:', len(mudou))
+          for f in mudou: print('  -', f)
+          if sobrou:
+              print('\nAinda aparece ".html" nestes lugares (confira à mão, pode ser link completo, texto ou código):')
+              for x in sobrou: print('  ', x)
+          PY
+
+      - name: Salvar as mudanças
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "Tira o .html dos links internos"
+            git push
+          else
+            echo "Nada para mudar."
+          fi
